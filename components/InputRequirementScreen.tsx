@@ -16,8 +16,10 @@ import {
   Image as ImageIcon,
   Volume2,
   VolumeX,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
-import { useVoiceActivityDetection } from "../hooks/useVoiceActivityDetection";
+import { useSpeechToText } from "../hooks/useSpeechToText";
 
 interface InputRequirementScreenProps {
   mode: "text" | "speech" | "upload";
@@ -33,62 +35,46 @@ export function InputRequirementScreen({
   initialRequirements = "",
 }: InputRequirementScreenProps) {
   const [input, setInput] = useState(initialRequirements);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const timerRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  // Voice Activity Detection hook
-  const vad = useVoiceActivityDetection(isRecording, {
-    threshold: 25, // Lower threshold for more sensitive detection
-    silenceDuration: 1500, // 1.5 seconds of silence before stopping
-    minSpeechDuration: 300, // Minimum 300ms of speech
+  // Speech-to-Text hook with integrated VAD
+  const speechToText = useSpeechToText({
+    language: "en",
     sampleRate: 16000,
-    fftSize: 512,
+    chunkDuration: 1000,
+    apiEndpoint: "/api/speech-to-text",
+    useWebSocket: false,
+    vadThreshold: 25,
+    vadSilenceDuration: 1500,
+    vadMinSpeechDuration: 300,
+    autoStart: false,
+    autoStop: true,
+    maxRecordingDuration: 300000, // 5 minutes max
   });
 
+  // Update input when transcription changes
   useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
+    if (speechToText.totalText) {
+      setInput(speechToText.totalText);
+    }
+  }, [speechToText.totalText]);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+  const formatTime = (milliseconds: number) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      setRecordingTime(0);
-      vad.reset(); // Reset VAD state
+  const toggleRecording = async () => {
+    if (speechToText.isRecording) {
+      speechToText.stopRecording();
     } else {
-      setIsRecording(true);
-      setRecordingTime(0);
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-
-      // Simulate speech-to-text after 3 seconds for demo
-      setTimeout(() => {
-        if (isRecording) {
-          setInput(
-            "Create a travel insurance quote and buy journey with trip details, traveler information, and coverage selection"
-          );
-        }
-      }, 3000);
+      await speechToText.startRecording();
     }
   };
 
@@ -249,19 +235,22 @@ export function InputRequirementScreen({
                       <div className='relative'>
                         <button
                           onClick={toggleRecording}
+                          disabled={speechToText.isProcessing}
                           className={`h-24 w-24 rounded-full flex items-center justify-center transition-all ${
-                            isRecording
-                              ? vad.isSpeaking
+                            speechToText.isRecording
+                              ? speechToText.vad.isSpeaking
                                 ? "bg-success/10 border-4 border-success animate-pulse"
                                 : "bg-destructive/10 border-4 border-destructive"
-                              : "bg-purple hover:bg-purple/90 border-4 border-purple/20"
+                              : "bg-purple hover:bg-purple/90 border-4 border-purple/20 disabled:opacity-50"
                           }`}
                           aria-label={
-                            isRecording ? "Stop recording" : "Start recording"
+                            speechToText.isRecording
+                              ? "Stop recording"
+                              : "Start recording"
                           }
-                          aria-pressed={isRecording}
+                          aria-pressed={speechToText.isRecording}
                         >
-                          {isRecording ? (
+                          {speechToText.isRecording ? (
                             <MicOff
                               className='h-12 w-12 text-destructive'
                               aria-hidden='true'
@@ -273,35 +262,123 @@ export function InputRequirementScreen({
                             />
                           )}
                         </button>
+
+                        {/* Voice Activity & Connection Indicators */}
+                        {speechToText.isRecording &&
+                          speechToText.vad.isActive && (
+                            <div className='absolute -bottom-2 -right-2'>
+                              <div
+                                className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                                  speechToText.vad.isSpeaking
+                                    ? "bg-success"
+                                    : "bg-muted"
+                                }`}
+                              >
+                                {speechToText.vad.isSpeaking ? (
+                                  <Volume2 className='h-4 w-4 text-success-foreground' />
+                                ) : (
+                                  <VolumeX className='h-4 w-4 text-muted-foreground' />
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                        {/* Connection Status */}
+                        {speechToText.isRecording && (
+                          <div className='absolute -top-2 -left-2'>
+                            <div
+                              className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                                speechToText.isConnected
+                                  ? "bg-success"
+                                  : "bg-destructive"
+                              }`}
+                            >
+                              {speechToText.isConnected ? (
+                                <Wifi className='h-4 w-4 text-success-foreground' />
+                              ) : (
+                                <WifiOff className='h-4 w-4 text-destructive-foreground' />
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <p className='text-foreground mt-4'>
-                        {isRecording
-                          ? `Recording... ${formatTime(recordingTime)}`
+                        {speechToText.isProcessing
+                          ? "Processing..."
+                          : speechToText.isRecording
+                          ? `Recording... ${formatTime(
+                              speechToText.recordingDuration
+                            )}`
                           : "Click to start recording"}
                       </p>
 
                       <div className='flex flex-wrap gap-2 mt-2 justify-center'>
-                        {isRecording && (
+                        {speechToText.isRecording && (
                           <Badge className='bg-destructive text-destructive-foreground rounded-[var(--radius-pill)]'>
                             Live
                           </Badge>
                         )}
-                        {vad.error && (
+                        {speechToText.vad.isSpeaking && (
+                          <Badge className='bg-success text-success-foreground rounded-[var(--radius-pill)]'>
+                            Speaking
+                          </Badge>
+                        )}
+                        {speechToText.isProcessing && (
+                          <Badge className='bg-primary text-primary-foreground rounded-[var(--radius-pill)]'>
+                            Processing
+                          </Badge>
+                        )}
+                        {speechToText.isConnected &&
+                          speechToText.isRecording && (
+                            <Badge className='bg-success text-success-foreground rounded-[var(--radius-pill)]'>
+                              Connected
+                            </Badge>
+                          )}
+                        {speechToText.error && (
                           <Badge className='bg-destructive text-destructive-foreground rounded-[var(--radius-pill)]'>
-                            Mic Error
+                            Error
                           </Badge>
                         )}
                       </div>
 
+                      {/* Volume Level Indicator */}
+                      {speechToText.isRecording &&
+                        speechToText.vad.isActive && (
+                          <div className='mt-3 w-32'>
+                            <div className='flex justify-between text-xs text-muted-foreground mb-1'>
+                              <span>Volume</span>
+                              <span>{speechToText.vad.volume}%</span>
+                            </div>
+                            <div className='w-full bg-muted rounded-full h-2'>
+                              <div
+                                className={`h-2 rounded-full transition-all duration-150 ${
+                                  speechToText.vad.volume >
+                                  speechToText.vad.getThreshold()
+                                    ? "bg-success"
+                                    : "bg-muted-foreground"
+                                }`}
+                                style={{
+                                  width: `${Math.min(
+                                    speechToText.vad.volume,
+                                    100
+                                  )}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
                       {/* Speech Duration */}
-                      {vad.isSpeaking && vad.duration > 0 && (
-                        <div className='mt-2'>
-                          <Badge className='bg-primary text-primary-foreground rounded-[var(--radius-pill)]'>
-                            Speech: {(vad.duration / 1000).toFixed(1)}s
-                          </Badge>
-                        </div>
-                      )}
+                      {speechToText.vad.isSpeaking &&
+                        speechToText.vad.duration > 0 && (
+                          <div className='mt-2'>
+                            <Badge className='bg-primary text-primary-foreground rounded-[var(--radius-pill)]'>
+                              Speech:{" "}
+                              {(speechToText.vad.duration / 1000).toFixed(1)}s
+                            </Badge>
+                          </div>
+                        )}
                     </div>
 
                     {/* Live Preview */}
@@ -310,35 +387,74 @@ export function InputRequirementScreen({
                         <label className='text-foreground'>
                           Live Transcription
                         </label>
-                        {vad.error && (
-                          <Badge className='bg-destructive text-destructive-foreground rounded-[var(--radius-pill)]'>
-                            {vad.error}
-                          </Badge>
-                        )}
+                        <div className='flex gap-2'>
+                          {speechToText.partialTranscription && (
+                            <Badge className='bg-primary/20 text-primary rounded-[var(--radius-pill)]'>
+                              Partial
+                            </Badge>
+                          )}
+                          {speechToText.error && (
+                            <Badge className='bg-destructive text-destructive-foreground rounded-[var(--radius-pill)]'>
+                              API Error
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <div className='min-h-[200px] p-4 bg-input-background border border-border rounded-[var(--radius-input)]'>
-                        {vad.error ? (
+                        {speechToText.error ? (
                           <div className='text-destructive'>
-                            <p className='font-medium'>
-                              Microphone Access Error
-                            </p>
-                            <p className='text-sm mt-1'>{vad.error}</p>
+                            <p className='font-medium'>Speech-to-Text Error</p>
+                            <p className='text-sm mt-1'>{speechToText.error}</p>
                             <p className='text-sm mt-2 text-muted-foreground'>
-                              Please ensure microphone permissions are granted
-                              and try again.
+                              Please check your internet connection and try
+                              again.
                             </p>
                           </div>
                         ) : (
-                          <p className='text-foreground whitespace-pre-wrap'>
-                            {input ||
-                              (isRecording && vad.isActive
-                                ? vad.isSpeaking
-                                  ? "Listening... speak now"
-                                  : "Ready to listen..."
-                                : "Your speech will appear here...")}
-                          </p>
+                          <div className='space-y-2'>
+                            {/* Final Transcription */}
+                            {speechToText.transcription && (
+                              <p className='text-foreground whitespace-pre-wrap'>
+                                {speechToText.transcription}
+                              </p>
+                            )}
+
+                            {/* Partial Transcription */}
+                            {speechToText.partialTranscription && (
+                              <p className='text-muted-foreground italic whitespace-pre-wrap'>
+                                {speechToText.partialTranscription}...
+                              </p>
+                            )}
+
+                            {/* Status Messages */}
+                            {!speechToText.transcription &&
+                              !speechToText.partialTranscription && (
+                                <p className='text-muted-foreground'>
+                                  {speechToText.isRecording &&
+                                  speechToText.vad.isActive
+                                    ? speechToText.vad.isSpeaking
+                                      ? "Listening... speak now"
+                                      : "Ready to listen..."
+                                    : "Your speech will appear here..."}
+                                </p>
+                              )}
+                          </div>
                         )}
                       </div>
+
+                      {/* Transcription Actions */}
+                      {speechToText.hasText && (
+                        <div className='flex gap-2 justify-end'>
+                          <Button
+                            onClick={speechToText.clearTranscription}
+                            size='sm'
+                            variant='outline'
+                            className='border border-border rounded-[var(--radius-button)] hover:border-primary hover:bg-primary/5'
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
