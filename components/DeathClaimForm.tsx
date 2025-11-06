@@ -13,6 +13,7 @@ import {
 } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { Badge } from "./ui/badge";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 import {
   Check,
   ChevronLeft,
@@ -44,7 +45,6 @@ import {
   type AssessmentResult,
 } from "../utils/deathClaimData";
 import { toast } from "sonner";
-import shieldIcon from "../assets/f30a427caa35ad0fa445dabc8cfd7cc348ad34f1.png";
 
 interface DeathClaimFormProps {
   showStepper?: boolean;
@@ -79,7 +79,7 @@ interface FormData {
   notes: string;
 }
 
-export function DeathClaimForm({
+const DeathClaimFormComponent = ({
   showStepper = true,
   stepperType = "numbers",
   borderRadius = "rounded",
@@ -89,7 +89,7 @@ export function DeathClaimForm({
   template = "simple",
   themeColors,
   onFormDataChange,
-}: DeathClaimFormProps) {
+}: DeathClaimFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [claimId, setClaimId] = useState("");
@@ -148,7 +148,7 @@ export function DeathClaimForm({
       });
       return () => subscription.unsubscribe();
     }
-  }, [watch, onFormDataChange]);
+  }, []); // Empty dependency array - watch and onFormDataChange are stable references
 
   const steps = ["Claim Details", "Documents", "Assessment", "Payment"];
 
@@ -1275,23 +1275,54 @@ export function DeathClaimForm({
                       handleAssessmentAnswer(question.id, value)
                     }
                   >
-                    {question.options.map((option) => (
-                      <div
-                        key={option.value}
-                        className='flex items-center space-x-2'
-                      >
-                        <RadioGroupItem
-                          value={option.value}
-                          id={`${question.id}-${option.value}`}
-                        />
-                        <Label
-                          htmlFor={`${question.id}-${option.value}`}
-                          className='text-foreground cursor-pointer'
-                        >
-                          {option.label}
-                        </Label>
-                      </div>
-                    ))}
+                    <div className='flex gap-3'>
+                      {question.options.map((option) => {
+                        const isSelected =
+                          assessmentAnswers[question.id] === option.value;
+                        return (
+                          <label
+                            key={option.value}
+                            htmlFor={`${question.id}-${option.value}`}
+                            className='relative flex items-center justify-center p-4 border cursor-pointer transition-all flex-1'
+                            style={{
+                              borderRadius: getInputBorderRadius(),
+                              borderColor: isSelected
+                                ? themeColors?.[0]
+                                  ? "var(--theme-primary)"
+                                  : "var(--accent)"
+                                : "var(--border)",
+                              backgroundColor: isSelected
+                                ? themeColors?.[0]
+                                  ? "rgba(var(--theme-primary-rgb), 0.05)"
+                                  : "var(--accent-background)"
+                                : "var(--card)",
+                              borderWidth: isSelected ? "2px" : "1px",
+                            }}
+                          >
+                            <RadioGroupItem
+                              value={option.value}
+                              id={`${question.id}-${option.value}`}
+                              className='sr-only'
+                            />
+                            <span className='text-foreground'>
+                              {option.label}
+                            </span>
+                            {isSelected && (
+                              <CheckCircle2
+                                className='flex-shrink-0 ml-2'
+                                style={{
+                                  width: "20px",
+                                  height: "20px",
+                                  color: themeColors?.[0]
+                                    ? "var(--theme-primary)"
+                                    : "var(--accent)",
+                                }}
+                              />
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
                   </RadioGroup>
                 )}
 
@@ -1701,13 +1732,12 @@ export function DeathClaimForm({
             </div>
 
             {/* Main Content */}
-            <div className='relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 max-w-3xl mx-auto'>
+            <div className='relative z-10 flex flex-col md:flex-row items-center justify-center md:justify-start gap-6 max-w-5xl mx-auto w-full'>
               {/* Icon */}
-              <div className='relative flex-shrink-0'>
-                <img
-                  src={shieldIcon as any}
-                  alt='Shield'
-                  className='w-24 h-24'
+              <div className='relative flex-shrink-0 w-24 h-24 flex items-center justify-center rounded-full bg-[rgba(241,245,249,0)]'>
+                <Shield
+                  className='w-12 h-12'
+                  style={{ color: themeColors?.[0] || "var(--primary)" }}
                 />
               </div>
 
@@ -1869,4 +1899,7 @@ export function DeathClaimForm({
       </div>
     </div>
   );
-}
+};
+
+// Memoize component to prevent unnecessary re-renders
+export const DeathClaimForm = React.memo(DeathClaimFormComponent);

@@ -67,18 +67,16 @@ export function FormRenderer({
     setValue,
   } = useForm();
 
-  const formData = watch();
-  const formDataRef = React.useRef<string>('');
-
+  // Use watch subscription instead of watching all fields to prevent re-renders
   React.useEffect(() => {
-    if (onFormDataChange) {
-      const serialized = JSON.stringify(formData);
-      if (serialized !== formDataRef.current) {
-        formDataRef.current = serialized;
-        onFormDataChange(formData);
-      }
-    }
-  }, [formData, onFormDataChange]);
+    if (!onFormDataChange) return;
+
+    const subscription = watch((formData) => {
+      onFormDataChange(formData);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []); // Empty dependency array - watch and onFormDataChange are stable references
 
   if (!schema) {
     return (

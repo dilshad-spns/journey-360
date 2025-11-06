@@ -2,15 +2,15 @@
 
 AI-powered system that transforms user stories and speech input into complete, production-ready forms with UI, data bindings, mock APIs, validations, and unit tests.
 
-> **📚 First Time Setup?** Run `npm run reorganize-docs` to organize all documentation into the `/docs` folder for better structure.
+> **First Time Setup?** Run `npm run reorganize-docs` to organize all documentation into the `/docs` folder for better structure.
 
-## 🚀 Quick Links
+## Quick Links
 
-- **🎯 [Try Live Demo Forms](http://localhost:3000)** - Explore embeddable journeys
-- **📱 [Travel Insurance Embed](http://localhost:3000/embed/travel)** - 4-step travel form
-- **🚗 [Death Claim Embed](http://localhost:3000/embed/motor)** - 4-step claim form
-- **💻 [Integration Demo](http://localhost:3000/demo-integration)** - Live preview with data monitoring
-- **📝 [Code Examples](http://localhost:3000/embed)** - Copy-paste integration code
+- **[Try Live Demo Forms](http://localhost:3000)** - Explore embeddable journeys
+- **[Travel Insurance Embed](http://localhost:3000/embed/travel)** - 4-step travel form
+- **[Death Claim Embed](http://localhost:3000/embed/motor)** - 4-step claim form
+- **[Integration Demo](http://localhost:3000/demo-integration)** - Live preview with data monitoring
+- **[Code Examples](http://localhost:3000/embed)** - Copy-paste integration code
 
 ## Overview
 
@@ -18,14 +18,14 @@ Journey 360 is an 8-layer AI form generation system built with React, TypeScript
 
 ### Key Features
 
-- 🎤 **Multiple Input Methods**: Text, speech recognition, or file upload
-- 🤖 **AI-Powered Generation**: Converts natural language to form schemas
-- 🎨 **Design System Integration**: Uses CSS variables for complete customization
-- 📝 **8 Integrated Layers**: Input → Schema → UI → Bindings → Validation → API → Tests → Deployment
-- 🎯 **Production-Ready**: Generates deployable forms with validations and tests
-- 🌓 **Dark Mode**: Full theme support with persistence
-- ♿ **Accessible**: WCAG-compliant components
-- 📱 **Responsive**: Mobile-first design
+- **Multiple Input Methods**: Text, speech recognition, or file upload
+- **AI-Powered Generation**: Converts natural language to form schemas
+- **Design System Integration**: Uses CSS variables for complete customization
+- **8 Integrated Layers**: Input → Schema → UI → Bindings → Validation → API → Tests → Deployment
+- **Production-Ready**: Generates deployable forms with validations and tests
+- **Dark Mode**: Full theme support with persistence
+- **Accessible**: WCAG-compliant components
+- **Responsive**: Mobile-first design
 
 ### Mock Scenarios Included
 
@@ -184,7 +184,7 @@ npm run prepare-build    # Fix imports before build
 - 3 border radius styles: Sharp, Rounded, Pill
 - Responsive and accessible
 
-### Embeddable Forms ✨
+### Embeddable Forms
 - **Travel Insurance Journey**: `/embed/travel` - 4-step travel insurance form
 - **Death Claim Journey**: `/embed/motor` - 4-step claim submission form
 - **Integration Demo**: `/demo-integration` - Live preview with data monitoring
@@ -258,7 +258,7 @@ See [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) for more details.
 - [Stepper Types Guide](./docs/STEPPER_TYPES_GUIDE.md) - Form stepper options
 - [Mock Scenarios](./docs/MOCK_SCENARIO_SUMMARY.md) - Sample forms included
 
-**[📚 View All Documentation →](./docs/)**
+**[View All Documentation →](./docs/)**
 
 ## Contributing
 
@@ -270,4 +270,4 @@ Proprietary - Internal Use Only
 
 ---
 
-**Built with ❤️ for Journey 360 Team**
+**Built with care for Journey 360 Team**

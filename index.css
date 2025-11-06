@@ -84,7 +84,6 @@
     --color-green-600: oklch(.627 .194 149.214);
     --color-blue-500: oklch(.623 .214 259.815);
     --color-blue-600: oklch(.546 .245 262.881);
-    --color-gray-100: oklch(.967 .003 264.542);
     --color-black: #000;
     --color-white: #fff;
     --spacing: .25rem;
@@ -944,10 +943,6 @@
 
   .inline {
     display: inline;
-  }
-
-  .inline-block {
-    display: inline-block;
   }
 
   .inline-flex {
@@ -2104,6 +2099,10 @@
     background-color: #24242400;
   }
 
+  .bg-\[rgba\(241\,245\,249\,0\)\] {
+    background-color: #f1f5f900;
+  }
+
   .bg-\[rgba\(255\,255\,255\,0\)\] {
     background-color: #fff0;
   }
@@ -2250,10 +2249,6 @@
     .bg-destructive\/20 {
       background-color: color-mix(in oklab, var(--destructive) 20%, transparent);
     }
-  }
-
-  .bg-gray-100 {
-    background-color: var(--color-gray-100);
   }
 
   .bg-green-500\/10 {
@@ -2440,6 +2435,10 @@
 
   .bg-warning {
     background-color: var(--warning);
+  }
+
+  .bg-white {
+    background-color: var(--color-white);
   }
 
   .bg-yellow-500\/10 {
@@ -2755,10 +2754,6 @@
     fill: var(--primary);
   }
 
-  .object-contain {
-    object-fit: contain;
-  }
-
   .p-0 {
     padding: calc(var(--spacing) * 0);
   }
@@ -2957,10 +2952,6 @@
 
   .text-left {
     text-align: left;
-  }
-
-  .align-middle {
-    vertical-align: middle;
   }
 
   .font-\[\'Inter\:Semi_Bold\'\,sans-serif\] {
@@ -4418,6 +4409,12 @@
   @media (width >= 48rem) {
     .md\:flex-row {
       flex-direction: row;
+    }
+  }
+
+  @media (width >= 48rem) {
+    .md\:justify-start {
+      justify-content: flex-start;
     }
   }
 

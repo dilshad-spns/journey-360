@@ -6,7 +6,7 @@ All notable changes to the AI 360 - Auto-Build Deployable Journeys project.
 
 ## [1.1.0] - 2025-11-04
 
-### 🚀 Major Update: Next.js Migration
+### Major Update: Next.js Migration
 
 Migrated the entire project to Next.js 15 for production-ready local development and deployment capabilities.
 
@@ -59,15 +59,15 @@ Migrated the entire project to Next.js 15 for production-ready local development
 - **Node.js Required**: 18.0.0+
 
 #### Preserved Features
-✅ All existing features remain unchanged
-✅ UI/UX exactly the same
-✅ Travel Insurance mock scenario
-✅ Three-page application flow
-✅ Form editor with 3-panel layout
-✅ Dark mode support
-✅ Speech recognition
-✅ All configuration options
-✅ Design system variables
+- All existing features remain unchanged
+- UI/UX exactly the same
+- Travel Insurance mock scenario
+- Three-page application flow
+- Form editor with 3-panel layout
+- Dark mode support
+- Speech recognition
+- All configuration options
+- Design system variables
 
 #### Commands
 ```bash
@@ -82,7 +82,7 @@ npm run lint       # Run ESLint
 
 ## [1.0.2] - 2025-11-04
 
-### 🎯 Major Feature: Travel Insurance Mock Scenario
+### Major Feature: Travel Insurance Mock Scenario
 
 Implemented a comprehensive Travel Insurance Quote & Buy journey as a permanent mock scenario. **The system now always generates this specific journey regardless of user input**, demonstrating the full capability of the AI 360 platform.
 
@@ -147,7 +147,7 @@ Implemented a comprehensive Travel Insurance Quote & Buy journey as a permanent 
 - Policy issuance workflow tests
 - Wizard navigation logic tests
 
-### 📚 Documentation
+### Documentation
 
 #### New Documentation Files
 - `TRAVEL_INSURANCE_MOCK.md` - Comprehensive 500+ line documentation covering:
@@ -170,7 +170,7 @@ Implemented a comprehensive Travel Insurance Quote & Buy journey as a permanent 
 - `CHANGELOG.md` - Added mock scenario section and v1.0.2 details
 - `VERSION_SNAPSHOT.md` - Added mock scenario warning and version bump
 
-### 🎨 Design Enhancements
+### Design Enhancements
 
 All components use the Sapiens design system:
 - Wizard progress indicators with accent color
@@ -179,7 +179,7 @@ All components use the Sapiens design system:
 - Responsive layout for all viewports
 - Clear visual hierarchy
 
-### 💡 Usage Notes
+### Usage Notes
 
 **Important**: This is a mock scenario for demonstration purposes.
 - Any text input will generate the travel insurance journey
@@ -192,7 +192,7 @@ To restore normal AI parsing, modify `/utils/aiParser.ts` as documented in READM
 
 ## [1.0.1] - 2025-11-04
 
-### 🐛 Bug Fixes
+### Bug Fixes
 
 #### Clipboard API Error Fixed
 - **Issue**: `NotAllowedError: Failed to execute 'writeText' on 'Clipboard'`
@@ -207,7 +207,7 @@ To restore normal AI parsing, modify `/utils/aiParser.ts` as documented in READM
 - `SchemaViewer.tsx`: Schema copy functionality now uses fallback-safe clipboard
 - `DeploymentPanel.tsx`: URL and cURL command copying now uses fallback-safe clipboard
 
-### 🎨 Design Enhancements
+### Design Enhancements
 
 #### Vibrant Icon Containers
 Replaced muted gray icon containers with vibrant colors from the design system:
@@ -240,7 +240,7 @@ Replaced muted gray icon containers with vibrant colors from the design system:
 - `TestViewer.tsx`: Empty state icon container
 - `DeploymentPanel.tsx`: Empty state icon container
 
-### 📚 Documentation
+### Documentation
 
 #### Updated Files
 - `VERSION_SNAPSHOT.md`: 
@@ -254,7 +254,7 @@ Replaced muted gray icon containers with vibrant colors from the design system:
 
 ## [1.0.0] - 2025-11-04
 
-### 🎉 Initial Release
+### Initial Release
 
 #### Core Features
 - Three-page navigation flow

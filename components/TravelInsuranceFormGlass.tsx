@@ -45,8 +45,6 @@ import {
   NomineeIllustration,
   SuccessIllustration,
 } from "./TravelInsuranceIllustrations";
-import suitcaseImage from "../assets/889ee1478755e2ac5774c502ce329fc5b855d3ee.png";
-import thumbsUpImage from "../assets/afec21c807652581e66568c73b3d799382091884.png";
 
 interface TravelInsuranceFormGlassProps {
   showStepper?: boolean;
@@ -84,7 +82,7 @@ interface FormData {
   cardCvv?: string;
 }
 
-export function TravelInsuranceFormGlass({
+const TravelInsuranceFormGlassComponent = ({
   showStepper = true,
   stepperType = "numbers",
   borderRadius = "rounded",
@@ -94,13 +92,26 @@ export function TravelInsuranceFormGlass({
   template = "simple",
   themeColors,
   onFormDataChange,
-}: TravelInsuranceFormGlassProps) {
+}: TravelInsuranceFormGlassProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [policyNumber, setPolicyNumber] = useState("");
   const [viewportMode, setViewportMode] = useState<
     "desktop" | "tablet" | "mobile"
   >("desktop");
+
+  // Local state for conditional rendering (prevents re-renders from watch)
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [nomineeRelation, setNomineeRelation] = useState("");
+  const [tripType, setTripType] = useState("");
+  const [destination, setDestination] = useState("");
+  const [coveragePlan, setCoveragePlan] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [numTravellers, setNumTravellers] = useState(1);
+  const [travellerMedicalConditions, setTravellerMedicalConditions] = useState<{
+    [key: number]: string;
+  }>({});
 
   const {
     register,
@@ -109,6 +120,7 @@ export function TravelInsuranceFormGlass({
     setValue,
     control,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -135,24 +147,23 @@ export function TravelInsuranceFormGlass({
 
   // Initialize travellers array on mount
   useEffect(() => {
-    if (travellerFields.length === 0 && watchNumTravellers > 0) {
+    if (travellerFields.length === 0) {
+      const num = getValues("numTravellers") || 1;
       const initialTravellers: TravellerInfo[] = [];
-      for (let i = 0; i < watchNumTravellers; i++) {
+      const medicalConditions: { [key: number]: string } = {};
+      for (let i = 0; i < num; i++) {
         initialTravellers.push({
           fullName: "",
           age: "",
           passportNumber: "",
           hasMedicalConditions: "no",
         });
+        medicalConditions[i] = "no";
       }
       replaceTravellers(initialTravellers);
+      setTravellerMedicalConditions(medicalConditions);
     }
   }, []);
-
-  const watchAll: any = watch();
-  const watchNumTravellers = watch("numTravellers");
-  const watchPaymentMethod = watch("paymentMethod");
-  const watchCoveragePlan = watch("coveragePlan");
 
   // Configuration helper functions
   const getCardBorderRadius = () => {
@@ -234,24 +245,81 @@ export function TravelInsuranceFormGlass({
 
   // Update traveller fields when number changes
   useEffect(() => {
-    const num = parseInt(String(watchNumTravellers)) || 1;
-    const currentTravellers = watchAll.travellers || [];
+    const subscription = watch((formData, { name }) => {
+      if (name === "numTravellers") {
+        const num = parseInt(String(formData.numTravellers)) || 1;
+        const currentLength = travellerFields.length;
 
-    if (num !== currentTravellers.length) {
-      const newTravellers: TravellerInfo[] = [];
-      for (let i = 0; i < num; i++) {
-        newTravellers.push(
-          currentTravellers[i] || {
-            fullName: "",
-            age: "",
-            passportNumber: "",
-            hasMedicalConditions: "no",
+        // Only update if the actual count is different
+        if (num !== currentLength && num > 0 && num <= 10) {
+          const currentTravellers = getValues("travellers") || [];
+          const newTravellers: TravellerInfo[] = [];
+          const medicalConditions: { [key: number]: string } = {};
+          for (let i = 0; i < num; i++) {
+            newTravellers.push(
+              currentTravellers[i] || {
+                fullName: "",
+                age: "",
+                passportNumber: "",
+                hasMedicalConditions: "no",
+              }
+            );
+            medicalConditions[i] =
+              currentTravellers[i]?.hasMedicalConditions || "no";
           }
-        );
+          replaceTravellers(newTravellers);
+          setTravellerMedicalConditions(medicalConditions);
+        }
       }
-      replaceTravellers(newTravellers);
-    }
-  }, [watchNumTravellers, replaceTravellers]);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [travellerFields.length]);
+
+  // Sync local state with form values for conditional rendering
+  useEffect(() => {
+    const subscription = watch((formData, { name }) => {
+      if (name === "paymentMethod" && formData.paymentMethod) {
+        setPaymentMethod(formData.paymentMethod);
+      }
+      if (name === "nomineeRelation" && formData.nomineeRelation) {
+        setNomineeRelation(formData.nomineeRelation);
+      }
+      if (name === "tripType" && formData.tripType) {
+        setTripType(formData.tripType);
+      }
+      if (name === "destination" && formData.destination) {
+        setDestination(formData.destination);
+      }
+      if (name === "coveragePlan" && formData.coveragePlan) {
+        setCoveragePlan(formData.coveragePlan);
+      }
+      if (name === "travelStartDate" && formData.travelStartDate) {
+        setStartDate(formData.travelStartDate);
+      }
+      if (name === "travelEndDate" && formData.travelEndDate) {
+        setEndDate(formData.travelEndDate);
+      }
+      if (name === "numTravellers" && formData.numTravellers !== undefined) {
+        setNumTravellers(formData.numTravellers);
+      }
+      if (
+        name?.startsWith("travellers.") &&
+        name?.includes("hasMedicalConditions")
+      ) {
+        const index = parseInt(name.split(".")[1]);
+        const travellers = formData.travellers || [];
+        if (travellers[index]?.hasMedicalConditions) {
+          setTravellerMedicalConditions((prev) => ({
+            ...prev,
+            [index]: travellers[index].hasMedicalConditions,
+          }));
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Notify parent of form changes
   useEffect(() => {
@@ -261,7 +329,7 @@ export function TravelInsuranceFormGlass({
       });
       return () => subscription.unsubscribe();
     }
-  }, [watch, onFormDataChange]);
+  }, []); // Empty dependency array - watch and onFormDataChange are stable references
 
   const steps = ["Trip Details", "Travellers", "Plan", "Nominee", "Payment"];
 
@@ -356,14 +424,21 @@ export function TravelInsuranceFormGlass({
           {/* Success Illustration */}
           <div className='relative overflow-hidden'>
             <div
-              className='flex items-center justify-center py-6'
-              style={{ backgroundColor: "#e8f5e9" }}
+              className='flex items-center justify-center py-12'
+              style={{
+                background: `linear-gradient(135deg, ${
+                  themeColors?.[0] ? "var(--theme-primary)" : "var(--primary)"
+                } 0%, ${
+                  themeColors?.[1] ? "var(--theme-accent)" : "var(--success)"
+                } 100%)`,
+              }}
             >
-              <img
-                src={thumbsUpImage as any}
-                alt='Success'
-                className='w-32 h-32 object-contain'
-              />
+              <div className='w-32 h-32 rounded-full bg-white flex items-center justify-center shadow-lg'>
+                <CheckCircle2
+                  className='w-20 h-20'
+                  style={{ color: themeColors?.[0] || "var(--success)" }}
+                />
+              </div>
             </div>
           </div>
 
@@ -403,7 +478,7 @@ export function TravelInsuranceFormGlass({
                   Coverage Plan
                 </span>
                 <span className='text-foreground capitalize break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
-                  {watchCoveragePlan}
+                  {coveragePlan}
                 </span>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
@@ -412,9 +487,7 @@ export function TravelInsuranceFormGlass({
                   Trip Type
                 </span>
                 <span className='text-foreground capitalize break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
-                  {watchAll.tripType === "single"
-                    ? "Single Trip"
-                    : "Annual Multi-trip"}
+                  {tripType === "single" ? "Single Trip" : "Annual Multi-trip"}
                 </span>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
@@ -423,10 +496,7 @@ export function TravelInsuranceFormGlass({
                   Destination
                 </span>
                 <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
-                  {
-                    countries.find((c) => c.value === watchAll.destination)
-                      ?.label
-                  }
+                  {countries.find((c) => c.value === destination)?.label}
                 </span>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
@@ -435,7 +505,7 @@ export function TravelInsuranceFormGlass({
                   Travel Dates
                 </span>
                 <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
-                  {watchAll.startDate} - {watchAll.endDate}
+                  {startDate} - {endDate}
                 </span>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
@@ -444,7 +514,7 @@ export function TravelInsuranceFormGlass({
                   Travellers
                 </span>
                 <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
-                  {watchAll.numberOfTravellers}
+                  {numTravellers}
                 </span>
               </div>
               <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 pt-3 border-t border-border min-w-0'>
@@ -684,7 +754,7 @@ export function TravelInsuranceFormGlass({
           ))}
         </div>
 
-        {stepperType === ("dots" as any) && (
+        {stepperType === "dots" && (
           <div className='text-center'>
             <span className='text-muted-foreground'>
               Step {currentStep + 1} of {steps.length}
@@ -807,32 +877,37 @@ export function TravelInsuranceFormGlass({
 
       <StepContentWrapper>
         <FieldWrapper label='Trip Type' required>
-          <RadioGroup
-            value={watchAll.tripType}
-            onValueChange={(value) => setValue("tripType", value)}
+          <Select
+            value={tripType}
+            onValueChange={(value) => {
+              setValue("tripType", value);
+              setTripType(value);
+            }}
           >
-            <Select
-              value={watchAll.tripType || ""}
-              onValueChange={(value) => setValue("tripType", value)}
+            <SelectTrigger
+              className='bg-input-background border-border text-foreground'
+              style={{
+                height: getInputHeight(),
+                borderRadius: getInputBorderRadius(),
+                padding: getInputPadding(),
+              }}
             >
-              <SelectTrigger
-                className='bg-card border-border text-foreground'
-                style={{ borderRadius: getInputBorderRadius() }}
-              >
-                <SelectValue placeholder='Select trip type' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='single'>Single Trip</SelectItem>
-                <SelectItem value='annual'>Annual Multi-trip</SelectItem>
-              </SelectContent>
-            </Select>
-          </RadioGroup>
+              <SelectValue placeholder='Select trip type' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='single'>Single Trip</SelectItem>
+              <SelectItem value='annual'>Annual Multi-trip</SelectItem>
+            </SelectContent>
+          </Select>
         </FieldWrapper>
 
         <FieldWrapper label='Destination' required>
           <Select
-            value={watchAll.destination}
-            onValueChange={(value) => setValue("destination", value)}
+            value={destination}
+            onValueChange={(value) => {
+              setValue("destination", value);
+              setDestination(value);
+            }}
           >
             <SelectTrigger
               className='bg-input-background border-border text-foreground'
@@ -1022,10 +1097,14 @@ export function TravelInsuranceFormGlass({
 
               <FieldWrapper label='Pre-existing Medical Conditions' required>
                 <Select
-                  value={watchAll.travellers?.[index]?.hasMedicalConditions}
-                  onValueChange={(value) =>
-                    setValue(`travellers.${index}.hasMedicalConditions`, value)
-                  }
+                  value={travellerMedicalConditions[index] || "no"}
+                  onValueChange={(value) => {
+                    setValue(`travellers.${index}.hasMedicalConditions`, value);
+                    setTravellerMedicalConditions((prev) => ({
+                      ...prev,
+                      [index]: value,
+                    }));
+                  }}
                 >
                   <SelectTrigger
                     className='bg-input-background border-border text-foreground'
@@ -1088,24 +1167,26 @@ export function TravelInsuranceFormGlass({
       </div>
 
       <div className='grid grid-cols-1 gap-3'>
-        {coveragePlans.map((plan: any, planIndex: number) => (
+        {coveragePlans.map((plan, planIndex) => (
           <div
             key={plan.id}
             className={`p-4 border-2 cursor-pointer transition-all duration-300 bg-card relative overflow-hidden ${
-              watchCoveragePlan === plan.id
+              coveragePlan === plan.id
                 ? "border-primary shadow-lg"
                 : "border-border hover:border-primary/50"
             }`}
             style={{
-              transform:
-                watchCoveragePlan === plan.id ? "translateY(-4px)" : "none",
+              transform: coveragePlan === plan.id ? "translateY(-4px)" : "none",
               borderRadius: getInputBorderRadius(),
               borderColor:
-                watchCoveragePlan === plan.id && themeColors?.[0]
+                coveragePlan === plan.id && themeColors?.[0]
                   ? `var(--theme-primary)`
                   : undefined,
             }}
-            onClick={() => setValue("coveragePlan", plan.id)}
+            onClick={() => {
+              setValue("coveragePlan", plan.id);
+              setCoveragePlan(plan.id);
+            }}
           >
             {/* Decorative Shield SVG in background */}
             <div className='absolute -bottom-4 -right-4 w-24 h-24 opacity-5 pointer-events-none'>
@@ -1118,7 +1199,7 @@ export function TravelInsuranceFormGlass({
             </div>
 
             {/* Decorative circles */}
-            {watchCoveragePlan === plan.id && (
+            {coveragePlan === plan.id && (
               <>
                 <div
                   className='absolute top-2 left-2 w-2 h-2'
@@ -1186,7 +1267,7 @@ export function TravelInsuranceFormGlass({
               Coverage: {plan.coverage}
             </p>
             <ul className='space-y-1'>
-              {plan.features.map((feature: any, index: number) => (
+              {plan.features.map((feature, index) => (
                 <li
                   key={index}
                   className='text-muted-foreground flex items-start gap-2'
@@ -1255,8 +1336,11 @@ export function TravelInsuranceFormGlass({
 
         <FieldWrapper label='Relationship' required>
           <Select
-            value={watchAll.nomineeRelation}
-            onValueChange={(value) => setValue("nomineeRelation", value)}
+            value={nomineeRelation}
+            onValueChange={(value) => {
+              setValue("nomineeRelation", value);
+              setNomineeRelation(value);
+            }}
           >
             <SelectTrigger
               className='bg-input-background border-border text-foreground'
@@ -1353,21 +1437,24 @@ export function TravelInsuranceFormGlass({
               <div
                 key={method}
                 className={`p-4 border-2 cursor-pointer transition-all relative overflow-hidden ${
-                  watchPaymentMethod === method
+                  paymentMethod === method
                     ? "border-primary bg-primary/5"
                     : "border-border bg-card hover:border-primary/30"
                 }`}
                 style={{
                   borderRadius: getInputBorderRadius(),
                   borderColor:
-                    watchPaymentMethod === method && themeColors?.[0]
+                    paymentMethod === method && themeColors?.[0]
                       ? `var(--theme-primary)`
                       : undefined,
                 }}
-                onClick={() => setValue("paymentMethod", method)}
+                onClick={() => {
+                  setValue("paymentMethod", method);
+                  setPaymentMethod(method);
+                }}
               >
                 {/* Decorative wave pattern */}
-                {watchPaymentMethod === method && (
+                {paymentMethod === method && (
                   <div className='absolute top-0 right-0 w-16 h-16 opacity-10 pointer-events-none'>
                     <svg viewBox='0 0 100 100' className='w-full h-full'>
                       <path
@@ -1383,7 +1470,7 @@ export function TravelInsuranceFormGlass({
                     className='w-10 h-10 flex items-center justify-center relative'
                     style={{
                       backgroundColor:
-                        watchPaymentMethod === method
+                        paymentMethod === method
                           ? themeColors?.[0]
                             ? `var(--theme-primary)`
                             : "var(--primary)"
@@ -1393,12 +1480,12 @@ export function TravelInsuranceFormGlass({
                   >
                     <CreditCard
                       className={`w-5 h-5 ${
-                        watchPaymentMethod === method
+                        paymentMethod === method
                           ? "text-white"
                           : "text-muted-foreground"
                       }`}
                     />
-                    {watchPaymentMethod === method && (
+                    {paymentMethod === method && (
                       <div
                         className='absolute -top-1 -right-1 w-3 h-3 bg-success border-2 border-card'
                         style={{ borderRadius: "50%" }}
@@ -1414,7 +1501,7 @@ export function TravelInsuranceFormGlass({
           </div>
         </div>
 
-        {watchPaymentMethod === "card" && (
+        {paymentMethod === "card" && (
           <>
             <FieldWrapper label='Card Number' required>
               <Input
@@ -1469,7 +1556,7 @@ export function TravelInsuranceFormGlass({
           </>
         )}
 
-        {watchPaymentMethod === "upi" && (
+        {paymentMethod === "upi" && (
           <FieldWrapper label='UPI ID' required>
             <Input
               placeholder='yourname@upi'
@@ -1623,13 +1710,12 @@ export function TravelInsuranceFormGlass({
             </div>
 
             {/* Main Content */}
-            <div className='relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 max-w-3xl mx-auto'>
+            <div className='relative z-10 flex flex-col md:flex-row items-center justify-center md:justify-start gap-6 max-w-5xl mx-auto w-full'>
               {/* Icon */}
-              <div className='relative flex-shrink-0'>
-                <ImageWithFallback
-                  src={suitcaseImage as any}
-                  alt='Travel Insurance'
-                  className='w-24 h-24 object-contain'
+              <div className='relative flex-shrink-0 w-24 h-24 flex items-center justify-center rounded-full bg-[rgba(241,245,249,0)]'>
+                <Plane
+                  className='w-12 h-12'
+                  style={{ color: themeColors?.[0] || "var(--primary)" }}
                 />
               </div>
 
@@ -1767,4 +1853,9 @@ export function TravelInsuranceFormGlass({
       </div>
     </div>
   );
-}
+};
+
+// Memoize component to prevent unnecessary re-renders
+export const TravelInsuranceFormGlass = React.memo(
+  TravelInsuranceFormGlassComponent
+);

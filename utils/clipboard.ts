@@ -10,7 +10,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text);
       return true;
     } catch (err) {
-      console.warn('Clipboard API failed, falling back to execCommand:', err);
+      // Silently fall back to execCommand - this is expected in some environments
+      // (e.g., embedded contexts, certain browser configurations)
     }
   }
 
