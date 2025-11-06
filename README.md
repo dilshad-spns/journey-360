@@ -7,8 +7,6 @@ AI-powered system that transforms user stories and speech input into complete, p
 ## Quick Links
 
 - **[Try Live Demo Forms](http://localhost:3000)** - Explore embeddable journeys
-- **[Travel Insurance Embed](http://localhost:3000/embed/travel)** - 4-step travel form
-- **[Death Claim Embed](http://localhost:3000/embed/motor)** - 4-step claim form
 - **[Integration Demo](http://localhost:3000/demo-integration)** - Live preview with data monitoring
 - **[Code Examples](http://localhost:3000/embed)** - Copy-paste integration code
 
@@ -134,7 +132,7 @@ Update design tokens in `/styles/globals.css`:
 :root {
   --color-primary: 33 150 243;
   --radius-button: 8px;
-  --font-family: 'Inter', sans-serif;
+  --font-family: "Inter", sans-serif;
 }
 ```
 
@@ -166,18 +164,21 @@ npm run prepare-build    # Fix imports before build
 ## Features
 
 ### Input Layer
+
 - Rich text editor with formatting
 - Speech-to-text with microphone permission handling
 - File upload (PDF, DOCX, TXT)
 - Grammar correction and AI suggestions
 
 ### Schema Generation
+
 - Automatic field detection from natural language
 - Validation rule generation
 - Multi-step wizard configuration
 - Conditional logic support
 
 ### Form Rendering
+
 - 4 stepper types: Dots, Numbers, Progress, Breadcrumb
 - 3 layout templates: Simple, Two-Column, Carded
 - 3 spacing options: Compact, Comfortable, Spacious
@@ -185,6 +186,7 @@ npm run prepare-build    # Fix imports before build
 - Responsive and accessible
 
 ### Embeddable Forms
+
 - **Travel Insurance Journey**: `/embed/travel` - 4-step travel insurance form
 - **Death Claim Journey**: `/embed/motor` - 4-step claim submission form
 - **Integration Demo**: `/demo-integration` - Live preview with data monitoring
@@ -194,11 +196,13 @@ npm run prepare-build    # Fix imports before build
 - See [Embed Integration Guide](./docs/EMBED_INTEGRATION.md)
 
 ### Mock API
+
 - Auto-generated endpoints
 - Configurable response delays
 - Status code simulation
 
 ### Testing
+
 - Auto-generated unit tests
 - Validation tests
 - Integration tests
@@ -240,20 +244,24 @@ See [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) for more details.
 ## Documentation
 
 ### Getting Started
+
 - [Installation Guide](./docs/INSTALLATION.md) - Complete setup instructions
 - [Quick Start Guide](./docs/QUICK_START_GUIDE.md) - Get running in 5 minutes
 - [Commands Reference](./docs/COMMANDS.md) - All available commands
 
 ### Configuration
+
 - [Environment Variables](./docs/ENVIRONMENT_VARIABLES.md) - AI service setup
 - [Design System](./styles/globals.css) - CSS variables and tokens
 
 ### Build & Deploy
+
 - [Build Checklist](./docs/BUILD_CHECKLIST.md) - Pre-build verification
 - [Deployment Guide](./docs/DEPLOYMENT.md) - Production deployment
 - [Troubleshooting](./docs/TROUBLESHOOTING.md) - Common issues
 
 ### Reference
+
 - [Project Overview](./docs/PROJECT_OVERVIEW.md) - Architecture details
 - [Stepper Types Guide](./docs/STEPPER_TYPES_GUIDE.md) - Form stepper options
 - [Mock Scenarios](./docs/MOCK_SCENARIO_SUMMARY.md) - Sample forms included
