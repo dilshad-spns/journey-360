@@ -308,9 +308,9 @@ const TravelInsuranceFormGlassComponent = ({
         name?.includes("hasMedicalConditions")
       ) {
         const index = parseInt(name.split(".")[1]);
-        const travellers = formData.travellers || [];
+        const travellers: any = formData.travellers || [];
         if (travellers[index]?.hasMedicalConditions) {
-          setTravellerMedicalConditions((prev) => ({
+          setTravellerMedicalConditions((prev: any) => ({
             ...prev,
             [index]: travellers[index].hasMedicalConditions,
           }));
@@ -754,7 +754,7 @@ const TravelInsuranceFormGlassComponent = ({
           ))}
         </div>
 
-        {stepperType === "dots" && (
+        {stepperType === ("dots" as any) && (
           <div className='text-center'>
             <span className='text-muted-foreground'>
               Step {currentStep + 1} of {steps.length}
@@ -1167,7 +1167,7 @@ const TravelInsuranceFormGlassComponent = ({
       </div>
 
       <div className='grid grid-cols-1 gap-3'>
-        {coveragePlans.map((plan, planIndex) => (
+        {coveragePlans.map((plan: any, planIndex: number) => (
           <div
             key={plan.id}
             className={`p-4 border-2 cursor-pointer transition-all duration-300 bg-card relative overflow-hidden ${
@@ -1234,7 +1234,7 @@ const TravelInsuranceFormGlassComponent = ({
               </>
             )}
 
-            {plan.recommended && (
+            {(plan.recommended as any) && (
               <div
                 className='absolute -top-3 right-4 px-3 py-1 text-xs text-white flex items-center gap-1'
                 style={{
@@ -1264,10 +1264,10 @@ const TravelInsuranceFormGlassComponent = ({
               <span className='text-muted-foreground'> /trip</span>
             </div>
             <p className='text-muted-foreground mb-2'>
-              Coverage: {plan.coverage}
+              Coverage: {plan.coverage as any}
             </p>
             <ul className='space-y-1'>
-              {plan.features.map((feature, index) => (
+              {plan.features.map((feature: any, index: number) => (
                 <li
                   key={index}
                   className='text-muted-foreground flex items-start gap-2'

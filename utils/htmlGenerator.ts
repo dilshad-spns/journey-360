@@ -3,8 +3,6 @@
  * This creates a fully self-contained embeddable form with glassmorphism design
  */
 
-import { JSONSchema } from '../types/schema';
-
 export interface PublishConfig {
   uuid: string;
   publishedAt: string;
@@ -17,9 +15,9 @@ export interface PublishConfig {
  * Generate a unique UUID v4
  */
 export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -29,7 +27,7 @@ export function generateUUID(): string {
  */
 export function generateHTMLBundle(schema: any, formData?: any): string {
   const uuid = generateUUID();
-  
+
   const cssVariables = `
     :root {
       /* Typography */
@@ -40,7 +38,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
       --text-h4: 18px;
       --text-base: 14px;
       --text-label: 12px;
-      
+
       /* Colors */
       --background: rgba(250, 251, 252, 1);
       --foreground: rgba(15, 23, 42, 1);
@@ -65,18 +63,18 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
       --border: rgba(226, 232, 240, 1);
       --input-background: rgba(255, 255, 255, 1);
       --ring: rgba(0, 28, 86, 0.2);
-      
+
       /* Radius */
       --radius-button: 6px;
       --radius-card: 12px;
       --radius-input: 6px;
       --radius-pill: 999px;
-      
+
       /* Elevation */
       --elevation-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
       --elevation-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       --elevation-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-      
+
       /* Glassmorphism */
       --glass-bg: rgba(255, 255, 255, 0.7);
       --glass-border: rgba(255, 255, 255, 0.18);
@@ -760,8 +758,8 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
       // Mock Data
       const countries = [
-        "United States", "United Kingdom", "Canada", "Australia", "Germany", 
-        "France", "Italy", "Spain", "Japan", "Singapore", "Thailand", 
+        "United States", "United Kingdom", "Canada", "Australia", "Germany",
+        "France", "Italy", "Spain", "Japan", "Singapore", "Thailand",
         "United Arab Emirates", "Switzerland", "Netherlands", "New Zealand"
       ];
 
@@ -841,7 +839,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
         renderStep(currentStep);
         updateProgress();
         initializeEventListeners();
-        
+
         // Initialize Flatpickr
         if (typeof flatpickr !== 'undefined') {
           console.log('Flatpickr loaded successfully');
@@ -861,7 +859,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
         for (let i = 1; i <= totalSteps; i++) {
           const circle = document.getElementById('step-' + i);
           circle.classList.remove('active', 'completed');
-          
+
           if (i < currentStep) {
             circle.classList.add('completed');
             circle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -873,7 +871,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
         // Update navigation buttons
         document.getElementById('backBtn').style.display = currentStep > 1 ? 'flex' : 'none';
         const continueBtn = document.getElementById('continueBtn');
-        
+
         if (currentStep === totalSteps) {
           continueBtn.innerHTML = '<span class="loading"></span> Processing Payment...';
         } else {
@@ -883,7 +881,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
       function renderStep(step) {
         const container = document.getElementById('stepContainer');
-        
+
         switch(step) {
           case 1:
             container.innerHTML = renderTripInformation();
@@ -1031,7 +1029,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
       function validateTripInformation() {
         let isValid = true;
-        
+
         if (!formData.tripType) {
           showError('tripType');
           isValid = false;
@@ -1138,7 +1136,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
       function initializeTravellerInformation() {
         const travellerCount = formData.travellers || 1;
-        
+
         for (let i = 0; i < travellerCount; i++) {
           document.getElementById(\`traveller-\${i}-name\`).addEventListener('input', (e) => {
             if (!formData.travellerDetails[i]) formData.travellerDetails[i] = {};
@@ -1172,7 +1170,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
         for (let i = 0; i < travellerCount; i++) {
           const traveller = formData.travellerDetails[i] || {};
-          
+
           if (!traveller.name) {
             showError(\`traveller-\${i}-name\`);
             isValid = false;
@@ -1321,7 +1319,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 
       function validateNomineeDetails() {
         let isValid = true;
-        
+
         if (!formData.nomineeName) {
           showError('nomineeName');
           isValid = false;
@@ -1505,7 +1503,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
       async function goNext() {
         // Validate current step
         let isValid = false;
-        
+
         switch(currentStep) {
           case 1:
             isValid = validateTripInformation();
@@ -1633,7 +1631,7 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travel Insurance Journey - ${schema.title || 'Journey 360'}</title>
+  <title>Travel Insurance Journey - ${schema.title || "Journey 360"}</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
@@ -1654,17 +1652,20 @@ export function generateHTMLBundle(schema: any, formData?: any): string {
 /**
  * Generate publish configuration with script embed code
  */
-export function generatePublishConfig(schema: any, formData?: any): PublishConfig {
+export function generatePublishConfig(
+  schema: any,
+  formData?: any
+): PublishConfig {
   const uuid = generateUUID();
   const scriptUrl = `https://journey360.com/embed/${uuid}.js`;
   const htmlBundle = generateHTMLBundle(schema, formData);
-  
+
   const embedCode = `<!-- Journey 360 Embedded Form -->
 <script src="${scriptUrl}" async></script>
 <div id="journey360-form-${uuid}"></div>
 
 <!-- OR use React component -->
-{/* 
+{/*
 import Script from 'next/script'
 
 <Script src="${scriptUrl}" />
@@ -1683,10 +1684,13 @@ import Script from 'next/script'
 /**
  * Download HTML bundle as file
  */
-export function downloadHTMLBundle(htmlBundle: string, filename: string = 'journey360-form.html') {
-  const blob = new Blob([htmlBundle], { type: 'text/html' });
+export function downloadHTMLBundle(
+  htmlBundle: string,
+  filename: string = "journey360-form.html"
+) {
+  const blob = new Blob([htmlBundle], { type: "text/html" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);

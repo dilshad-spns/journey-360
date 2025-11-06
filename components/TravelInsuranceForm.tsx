@@ -14,6 +14,7 @@ import {
 import { Checkbox } from "./ui/checkbox";
 import { Card } from "./ui/card";
 import { Textarea } from "./ui/textarea";
+import { Badge } from "./ui/badge";
 import {
   AlertCircle,
   Check,
@@ -204,7 +205,7 @@ const TravelInsuranceFormComponent = ({
         setCoveragePlan(formData.coveragePlan);
       }
       if (name === "addOns") {
-        setAddOns(formData.addOns || []);
+        setAddOns((formData.addOns || []) as any);
       }
       if (name === "paymentMethod" && formData.paymentMethod) {
         setPaymentMethod(formData.paymentMethod);
@@ -216,7 +217,7 @@ const TravelInsuranceFormComponent = ({
         setTerms(formData.terms);
       }
       if (name?.startsWith("travellers")) {
-        setTravellers(formData.travellers || []);
+        setTravellers((formData.travellers || []) as any);
       }
     });
 
@@ -372,7 +373,7 @@ const TravelInsuranceFormComponent = ({
 
   // Update traveller fields when number changes
   React.useEffect(() => {
-    const num = parseInt(String(watchNumTravellers)) || 1;
+    const num = parseInt(String(numTravellers)) || 1;
     const currentLength = travellerFields.length;
 
     // Only update if the actual count is different
@@ -401,12 +402,7 @@ const TravelInsuranceFormComponent = ({
       }
       replaceTravellers(newTravellers);
     }
-  }, [
-    watchNumTravellers,
-    travellerFields.length,
-    getValues,
-    replaceTravellers,
-  ]);
+  }, [numTravellers, travellerFields.length, getValues, replaceTravellers]);
 
   // Watch all form data and notify parent component using subscription
   React.useEffect(() => {
@@ -420,9 +416,9 @@ const TravelInsuranceFormComponent = ({
   }, []); // Empty dependency array - watch and onFormDataChange are stable references
 
   const validateDateRange = () => {
-    if (watchStartDate && watchEndDate && watchTripType === "single") {
-      const start = new Date(watchStartDate);
-      const end = new Date(watchEndDate);
+    if (startDate && endDate && tripType === "single") {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
       const diffDays = Math.ceil(
         (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
       );
@@ -460,11 +456,11 @@ const TravelInsuranceFormComponent = ({
   const handleNext = () => {
     if (currentStep === 0) {
       if (
-        !watchTripType ||
-        !watchDestination ||
-        !watchStartDate ||
-        !watchEndDate ||
-        !watchNumTravellers
+        !tripType ||
+        !destination ||
+        !startDate ||
+        !endDate ||
+        !numTravellers
       ) {
         toast.error("Please fill all required fields");
         return;
@@ -767,8 +763,11 @@ const TravelInsuranceFormComponent = ({
               icon={<Globe className='h-4 w-4' />}
             >
               <Select
-                value={watchTripType}
-                onValueChange={(value) => setValue("tripType", value)}
+                value={tripType}
+                onValueChange={(value) => {
+                  setValue("tripType", value);
+                  setTripType(value);
+                }}
               >
                 <SelectTrigger
                   className='bg-input-background border-border text-foreground'
@@ -795,8 +794,11 @@ const TravelInsuranceFormComponent = ({
             icon={<Globe className='h-4 w-4' />}
           >
             <Select
-              value={watchTripType}
-              onValueChange={(value) => setValue("tripType", value)}
+              value={tripType}
+              onValueChange={(value) => {
+                setValue("tripType", value);
+                setTripType(value);
+              }}
             >
               <SelectTrigger
                 className='bg-input-background border-border text-foreground'
@@ -828,8 +830,11 @@ const TravelInsuranceFormComponent = ({
               icon={<MapPin className='h-4 w-4' />}
             >
               <Select
-                value={watchDestination}
-                onValueChange={(value) => setValue("destination", value)}
+                value={destination}
+                onValueChange={(value) => {
+                  setValue("destination", value);
+                  setDestination(value);
+                }}
               >
                 <SelectTrigger
                   className='bg-input-background border-border text-foreground'
@@ -1046,9 +1051,9 @@ const TravelInsuranceFormComponent = ({
         }
       >
         {fields}
-        {watchTripType === "single" &&
-          watchStartDate &&
-          watchEndDate &&
+        {tripType === "single" &&
+          startDate &&
+          endDate &&
           !validateDateRange() && (
             <div
               className={template === "two-column" ? "md:col-span-2" : ""}
@@ -1151,7 +1156,7 @@ const TravelInsuranceFormComponent = ({
 
               <FormField label='Gender' required>
                 <Select
-                  value={watchTravellers?.[index]?.gender || ""}
+                  value={travellers?.[index]?.gender || ""}
                   onValueChange={(value) =>
                     setValue(`travellers.${index}.gender`, value)
                   }
@@ -1191,7 +1196,7 @@ const TravelInsuranceFormComponent = ({
 
               <FormField label='Nationality' required>
                 <Select
-                  value={watchTravellers?.[index]?.nationality || ""}
+                  value={travellers?.[index]?.nationality || ""}
                   onValueChange={(value) =>
                     setValue(`travellers.${index}.nationality`, value)
                   }
@@ -1218,7 +1223,7 @@ const TravelInsuranceFormComponent = ({
 
               <FormField label='Relationship' required>
                 <Select
-                  value={watchTravellers?.[index]?.relationship || ""}
+                  value={travellers?.[index]?.relationship || ""}
                   onValueChange={(value) =>
                     setValue(`travellers.${index}.relationship`, value)
                   }
@@ -1598,8 +1603,11 @@ const TravelInsuranceFormComponent = ({
           icon={<CreditCard className='h-4 w-4' />}
         >
           <RadioGroup
-            value={watchPaymentMethod}
-            onValueChange={(value) => setValue("paymentMethod", value)}
+            value={paymentMethod}
+            onValueChange={(value) => {
+              setValue("paymentMethod", value);
+              setPaymentMethod(value);
+            }}
             className='space-y-3'
           >
             <Card
@@ -1897,7 +1905,7 @@ const TravelInsuranceFormComponent = ({
           </li>
           <li className='break-words flex items-start gap-2'>
             <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
-            <span>Coverage effective from {watchStartDate}</span>
+            <span>Coverage effective from {startDate}</span>
           </li>
           <li className='break-words flex items-start gap-2'>
             <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
@@ -2025,7 +2033,7 @@ const TravelInsuranceFormComponent = ({
             ) : (
               <Button
                 type='submit'
-                disabled={!watchDeclaration || !watchTerms}
+                disabled={!declaration || !terms}
                 className='bg-primary text-primary-foreground hover:bg-primary/90 transition-all ml-auto disabled:opacity-50'
                 style={{
                   borderRadius: getButtonBorderRadius(),
