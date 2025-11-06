@@ -94,7 +94,7 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
             <Button
               onClick={handleSubmit}
               disabled={!input.trim() || isProcessing || isRecording}
-              className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary/90 transition-all"
+              className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary-hover transition-all"
             >
               <Sparkles className="h-4 w-4 mr-1" />
               {isProcessing ? 'Generating...' : 'Generate Form'}
@@ -105,8 +105,8 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
               variant="outline"
               className={`border-2 rounded-[var(--radius-button)] transition-all ${
                 isRecording 
-                  ? 'bg-destructive/10 border-destructive text-destructive hover:bg-destructive/20' 
-                  : 'border-border hover:border-primary hover:bg-primary/5 hover:text-primary'
+                  ? 'bg-destructive-hover-bg border-destructive text-destructive hover:bg-destructive-hover-bg' 
+                  : 'border-border hover:border-border-hover hover:bg-primary-hover-bg hover:text-primary'
               }`}
               disabled={isProcessing}
             >
@@ -158,7 +158,7 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
               key={index}
               onClick={() => handleExampleClick(story)}
               disabled={isProcessing || isRecording}
-              className="text-left p-5 bg-card border-2 border-border rounded-[var(--radius-card)] hover:border-primary hover:bg-primary/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="text-left p-5 bg-card border-2 border-border rounded-[var(--radius-card)] hover:border-border-hover hover:bg-primary-hover-bg transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <p className="text-foreground group-hover:text-primary transition-colors">{story}</p>
             </button>

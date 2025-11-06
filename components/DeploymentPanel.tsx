@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Rocket, Globe, CheckCircle2, Loader2, ExternalLink, Copy, Download, Server, RotateCcw } from 'lucide-react';
+import { Rocket, Globe, CheckCircle2, Loader2, ExternalLink, Copy, Download, Server, RotateCcw, Code } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { DeploymentConfig, MockApiEndpoint } from '../types/schema';
 import { toast } from 'sonner';
 import { copyToClipboard } from '../utils/clipboard';
+import { generatePublishConfig, downloadHTMLBundle, PublishConfig } from '../utils/htmlGenerator';
 
 interface DeploymentPanelProps {
   schema: any;
@@ -24,6 +25,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployProgress, setDeployProgress] = useState(0);
   const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
+  const [publishConfig, setPublishConfig] = useState<PublishConfig | null>(null);
 
   const handleDeploy = async () => {
     setIsDeploying(true);
@@ -32,10 +34,10 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
 
     const steps = [
       { label: 'Validating schema...', duration: 800 },
-      { label: 'Building form components...', duration: 1200 },
-      { label: 'Generating API endpoints...', duration: 1000 },
+      { label: 'Generating HTML bundle...', duration: 1200 },
+      { label: 'Creating embed script...', duration: 1000 },
       { label: 'Running tests...', duration: 1500 },
-      { label: 'Deploying to server...', duration: 1000 },
+      { label: 'Publishing to CDN...', duration: 1000 },
     ];
 
     for (let i = 0; i < steps.length; i++) {
@@ -43,7 +45,11 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
       setDeployProgress(((i + 1) / steps.length) * 100);
     }
 
-    const mockUrl = `https://${deployment.environment}-${schema.id}.ai360-deploy.app`;
+    // Generate publish configuration
+    const config = generatePublishConfig(schema);
+    setPublishConfig(config);
+
+    const mockUrl = config.scriptUrl;
     setDeploymentUrl(mockUrl);
     setDeployment({
       ...deployment,
@@ -52,7 +58,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
       timestamp: new Date().toISOString(),
     });
     setIsDeploying(false);
-    toast.success('Form deployed successfully!');
+    toast.success('Form published successfully!');
   };
 
   const copyUrl = async () => {
@@ -67,23 +73,41 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
   };
 
   const downloadBundle = () => {
-    const bundle = {
-      schema,
-      mockApi,
-      deployment,
-      generatedAt: new Date().toISOString(),
-    };
+    if (publishConfig) {
+      // Download HTML bundle
+      downloadHTMLBundle(publishConfig.htmlBundle, `journey360-form-${publishConfig.uuid}.html`);
+      toast.success('HTML bundle downloaded');
+    } else {
+      // Fallback: download JSON bundle
+      const bundle = {
+        schema,
+        mockApi,
+        deployment,
+        generatedAt: new Date().toISOString(),
+      };
 
-    const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${schema.id}-deployment-bundle.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success('Deployment bundle downloaded');
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${schema.id}-deployment-bundle.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Deployment bundle downloaded');
+    }
+  };
+
+  const copyEmbedCode = async () => {
+    if (publishConfig) {
+      const success = await copyToClipboard(publishConfig.embedCode);
+      if (success) {
+        toast.success('Embed code copied to clipboard');
+      } else {
+        toast.error('Failed to copy embed code');
+      }
+    }
   };
 
   if (!schema) {
@@ -93,20 +117,20 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
           <div className="h-16 w-16 mx-auto mb-4 rounded-[var(--radius-card)] bg-warning flex items-center justify-center">
             <Rocket className="h-8 w-8 text-warning-foreground" />
           </div>
-          <h3 className="mb-2">No form to deploy</h3>
-          <p>Generate a schema first to deploy your form</p>
+          <h3 className="mb-2">No form to publish</h3>
+          <p>Generate a schema first to publish your form</p>
         </div>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
       <div className="flex items-center justify-between">
-        <h3 className="text-foreground">Deployment</h3>
+        <h3 className="text-foreground">Publish</h3>
       </div>
 
-      <Card className="p-4 bg-card border border-border rounded-[var(--radius)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
+      <Card className="p-4 bg-card border border-border rounded-[var(--radius)] w-full max-w-full overflow-hidden" style={{ boxShadow: 'var(--elevation-sm)' }}>
         <div className="space-y-4">
           <div className="space-y-3">
             <div className="space-y-3">
@@ -160,46 +184,65 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
           {isDeploying && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Deploying...</span>
+                <span className="text-muted-foreground">Publishing...</span>
                 <span className="text-muted-foreground">{Math.round(deployProgress)}%</span>
               </div>
               <Progress value={deployProgress} className="h-2 bg-muted rounded-[var(--radius-pill)]" />
             </div>
           )}
 
-          {deployment.status === 'deployed' && deploymentUrl && (
+          {deployment.status === 'deployed' && publishConfig && (
             <Alert className="bg-primary/10 border-2 border-primary rounded-[var(--radius-card)]">
-              <Globe className="h-5 w-5 text-primary" />
-              <div className="flex-1">
-                <h4 className="text-primary">Deployment Successful!</h4>
-                <div className="flex items-center gap-2 mt-3 flex-wrap">
-                  <code className="px-3 py-2 bg-background rounded-[var(--radius)]">
-                    {deploymentUrl}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={copyUrl}
-                    className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all"
-                    aria-label="Copy URL"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => window.open(deploymentUrl, '_blank')}
-                    className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all"
-                    aria-label="Open in new tab"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
+              <Globe className="h-5 w-5 text-primary flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h4 className="text-primary">Published Successfully!</h4>
+                
+                {/* Script URL */}
+                <div className="mt-3">
+                  <label className="text-muted-foreground block mb-2">Script URL:</label>
+                  <div className="flex items-start gap-2">
+                    <code className="px-3 py-2 bg-background rounded-[var(--radius)] flex-1 min-w-0 break-all" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
+                      {publishConfig.scriptUrl}
+                    </code>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={copyUrl}
+                      className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all flex-shrink-0"
+                      aria-label="Copy URL"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                {deployment.timestamp && (
-                  <p className="text-muted-foreground mt-3">
-                    Deployed at {new Date(deployment.timestamp).toLocaleString()}
-                  </p>
-                )}
+
+                {/* Embed Code */}
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2 gap-2">
+                    <label className="text-muted-foreground">Embed Code:</label>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={copyEmbedCode}
+                      className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all flex-shrink-0"
+                    >
+                      <Copy className="h-3 w-3 mr-1" />
+                      Copy
+                    </Button>
+                  </div>
+                  <pre className="p-3 bg-background rounded-[var(--radius)] border border-border overflow-hidden" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+                    <code className="text-foreground block" style={{ fontSize: '0.75rem', wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>
+                      {publishConfig.embedCode}
+                    </code>
+                  </pre>
+                </div>
+
+                {/* UUID */}
+                <div className="flex flex-wrap items-center gap-2 mt-4 text-muted-foreground">
+                  <span className="break-all">UUID: {publishConfig.uuid}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="break-all">Published at {new Date(publishConfig.publishedAt).toLocaleString()}</span>
+                </div>
               </div>
             </Alert>
           )}
@@ -212,7 +255,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
               className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary/90 transition-all flex-1"
             >
               <Rocket className="h-3 w-3 mr-1" />
-              {isDeploying ? 'Deploying...' : deployment.status === 'deployed' ? 'Deployed' : 'Deploy'}
+              {isDeploying ? 'Publishing...' : deployment.status === 'deployed' ? 'Published' : 'Publish'}
             </Button>
             <Button
               onClick={downloadBundle}
@@ -227,6 +270,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
                 onClick={() => {
                   setDeployment({ ...deployment, status: 'draft' });
                   setDeploymentUrl(null);
+                  setPublishConfig(null);
                 }}
                 variant="outline"
                 size="sm"
@@ -239,11 +283,131 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
         </div>
       </Card>
 
+      {/* React Embed Example */}
+      {publishConfig && (
+        <Card className="p-4 bg-card border border-border rounded-[var(--radius)] w-full max-w-full overflow-hidden" style={{ boxShadow: 'var(--elevation-sm)' }}>
+          <div className="space-y-4 w-full max-w-full overflow-hidden">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-[var(--radius)] bg-accent flex items-center justify-center">
+                <Code className="h-4 w-4 text-accent-foreground" />
+              </div>
+              <h4 className="text-foreground">Embed in React App</h4>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-muted-foreground">
+                Use this code to embed the form in your React application:
+              </p>
+
+              <Tabs defaultValue="next" className="w-full">
+                <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1">
+                  <TabsTrigger value="next" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                    Next.js
+                  </TabsTrigger>
+                  <TabsTrigger value="react" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                    React
+                  </TabsTrigger>
+                  <TabsTrigger value="html" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                    HTML
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="next" className="mt-3">
+                  <div className="relative">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(`import Script from 'next/script';\n\nexport default function Page() {\n  return (\n    <>\n      <Script src="${publishConfig.scriptUrl}" />\n      <div id="journey360-form-${publishConfig.uuid}"></div>\n    </>\n  );\n}`)}
+                      className="absolute top-2 right-2 rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all z-10"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    <pre className="p-4 bg-background rounded-[var(--radius)] overflow-hidden border border-border" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+                      <code className="text-foreground block" style={{ fontSize: '0.75rem', wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>
+{`import Script from 'next/script';
+
+export default function Page() {
+  return (
+    <>
+      <Script src="${publishConfig.scriptUrl}" />
+      <div id="journey360-form-${publishConfig.uuid}"></div>
+    </>
+  );
+}`}
+                      </code>
+                    </pre>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="react" className="mt-3">
+                  <div className="relative">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(`import { useEffect } from 'react';\n\nexport default function MyForm() {\n  useEffect(() => {\n    const script = document.createElement('script');\n    script.src = '${publishConfig.scriptUrl}';\n    script.async = true;\n    document.body.appendChild(script);\n    return () => {\n      document.body.removeChild(script);\n    };\n  }, []);\n\n  return <div id="journey360-form-${publishConfig.uuid}"></div>;\n}`)}
+                      className="absolute top-2 right-2 rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all z-10"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    <pre className="p-4 bg-background rounded-[var(--radius)] overflow-hidden border border-border" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+                      <code className="text-foreground block" style={{ fontSize: '0.75rem', wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>
+{`import { useEffect } from 'react';
+
+export default function MyForm() {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '${publishConfig.scriptUrl}';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  return <div id="journey360-form-${publishConfig.uuid}"></div>;
+}`}
+                      </code>
+                    </pre>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="html" className="mt-3">
+                  <div className="relative">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(`<script src="${publishConfig.scriptUrl}" async></script>\n<div id="journey360-form-${publishConfig.uuid}"></div>`)}
+                      className="absolute top-2 right-2 rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all z-10"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    <pre className="p-4 bg-background rounded-[var(--radius)] overflow-hidden border border-border" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'anywhere', maxWidth: '100%' }}>
+                      <code className="text-foreground block" style={{ fontSize: '0.75rem', wordBreak: 'break-word', overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>
+{`<script src="${publishConfig.scriptUrl}" async></script>
+<div id="journey360-form-${publishConfig.uuid}"></div>`}
+                      </code>
+                    </pre>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <Alert className="bg-muted border border-border rounded-[var(--radius-card)] block">
+                <div className="text-foreground" style={{ display: 'block' }}>
+                  <p style={{ fontSize: '0.875rem', lineHeight: '1.6', display: 'block', whiteSpace: 'normal' }}>
+                    💡 <strong>Tip:</strong> The form will communicate with your parent app using <code className="px-1.5 py-0.5 bg-background rounded text-foreground border border-border" style={{ display: 'inline', whiteSpace: 'nowrap' }}>window.postMessage</code>. Listen for <code className="px-1.5 py-0.5 bg-background rounded text-foreground border border-border" style={{ display: 'inline', whiteSpace: 'nowrap' }}>journey360-form-submit</code> events to capture form submissions.
+                  </p>
+                </div>
+              </Alert>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* API Endpoints */}
-      <Card className="p-4 bg-card border border-border rounded-[var(--radius)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
-        <div className="space-y-4">
+      <Card className="p-4 bg-card border border-border rounded-[var(--radius)] w-full max-w-full" style={{ boxShadow: 'var(--elevation-sm)', boxSizing: 'border-box' }}>
+        <div className="space-y-4 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="h-8 w-8 rounded-[var(--radius)] bg-primary flex items-center justify-center">
+            <div className="h-8 w-8 rounded-[var(--radius)] bg-primary flex items-center justify-center flex-shrink-0">
               <Server className="h-4 w-4 text-primary-foreground" />
             </div>
             <h4 className="text-foreground">API Endpoints</h4>
@@ -252,7 +416,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
             </Badge>
           </div>
 
-          <Tabs defaultValue="endpoints" className="space-y-4">
+          <Tabs defaultValue="endpoints" className="space-y-4 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
             <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1">
               <TabsTrigger value="endpoints" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
                 Endpoints
@@ -262,69 +426,73 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="endpoints" className="space-y-3">
+            <TabsContent value="endpoints" className="space-y-3 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
               {mockApi.map((endpoint, index) => (
                 <div
                   key={index}
-                  className="p-5 bg-background border border-border rounded-[var(--radius-card)] hover:border-primary/30 transition-all"
-                  style={{ boxShadow: 'var(--elevation-sm)' }}
+                  className="p-4 bg-background border border-border rounded-[var(--radius-card)] hover:border-primary/30 transition-all w-full max-w-full"
+                  style={{ boxShadow: 'var(--elevation-sm)', boxSizing: 'border-box' }}
                 >
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <Badge
-                      variant="outline"
-                      className={`rounded-[var(--radius-pill)] px-3 py-1 ${
-                        endpoint.method === 'GET' ? 'border-accent bg-accent/10 text-accent' :
-                        endpoint.method === 'POST' ? 'border-primary bg-primary/10 text-primary' :
-                        endpoint.method === 'PUT' ? 'border-secondary bg-secondary/10' :
-                        'border-destructive bg-destructive/10 text-destructive'
-                      }`}
-                    >
-                      {endpoint.method}
-                    </Badge>
-                    <code className="text-foreground">{endpoint.path}</code>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <span>Status: {endpoint.statusCode}</span>
-                    <span>•</span>
-                    <span>Delay: {endpoint.delay || 500}ms</span>
+                  <div className="space-y-2 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={`rounded-[var(--radius-pill)] px-3 py-1 flex-shrink-0 ${
+                          endpoint.method === 'GET' ? 'border-accent bg-accent/10 text-accent' :
+                          endpoint.method === 'POST' ? 'border-primary bg-primary/10 text-primary' :
+                          endpoint.method === 'PUT' ? 'border-secondary bg-secondary/10' :
+                          'border-destructive bg-destructive/10 text-destructive'
+                        }`}
+                      >
+                        {endpoint.method}
+                      </Badge>
+                    </div>
+                    <div className="w-full max-w-full" style={{ boxSizing: 'border-box' }}>
+                      <code className="text-foreground block w-full" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere', fontSize: '0.875rem' }}>{endpoint.path}</code>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground flex-wrap" style={{ fontSize: '0.875rem' }}>
+                      <span>Status: {endpoint.statusCode}</span>
+                      <span>•</span>
+                      <span>Delay: {endpoint.delay || 500}ms</span>
+                    </div>
                   </div>
                 </div>
               ))}
             </TabsContent>
 
-            <TabsContent value="curl" className="space-y-3">
+            <TabsContent value="curl" className="space-y-3 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
               {mockApi.slice(0, 3).map((endpoint, index) => (
                 <div
                   key={index}
-                  className="p-5 bg-background border border-border rounded-[var(--radius-card)]"
-                  style={{ boxShadow: 'var(--elevation-sm)' }}
+                  className="p-4 bg-background border border-border rounded-[var(--radius-card)] w-full max-w-full"
+                  style={{ boxShadow: 'var(--elevation-sm)', boxSizing: 'border-box' }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-muted-foreground">{endpoint.method} {endpoint.path}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={async () => {
-                        const curl = `curl -X ${endpoint.method} "${deploymentUrl || 'https://api.example.com'}${endpoint.path}"`;
-                        const success = await copyToClipboard(curl);
-                        if (success) {
-                          toast.success('cURL command copied');
-                        } else {
-                          toast.error('Failed to copy cURL command');
-                        }
-                      }}
-                      className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all"
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
+                  <div className="space-y-3 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
+                    <div className="flex items-center justify-between gap-2 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
+                      <span className="text-muted-foreground break-all" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere', fontSize: '0.875rem' }}>{endpoint.method} {endpoint.path}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={async () => {
+                          const curl = `curl -X ${endpoint.method} "${deploymentUrl || 'https://api.example.com'}${endpoint.path}"`;
+                          const success = await copyToClipboard(curl);
+                          if (success) {
+                            toast.success('cURL command copied');
+                          } else {
+                            toast.error('Failed to copy cURL command');
+                          }
+                        }}
+                        className="rounded-[var(--radius-button)] hover:bg-primary/10 hover:text-primary transition-all flex-shrink-0"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <div className="w-full max-w-full bg-card rounded-[var(--radius)] overflow-x-auto" style={{ boxSizing: 'border-box' }}>
+                      <pre className="p-3 m-0 w-full max-w-full" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', overflowWrap: 'anywhere', boxSizing: 'border-box' }}>
+                        <code className="text-foreground block w-full" style={{ fontSize: '0.75rem', wordBreak: 'break-all', overflowWrap: 'anywhere' }}>curl -X {endpoint.method} "{deploymentUrl || 'https://api.example.com'}{endpoint.path}" \{'\n'}{'  '}-H "Content-Type: application/json" \{'\n'}{'  '}-H "Authorization: Bearer YOUR_API_KEY"</code>
+                      </pre>
+                    </div>
                   </div>
-                  <pre className="overflow-x-auto p-3 bg-card rounded-[var(--radius)]">
-                    <code className="text-foreground">
-                      curl -X {endpoint.method} "{deploymentUrl || 'https://api.example.com'}{endpoint.path}" \{'\n'}
-                      {'  '}-H "Content-Type: application/json" \{'\n'}
-                      {'  '}-H "Authorization: Bearer YOUR_API_KEY"
-                    </code>
-                  </pre>
                 </div>
               ))}
             </TabsContent>

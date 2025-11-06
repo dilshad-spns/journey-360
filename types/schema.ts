@@ -38,7 +38,7 @@ export interface FormSchema {
   submitUrl?: string;
   successMessage?: string;
   errorMessage?: string;
-  layout?: 'simple' | 'two-column' | 'wizard' | 'carded';
+  layout?: 'simple' | 'two-column' | 'carded';
   metadata?: {
     createdAt: string;
     userStory: string;

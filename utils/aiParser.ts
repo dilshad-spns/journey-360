@@ -14,7 +14,7 @@ export class AIParser {
       id: `travel-insurance-${Date.now()}`,
       title: 'Travel Insurance Quote & Buy',
       description: 'Complete your travel insurance purchase through our guided multi-step journey',
-      layout: 'wizard',
+      layout: 'simple',
       fields: [
         // ==================== STEP 1: Trip Information ====================
         {
@@ -588,9 +588,6 @@ export class AIParser {
       metadata: {
         createdAt: timestamp,
         userStory: 'Travel Insurance Quote & Buy Journey',
-        version: '1.0.0',
-        industry: 'Insurance',
-        productType: 'Travel Insurance',
       },
     };
   }

@@ -16,9 +16,10 @@ import { toast } from 'sonner';
 interface FormRendererProps {
   schema: FormSchema | null;
   onFormDataChange?: (data: Record<string, any>) => void;
-  template?: 'simple' | 'two-column' | 'wizard' | 'carded';
+  template?: 'simple' | 'two-column' | 'carded';
   themeColors?: string[];
   highlightRequired?: boolean;
+  showStepper?: boolean;
   wizardStep?: number;
   onWizardStepChange?: (step: number) => void;
   borderRadius?: 'sharp' | 'rounded' | 'pill';
@@ -34,6 +35,7 @@ export function FormRenderer({
   template = 'simple', 
   themeColors,
   highlightRequired = false,
+  showStepper = false,
   wizardStep: externalWizardStep,
   onWizardStepChange,
   borderRadius = 'rounded',
@@ -119,6 +121,20 @@ export function FormRenderer({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Create scoped theme style object
+  const getThemeStyle = (): React.CSSProperties => {
+    if (themeColors && themeColors.length >= 2) {
+      return {
+        '--primary': themeColors[0],
+        '--primary-foreground': 'rgba(255, 255, 255, 1)',
+        '--accent': themeColors[1],
+        '--accent-foreground': 'rgba(255, 255, 255, 1)',
+        '--ring': themeColors[0],
+      } as React.CSSProperties;
+    }
+    return {};
   };
 
   // Helper functions for UI configuration
@@ -447,15 +463,19 @@ export function FormRenderer({
     '--theme-accent': themeColors[1],
   } as React.CSSProperties : {};
 
-  // Split fields into steps for wizard layout
-  const fieldsPerStep = Math.ceil(schema.fields.length / 3);
-  const wizardSteps = template === 'wizard' ? [
-    schema.fields.slice(0, fieldsPerStep),
-    schema.fields.slice(fieldsPerStep, fieldsPerStep * 2),
-    schema.fields.slice(fieldsPerStep * 2)
-  ] : [];
+  // Group fields by wizardStep property when stepper is enabled
+  const wizardSteps = showStepper 
+    ? (() => {
+        // Get unique wizard steps
+        const stepNumbers = [...new Set(schema.fields.map(f => f.wizardStep ?? 0))].sort((a, b) => a - b);
+        // Group fields by their wizardStep
+        return stepNumbers.map(stepNum => 
+          schema.fields.filter(f => (f.wizardStep ?? 0) === stepNum)
+        );
+      })()
+    : [];
 
-  const currentStepFields = template === 'wizard' ? wizardSteps[wizardStep] : schema.fields;
+  const currentStepFields = showStepper ? wizardSteps[wizardStep] || [] : schema.fields;
 
   const handleWizardNext = () => {
     if (wizardStep < wizardSteps.length - 1) {
@@ -496,7 +516,7 @@ export function FormRenderer({
   };
 
   const renderWizardStepper = () => {
-    if (template !== 'wizard') return null;
+    if (!showStepper) return null;
 
     switch (stepperType) {
       case 'dots':
@@ -587,7 +607,7 @@ export function FormRenderer({
   };
 
   return (
-    <div className="space-y-6" style={themeStyles}>
+    <div className="space-y-6" style={getThemeStyle()}>
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-[var(--radius-card)] bg-primary flex items-center justify-center" style={themeColors ? { backgroundColor: themeColors[0] } : {}}>
           <LayoutGrid className="h-6 w-6 text-primary-foreground" />
@@ -605,7 +625,7 @@ export function FormRenderer({
             {schema.description && (
               <p className="text-muted-foreground">{schema.description}</p>
             )}
-            {template === 'wizard' && (
+            {showStepper && (
               <div className="pt-4 space-y-2">
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Step {wizardStep + 1} of {wizardSteps.length}</span>
@@ -640,18 +660,18 @@ export function FormRenderer({
           )}
 
           <div className="flex gap-3 pt-6 border-t border-border">
-            {template === 'wizard' && wizardStep > 0 && (
+            {showStepper && wizardStep > 0 && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleWizardPrevious}
                 disabled={isSubmitting}
-                className="border-2 border-border rounded-[var(--radius-button)] hover:border-primary hover:bg-primary/5 hover:text-primary transition-all"
+                className="rounded-[var(--radius-button)] transition-all"
               >
                 Previous
               </Button>
             )}
-            {template === 'wizard' && wizardStep < wizardSteps.length - 1 ? (
+            {showStepper && wizardStep < wizardSteps.length - 1 ? (
               <Button
                 type="button"
                 onClick={handleWizardNext}
@@ -670,13 +690,13 @@ export function FormRenderer({
                 {isSubmitting ? 'Submitting...' : 'Submit Form'}
               </Button>
             )}
-            {template !== 'wizard' && (
+            {!showStepper && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => reset()}
                 disabled={isSubmitting}
-                className="border-2 border-border rounded-[var(--radius-button)] hover:border-primary hover:bg-primary/5 hover:text-primary transition-all"
+                className="rounded-[var(--radius-button)] transition-all"
               >
                 <RotateCcw className="h-4 w-4 mr-1" />
                 Reset

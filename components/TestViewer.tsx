@@ -82,7 +82,7 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
   const totalTests = tests.length;
 
   return (
-    <div className="space-y-3 w-full max-w-full overflow-hidden">
+    <div className="space-y-3 w-full max-w-full overflow-y-auto">
       <div className="flex items-center justify-between gap-2 w-full max-w-full">
         <h3 className="text-foreground truncate min-w-0 flex-1">Unit Tests</h3>
         <div className="flex gap-2 flex-shrink-0">
@@ -264,10 +264,10 @@ function TestCard({ test, result }: { test: TestCase; result?: 'pass' | 'fail' |
       </div>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-border w-full max-w-full overflow-hidden">
-          <div className="p-3 bg-background rounded-[var(--radius)] overflow-x-auto max-w-full">
-            <pre className="text-sm whitespace-pre-wrap break-words max-w-full">
-              <code className="text-foreground">{test.code}</code>
+        <div className="mt-4 pt-4 border-t border-border w-full overflow-hidden">
+          <div className="p-3 bg-background rounded-[var(--radius)] overflow-auto max-w-full">
+            <pre className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere max-w-full min-w-0">
+              <code className="text-foreground break-all">{test.code}</code>
             </pre>
           </div>
         </div>

@@ -71,7 +71,7 @@ export function TopNav({ darkMode, onToggleDarkMode, onNewProject, onGoHome }: T
             </defs>
           </svg>
           <div>
-            <h1 className="text-foreground">Journey 360</h1>
+            <h1 className="text-foreground font-bold">Journey 360</h1>
             <p className="text-muted-foreground text-sm">Auto-Build Deployable Journeys</p>
           </div>
         </button>
