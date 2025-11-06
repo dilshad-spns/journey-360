@@ -60,13 +60,33 @@ import { FormSchema } from "../types/schema";
 import { FormRenderer } from "./FormRenderer";
 import { TravelInsuranceForm } from "./TravelInsuranceForm";
 import { TravelInsuranceFormGlass } from "./TravelInsuranceFormGlass";
+import { DeathClaimForm } from "./DeathClaimForm";
 import { SchemaViewer } from "./SchemaViewer";
 import { TestViewer } from "./TestViewer";
 import { DeploymentPanel } from "./DeploymentPanel";
 import { APIViewer } from "./APIViewer";
-// import { Test } from '../utils/testGenerator';
-import { MockApiEndpoint } from "../types/schema";
+import { TestCase, MockApiEndpoint } from "../types/schema";
 import { RulesValidationManager } from "./RulesValidationManager";
+import Simple from "../imports/Simple";
+import TwoColumn from "../imports/Simple-210-107";
+import Carded from "../imports/Carded";
+import Sharp from "../imports/Sharp";
+import Rounded from "../imports/Rounded";
+import Pill from "../imports/Pill";
+import Compact from "../imports/Compact";
+import Comfortable from "../imports/Comfortable";
+import Spacious from "../imports/Spacious";
+import Top from "../imports/Top";
+import Left from "../imports/Left";
+import Sm from "../imports/Sm";
+import Md from "../imports/Md";
+import Lg from "../imports/Lg";
+import Dots from "../imports/Dots";
+import Numbers from "../imports/Numbers";
+import Progress from "../imports/Progress-220-226";
+import Breadcrumb from "../imports/Breadcrumb";
+import Steppers from "../imports/Steppers";
+
 interface FormEditorPageProps {
   requirements: string;
   schema: FormSchema;
@@ -466,7 +486,7 @@ export function FormEditorPage({
                       onChange={(e) => {
                         setEditableRequirements(e.target.value);
                       }}
-                      className='min-h-[120px] bg-input-background border border-border rounded-[var(--radius-input)] focus:border-primary transition-all'
+                      className='h-[450px] overflow-y-auto resize-none bg-input-background border border-border rounded-[var(--radius-input)] focus:border-primary transition-all'
                     />
                     <div className='flex gap-2 flex-wrap'>
                       <input
@@ -572,29 +592,25 @@ export function FormEditorPage({
                       onClick={() => setSelectedTemplate(template.id as any)}
                       className={`p-4 rounded-[var(--radius-card)] border transition-all duration-300 hover:scale-105 ${
                         selectedTemplate === template.id
-                          ? "border-primary bg-primary/10 shadow-[var(--elevation-md)]"
+                          ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)] text-[var(--color-selected-border)] shadow-[var(--elevation-md)]"
                           : "border-border hover:border-primary/50 bg-card shadow-[var(--elevation-sm)] hover:shadow-[var(--elevation-md)]"
                       }`}
                     >
                       <div className='flex flex-col items-center gap-3'>
-                        <div
-                          className={`h-12 w-12 rounded-[var(--radius-card)] flex items-center justify-center transition-all duration-300 shadow-[var(--elevation-sm)] ${
-                            selectedTemplate === template.id
-                              ? "bg-primary/20 border border-primary/40"
-                              : "bg-primary/10 border border-primary/20"
-                          }`}
-                        >
-                          <span
-                            className={`text-2xl transition-colors ${
-                              selectedTemplate === template.id
-                                ? "text-primary"
-                                : "text-primary/70"
-                            }`}
-                          >
-                            {template.preview}
-                          </span>
+                        <div className='h-[58px] w-[58px] flex items-center justify-center'>
+                          {template.id === "simple" && <Simple />}
+                          {template.id === "two-column" && <TwoColumn />}
+                          {template.id === "carded" && <Carded />}
                         </div>
-                        <p className='text-foreground'>{template.name}</p>
+                        <p
+                          className={
+                            selectedTemplate === template.id
+                              ? "text-[var(--color-selected-border)]"
+                              : "text-foreground"
+                          }
+                        >
+                          {template.name}
+                        </p>
                       </div>
                     </button>
                   ))}
@@ -621,7 +637,7 @@ export function FormEditorPage({
                       onClick={() => setSelectedTheme(theme.id)}
                       className={`p-4 rounded-[var(--radius-card)] border transition-all duration-300 hover:scale-105 ${
                         selectedTheme === theme.id
-                          ? "border-primary bg-primary/10 shadow-[var(--elevation-md)]"
+                          ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)] text-[var(--color-selected-border)] shadow-[var(--elevation-md)]"
                           : "border-border hover:border-primary/50 bg-card shadow-[var(--elevation-sm)] hover:shadow-[var(--elevation-md)]"
                       }`}
                     >
@@ -634,7 +650,15 @@ export function FormEditorPage({
                           />
                         ))}
                       </div>
-                      <p className='text-foreground'>{theme.name}</p>
+                      <p
+                        className={
+                          selectedTheme === theme.id
+                            ? "text-[var(--color-selected-border)]"
+                            : "text-foreground"
+                        }
+                      >
+                        {theme.name}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -659,10 +683,6 @@ export function FormEditorPage({
                     <Upload className='h-4 w-4 mr-2' />
                     Upload Theme JSON
                   </Button>
-                  <p className='text-muted-foreground text-xs mt-2 px-1'>
-                    Import custom theme:{" "}
-                    {'{id, name, colors: ["#color1", "#color2"]}'}
-                  </p>
                 </div>
               </div>
 
@@ -680,37 +700,49 @@ export function FormEditorPage({
                 {/* Show Stepper Toggle - FIRST OPTION */}
                 <div className='space-y-2'>
                   <div className='flex items-center gap-2 mb-2'>
-                    <Navigation className='h-3.5 w-3.5 text-muted-foreground' />
+                    <div className='h-3.5 w-3.5 text-muted-foreground'>
+                      <Steppers />
+                    </div>
                     <label className='text-foreground'>Stepper</label>
                   </div>
                   <div className='grid grid-cols-2 gap-2'>
-                    {(["off", "on"] as const).map((mode) => (
-                      <button
-                        key={mode}
-                        onClick={() => {
-                          const newValue = mode === "on";
-                          setShowStepper(newValue);
-                          if (newValue) {
-                            setWizardStep(0);
-                          }
-                          toast.success(
-                            mode === "on"
-                              ? "Stepper enabled"
-                              : "Stepper disabled"
-                          );
-                        }}
-                        className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
-                          (mode === "on" && showStepper) ||
-                          (mode === "off" && !showStepper)
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 bg-card"
-                        }`}
-                      >
-                        <p className='text-foreground text-xs uppercase'>
-                          {mode}
-                        </p>
-                      </button>
-                    ))}
+                    {(["off", "on"] as const).map((mode) => {
+                      const isSelected =
+                        (mode === "on" && showStepper) ||
+                        (mode === "off" && !showStepper);
+                      return (
+                        <button
+                          key={mode}
+                          onClick={() => {
+                            const newValue = mode === "on";
+                            setShowStepper(newValue);
+                            if (newValue) {
+                              setWizardStep(0);
+                            }
+                            toast.success(
+                              mode === "on"
+                                ? "Stepper enabled"
+                                : "Stepper disabled"
+                            );
+                          }}
+                          className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
+                            isSelected
+                              ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                              : "border-border hover:border-primary/50 bg-card"
+                          }`}
+                        >
+                          <p
+                            className={`text-xs uppercase ${
+                              isSelected
+                                ? "text-[var(--color-selected-border)]"
+                                : "text-foreground"
+                            }`}
+                          >
+                            {mode}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                   <p className='text-muted-foreground text-xs px-1'>
                     Enable multi-step navigation for your form
@@ -727,45 +759,39 @@ export function FormEditorPage({
                     <div className='grid grid-cols-2 gap-2'>
                       {(
                         ["dots", "numbers", "progress", "breadcrumb"] as const
-                      ).map((type) => (
-                        <button
-                          key={type}
-                          onClick={() => {
-                            setStepperType(type);
-                            toast.success(`Stepper: ${type}`);
-                          }}
-                          className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
-                            stepperType === type
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/50 bg-card"
-                          }`}
-                        >
-                          <div className='flex items-center justify-center gap-1 mb-1 h-6'>
-                            {type === "dots" && (
-                              <>
-                                <Circle className='h-2 w-2 fill-primary text-primary' />
-                                <Circle className='h-2 w-2 text-muted-foreground' />
-                                <Circle className='h-2 w-2 text-muted-foreground' />
-                              </>
-                            )}
-                            {type === "numbers" && (
-                              <>
-                                <Hash className='h-3 w-3 text-primary' />
-                                <Hash className='h-3 w-3 text-muted-foreground' />
-                              </>
-                            )}
-                            {type === "progress" && (
-                              <BarChart3 className='h-4 w-4 text-primary' />
-                            )}
-                            {type === "breadcrumb" && (
-                              <ChevronRight className='h-4 w-4 text-primary' />
-                            )}
-                          </div>
-                          <p className='text-foreground text-xs capitalize'>
-                            {type}
-                          </p>
-                        </button>
-                      ))}
+                      ).map((type) => {
+                        const isSelected = stepperType === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => {
+                              setStepperType(type);
+                              toast.success(`Stepper: ${type}`);
+                            }}
+                            className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
+                              isSelected
+                                ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                                : "border-border hover:border-primary/50 bg-card"
+                            }`}
+                          >
+                            <div className='h-[58px] w-[58px] mx-auto mb-1 flex items-center justify-center'>
+                              {type === "dots" && <Dots />}
+                              {type === "numbers" && <Numbers />}
+                              {type === "progress" && <Progress />}
+                              {type === "breadcrumb" && <Breadcrumb />}
+                            </div>
+                            <p
+                              className={`text-xs capitalize ${
+                                isSelected
+                                  ? "text-[var(--color-selected-border)]"
+                                  : "text-foreground"
+                              }`}
+                            >
+                              {type}
+                            </p>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -777,33 +803,38 @@ export function FormEditorPage({
                     <label className='text-foreground'>Border Radius</label>
                   </div>
                   <div className='grid grid-cols-3 gap-2'>
-                    {(["sharp", "rounded", "pill"] as const).map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => {
-                          setBorderRadius(type);
-                          toast.success(`Border radius: ${type}`);
-                        }}
-                        className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
-                          borderRadius === type
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 bg-card"
-                        }`}
-                      >
-                        <div
-                          className={`h-8 mx-auto mb-1 bg-primary/20 border border-primary/40 ${
-                            type === "sharp"
-                              ? "rounded-none"
-                              : type === "rounded"
-                              ? "rounded-md"
-                              : "rounded-full"
+                    {(["sharp", "rounded", "pill"] as const).map((type) => {
+                      const isSelected = borderRadius === type;
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => {
+                            setBorderRadius(type);
+                            toast.success(`Border radius: ${type}`);
+                          }}
+                          className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
+                            isSelected
+                              ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                              : "border-border hover:border-primary/50 bg-card"
                           }`}
-                        />
-                        <p className='text-foreground text-xs capitalize'>
-                          {type}
-                        </p>
-                      </button>
-                    ))}
+                        >
+                          <div className='h-[58px] w-[58px] mx-auto mb-1 flex items-center justify-center'>
+                            {type === "sharp" && <Sharp />}
+                            {type === "rounded" && <Rounded />}
+                            {type === "pill" && <Pill />}
+                          </div>
+                          <p
+                            className={`text-xs capitalize ${
+                              isSelected
+                                ? "text-[var(--color-selected-border)]"
+                                : "text-foreground"
+                            }`}
+                          >
+                            {type}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -815,44 +846,38 @@ export function FormEditorPage({
                   </div>
                   <div className='grid grid-cols-3 gap-2'>
                     {(["compact", "comfortable", "spacious"] as const).map(
-                      (type) => (
-                        <button
-                          key={type}
-                          onClick={() => {
-                            setSpacing(type);
-                            toast.success(`Spacing: ${type}`);
-                          }}
-                          className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
-                            spacing === type
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/50 bg-card"
-                          }`}
-                        >
-                          <div className='space-y-1 mb-1'>
-                            <div
-                              className={`h-1.5 bg-primary/40 rounded-sm ${
-                                type === "compact"
-                                  ? "mx-4"
-                                  : type === "comfortable"
-                                  ? "mx-2"
-                                  : "mx-0"
+                      (type) => {
+                        const isSelected = spacing === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => {
+                              setSpacing(type);
+                              toast.success(`Spacing: ${type}`);
+                            }}
+                            className={`p-2 rounded-[var(--radius)] border transition-all text-center ${
+                              isSelected
+                                ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                                : "border-border hover:border-primary/50 bg-card"
+                            }`}
+                          >
+                            <div className='h-[58px] w-[58px] mx-auto mb-1 flex items-center justify-center'>
+                              {type === "compact" && <Compact />}
+                              {type === "comfortable" && <Comfortable />}
+                              {type === "spacious" && <Spacious />}
+                            </div>
+                            <p
+                              className={`text-xs capitalize ${
+                                isSelected
+                                  ? "text-[var(--color-selected-border)]"
+                                  : "text-foreground"
                               }`}
-                            />
-                            <div
-                              className={`h-1.5 bg-primary/40 rounded-sm ${
-                                type === "compact"
-                                  ? "mx-4"
-                                  : type === "comfortable"
-                                  ? "mx-2"
-                                  : "mx-0"
-                              }`}
-                            />
-                          </div>
-                          <p className='text-foreground text-xs capitalize'>
-                            {type}
-                          </p>
-                        </button>
-                      )
+                            >
+                              {type}
+                            </p>
+                          </button>
+                        );
+                      }
                     )}
                   </div>
                 </div>
@@ -864,37 +889,37 @@ export function FormEditorPage({
                     <label className='text-foreground'>Label Position</label>
                   </div>
                   <div className='grid grid-cols-2 gap-2'>
-                    {(["top", "left"] as const).map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => {
-                          setLabelPosition(type);
-                          toast.success(`Label position: ${type}`);
-                        }}
-                        className={`p-2 rounded-[var(--radius)] border-2 transition-all text-center ${
-                          labelPosition === type
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 bg-card"
-                        }`}
-                      >
-                        <div
-                          className={`mb-1 ${
-                            type === "left"
-                              ? "flex items-center gap-1"
-                              : "space-y-1"
+                    {(["top", "left"] as const).map((type) => {
+                      const isSelected = labelPosition === type;
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => {
+                            setLabelPosition(type);
+                            toast.success(`Label position: ${type}`);
+                          }}
+                          className={`p-2 rounded-[var(--radius)] border-2 transition-all text-center ${
+                            isSelected
+                              ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                              : "border-border hover:border-primary/50 bg-card"
                           }`}
                         >
-                          <div
-                            className='h-1 bg-primary/40 rounded-sm'
-                            style={{ width: type === "left" ? "40%" : "100%" }}
-                          />
-                          <div className='h-2 bg-primary/20 border border-primary/40 rounded-sm flex-1' />
-                        </div>
-                        <p className='text-foreground text-xs capitalize'>
-                          {type}
-                        </p>
-                      </button>
-                    ))}
+                          <div className='h-[58px] w-[58px] mx-auto mb-1 flex items-center justify-center'>
+                            {type === "top" && <Top />}
+                            {type === "left" && <Left />}
+                          </div>
+                          <p
+                            className={`text-xs capitalize ${
+                              isSelected
+                                ? "text-[var(--color-selected-border)]"
+                                : "text-foreground"
+                            }`}
+                          >
+                            {type}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -905,41 +930,46 @@ export function FormEditorPage({
                     <label className='text-foreground'>Input Size</label>
                   </div>
                   <div className='grid grid-cols-3 gap-2'>
-                    {(["sm", "md", "lg"] as const).map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => {
-                          setInputSize(size);
-                          toast.success(
-                            `Input size: ${
-                              size === "sm"
-                                ? "Small"
-                                : size === "md"
-                                ? "Medium"
-                                : "Large"
-                            }`
-                          );
-                        }}
-                        className={`p-2 rounded-[var(--radius)] border-2 transition-all text-center min-w-0 ${
-                          inputSize === size
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 bg-card"
-                        }`}
-                      >
-                        <div
-                          className={`bg-primary/20 border border-primary/40 rounded-sm mx-auto mb-1 ${
-                            size === "sm"
-                              ? "h-4 w-[70%]"
-                              : size === "md"
-                              ? "h-6 w-[80%]"
-                              : "h-8 w-[90%]"
+                    {(["sm", "md", "lg"] as const).map((size) => {
+                      const isSelected = inputSize === size;
+                      return (
+                        <button
+                          key={size}
+                          onClick={() => {
+                            setInputSize(size);
+                            toast.success(
+                              `Input size: ${
+                                size === "sm"
+                                  ? "Small"
+                                  : size === "md"
+                                  ? "Medium"
+                                  : "Large"
+                              }`
+                            );
+                          }}
+                          className={`p-2 rounded-[var(--radius)] border-2 transition-all text-center min-w-0 ${
+                            isSelected
+                              ? "bg-[var(--color-selected-bg)] border-[var(--color-selected-border)]"
+                              : "border-border hover:border-primary/50 bg-card"
                           }`}
-                        />
-                        <p className='text-foreground text-xs uppercase'>
-                          {size}
-                        </p>
-                      </button>
-                    ))}
+                        >
+                          <div className='h-[58px] w-[58px] mx-auto mb-1 flex items-center justify-center'>
+                            {size === "sm" && <Sm />}
+                            {size === "md" && <Md />}
+                            {size === "lg" && <Lg />}
+                          </div>
+                          <p
+                            className={`text-xs uppercase ${
+                              isSelected
+                                ? "text-[var(--color-selected-border)]"
+                                : "text-foreground"
+                            }`}
+                          >
+                            {size}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -985,9 +1015,18 @@ export function FormEditorPage({
                 onClick={() => setViewportMode("desktop")}
                 className={`rounded-[var(--radius)] transition-all ${
                   viewportMode === "desktop"
-                    ? "bg-primary text-primary-foreground shadow-[var(--elevation-sm)]"
+                    ? "shadow-[var(--elevation-sm)]"
                     : "hover:bg-primary/10"
                 }`}
+                style={
+                  viewportMode === "desktop"
+                    ? {
+                        backgroundColor: "#EEF6FA",
+                        borderColor: "#006BD0",
+                        color: "#006BD0",
+                      }
+                    : undefined
+                }
                 aria-label='Desktop view'
                 aria-pressed={viewportMode === "desktop"}
               >
@@ -999,9 +1038,18 @@ export function FormEditorPage({
                 onClick={() => setViewportMode("tablet")}
                 className={`rounded-[var(--radius)] transition-all ${
                   viewportMode === "tablet"
-                    ? "bg-primary text-primary-foreground shadow-[var(--elevation-sm)]"
+                    ? "shadow-[var(--elevation-sm)]"
                     : "hover:bg-primary/10"
                 }`}
+                style={
+                  viewportMode === "tablet"
+                    ? {
+                        backgroundColor: "#EEF6FA",
+                        borderColor: "#006BD0",
+                        color: "#006BD0",
+                      }
+                    : undefined
+                }
                 aria-label='Tablet view'
                 aria-pressed={viewportMode === "tablet"}
               >
@@ -1013,9 +1061,18 @@ export function FormEditorPage({
                 onClick={() => setViewportMode("mobile")}
                 className={`rounded-[var(--radius)] transition-all ${
                   viewportMode === "mobile"
-                    ? "bg-primary text-primary-foreground shadow-[var(--elevation-sm)]"
+                    ? "shadow-[var(--elevation-sm)]"
                     : "hover:bg-primary/10"
                 }`}
+                style={
+                  viewportMode === "mobile"
+                    ? {
+                        backgroundColor: "#EEF6FA",
+                        borderColor: "#006BD0",
+                        color: "#006BD0",
+                      }
+                    : undefined
+                }
                 aria-label='Mobile view'
                 aria-pressed={viewportMode === "mobile"}
               >
@@ -1033,9 +1090,25 @@ export function FormEditorPage({
                 key={`${selectedTemplate}-${selectedTheme}`}
                 className={`mx-auto transition-all animate-in fade-in-50 duration-300 ${getViewportWidth()}`}
               >
-                {/* Use TravelInsuranceFormGlass for travel insurance, otherwise use FormRenderer */}
+                {/* Use TravelInsuranceFormGlass for travel insurance, DeathClaimForm for death claim, otherwise use FormRenderer */}
                 {schema.title.toLowerCase().includes("travel insurance") ? (
                   <TravelInsuranceFormGlass
+                    showStepper={showStepper}
+                    stepperType={stepperType}
+                    borderRadius={borderRadius}
+                    spacing={spacing}
+                    labelPosition={labelPosition}
+                    inputSize={inputSize}
+                    template={
+                      selectedTemplate as "simple" | "two-column" | "carded"
+                    }
+                    themeColors={
+                      themes.find((t) => t.id === selectedTheme)?.colors
+                    }
+                    onFormDataChange={handleFormDataChange}
+                  />
+                ) : schema.title.toLowerCase().includes("death claim") ? (
+                  <DeathClaimForm
                     showStepper={showStepper}
                     stepperType={stepperType}
                     borderRadius={borderRadius}
@@ -1089,28 +1162,28 @@ export function FormEditorPage({
               <TabsList className='w-full bg-transparent rounded-none h-14 p-0 grid grid-cols-4'>
                 <TabsTrigger
                   value='schema'
-                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-primary/5 h-full transition-all'
+                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--color-selected-border)] data-[state=active]:bg-[var(--color-selected-bg)] data-[state=active]:text-[var(--color-selected-border)] h-full transition-all'
                 >
                   <Code2 className='h-4 w-4 mr-1' />
                   Schema
                 </TabsTrigger>
                 <TabsTrigger
                   value='apis'
-                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-primary/5 h-full transition-all'
+                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--color-selected-border)] data-[state=active]:bg-[var(--color-selected-bg)] data-[state=active]:text-[var(--color-selected-border)] h-full transition-all'
                 >
                   <Globe className='h-4 w-4 mr-1' />
                   APIs
                 </TabsTrigger>
                 <TabsTrigger
                   value='tests'
-                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-primary/5 h-full transition-all'
+                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--color-selected-border)] data-[state=active]:bg-[var(--color-selected-bg)] data-[state=active]:text-[var(--color-selected-border)] h-full transition-all'
                 >
                   <TestTube2 className='h-4 w-4 mr-1' />
                   Tests
                 </TabsTrigger>
                 <TabsTrigger
                   value='deploy'
-                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-primary/5 h-full transition-all'
+                  className='rounded-none data-[state=active]:border-b-2 data-[state=active]:border-[var(--color-selected-border)] data-[state=active]:bg-[var(--color-selected-bg)] data-[state=active]:text-[var(--color-selected-border)] h-full transition-all'
                 >
                   <Rocket className='h-4 w-4 mr-1' />
                   Deploy

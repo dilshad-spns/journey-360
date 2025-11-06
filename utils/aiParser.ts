@@ -1,9 +1,18 @@
 import { FormSchema, FieldSchema, FieldType, ValidationRule } from '../types/schema';
 
-// Mock AI Parser - Always returns Travel Insurance Journey
+// Mock AI Parser - Returns Travel Insurance or Death Claim Journey based on input
 export class AIParser {
   static parseUserStory(input: string): FormSchema {
-    // Always return the comprehensive travel insurance schema
+    // Check if input contains death claim keywords
+    const isDeathClaim = input.toLowerCase().includes('death claim') || 
+                         input.toLowerCase().includes('death claim journey') ||
+                         input.toLowerCase().includes('universal life');
+    
+    if (isDeathClaim) {
+      return this.getDeathClaimSchema();
+    }
+    
+    // Default to travel insurance schema
     return this.getTravelInsuranceSchema();
   }
 
@@ -588,6 +597,115 @@ export class AIParser {
       metadata: {
         createdAt: timestamp,
         userStory: 'Travel Insurance Quote & Buy Journey',
+      },
+    };
+  }
+
+  private static getDeathClaimSchema(): FormSchema {
+    const timestamp = new Date().toISOString();
+
+    return {
+      id: `death-claim-${Date.now()}`,
+      title: 'Death Claim Submission - Universal Life',
+      description: 'Submit death claims on behalf of existing clients through the North America Agent Portal',
+      layout: 'simple',
+      fields: [
+        // Step 1: Claim Main Details
+        {
+          id: 'step1-heading',
+          name: 'claim_main_details_heading',
+          label: 'Step 1: Claim Main Details',
+          type: 'text',
+          placeholder: '',
+          validations: [],
+          wizardStep: 0,
+          description: 'Provide key claim initiation details for the policyholder',
+        },
+        {
+          id: 'request-date',
+          name: 'request_date',
+          label: 'Request Date',
+          type: 'date',
+          placeholder: '',
+          validations: [],
+          wizardStep: 0,
+          description: 'Auto-populated with current date (read-only)',
+        },
+        {
+          id: 'effective-date',
+          name: 'effective_date',
+          label: 'Effective Date',
+          type: 'date',
+          placeholder: '',
+          validations: [
+            {
+              type: 'required',
+              message: 'Effective date is required',
+            },
+          ],
+          wizardStep: 0,
+        },
+        {
+          id: 'medical-reason',
+          name: 'medical_reason',
+          label: 'Primary Medical Reason',
+          type: 'select',
+          placeholder: 'Select medical reason',
+          validations: [
+            {
+              type: 'required',
+              message: 'Medical reason is required',
+            },
+          ],
+          options: [
+            { label: 'Heart Attack', value: 'heart-attack' },
+            { label: 'Cancer', value: 'cancer' },
+            { label: 'Accident', value: 'accident' },
+            { label: 'Stroke', value: 'stroke' },
+            { label: 'Other', value: 'other' },
+          ],
+          wizardStep: 0,
+        },
+        // Step 2: Required Documents
+        {
+          id: 'step2-heading',
+          name: 'documents_heading',
+          label: 'Step 2: Required Documents',
+          type: 'text',
+          placeholder: '',
+          validations: [],
+          wizardStep: 1,
+          description: 'Upload all required claim documentation',
+        },
+        // Step 3: Claim Assessment
+        {
+          id: 'step3-heading',
+          name: 'assessment_heading',
+          label: 'Step 3: Claim Assessment',
+          type: 'text',
+          placeholder: '',
+          validations: [],
+          wizardStep: 2,
+          description: 'Complete the assessment questionnaire',
+        },
+        // Step 4: Payment Details
+        {
+          id: 'step4-heading',
+          name: 'payment_heading',
+          label: 'Step 4: Payment Details',
+          type: 'text',
+          placeholder: '',
+          validations: [],
+          wizardStep: 3,
+          description: 'Set or confirm payment details for the approved claim',
+        },
+      ],
+      submitUrl: '/api/death-claim/submit',
+      successMessage: '✓ Death claim submitted successfully! Claim ID has been generated.',
+      errorMessage: 'Failed to process death claim submission. Please try again.',
+      metadata: {
+        createdAt: timestamp,
+        userStory: 'Death Claim Journey - Universal Life Product',
       },
     };
   }

@@ -3,6 +3,8 @@
  * This creates a fully self-contained embeddable form with glassmorphism design
  */
 
+// import { JSONSchema } from '../types/schema';
+
 export interface PublishConfig {
   uuid: string;
   publishedAt: string;

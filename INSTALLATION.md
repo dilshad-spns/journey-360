@@ -1,535 +1,288 @@
 # Installation Guide
 
-Complete guide to install and run AI 360 - Auto-Build Deployable Journeys locally.
+Quick guide to get Journey 360 running on your local machine.
 
----
+## Prerequisites
 
-## System Requirements
+- **Node.js**: Version 18 or higher
+- **npm**: Version 8 or higher (comes with Node.js)
+- **Browser**: Chrome, Edge, Safari, or Firefox (latest version)
+- **OS**: Windows, macOS, or Linux
 
-### Required
-
-- **Node.js**: Version 18.0.0 or higher
-- **npm**: Version 9.0.0 or higher (comes with Node.js)
-- **Git**: For cloning the repository
-- **Operating System**: Windows, macOS, or Linux
-
-### Optional
-
-- **yarn**: As an alternative to npm
-- **pnpm**: As another alternative package manager
-
-### Check Your Versions
-
-```bash
-# Check Node.js version
-node --version
-# Expected: v18.0.0 or higher
-
-# Check npm version
-npm --version
-# Expected: 9.0.0 or higher
-
-# Check Git version
-git --version
-# Expected: 2.x.x or higher
-```
-
-### Install Node.js (if needed)
-
-**Download from official website:**
-
-- Visit: https://nodejs.org/
-- Download the LTS (Long Term Support) version
-- Run the installer and follow instructions
-
-**Or use a version manager:**
-
-On macOS/Linux (using nvm):
-
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
-```
-
-On Windows (using nvm-windows):
-
-1. Download from: https://github.com/coreybutler/nvm-windows/releases
-2. Install and run:
-
-```bash
-nvm install 18
-nvm use 18
-```
-
----
-
-## Installation Steps
+## Step-by-Step Installation
 
 ### 1. Clone the Repository
 
 ```bash
-# Clone the project
-git clone <your-repository-url>
-
-# Navigate to project directory
-cd ai-360-auto-build-deployable-journeys
+git clone <repository-url>
+cd journey-360
 ```
-
-**If you don't have Git:**
-
-- Download the project as a ZIP file
-- Extract to your desired location
-- Open terminal/command prompt in the extracted folder
 
 ### 2. Install Dependencies
 
-This will download all required packages (~500MB):
-
 ```bash
 npm install
 ```
 
-**Alternative package managers:**
+This installs all required packages including:
+- Next.js 15
+- React 18
+- TypeScript 5
+- Tailwind CSS v4
+- shadcn/ui components
+- Radix UI primitives
 
-Using yarn:
-
-```bash
-yarn install
-```
-
-Using pnpm:
-
-```bash
-pnpm install
-```
-
-**What gets installed:**
-
-- Next.js 15.0.3
-- React 18.3.1
-- TypeScript 5.7.2
-- Tailwind CSS 4.0.0
-- 40+ shadcn/ui components
-- React Hook Form, Sonner, Lucide Icons
-- And all other dependencies (see package.json)
-
-**Expected time**: 2-5 minutes (depending on internet speed)
-
-**Expected output:**
-
-```
-added 342 packages, and audited 343 packages in 2m
-
-54 packages are looking for funding
-  run `npm fund` for details
-
-found 0 vulnerabilities
-```
-
-### 3. Verify Installation
-
-Check that all dependencies are installed:
+### 3. Fix Import Issues (Important!)
 
 ```bash
-npm list --depth=0
+npm run prepare-build
 ```
 
-You should see a list of packages including:
+This script:
+- Removes versioned package imports
+- Fixes compatibility issues
+- Prepares project for build
 
-- next@15.0.3
-- react@18.3.1
-- typescript@5.7.2
-- tailwindcss@4.0.0
-- etc.
+### 4. Configure Environment (Optional)
 
----
+```bash
+# Copy example environment file
+cp .env.example .env.local
 
-## Running the Application
+# Edit .env.local with your settings
+# (Not required for local development)
+```
 
-### Development Mode
+See [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) for details.
 
-Start the development server with hot reload:
+### 5. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-**Expected output:**
+The app will be available at: **http://localhost:3000**
 
-```
-   ▲ Next.js 15.0.3
-   - Local:        http://localhost:3000
-   - Environments: .env
+## Verify Installation
 
- ✓ Ready in 2.3s
-```
+### 1. Check Browser Console
+- Open Developer Tools (F12)
+- Look for any errors in Console tab
+- Should see "Journey 360" loaded message
 
-**What this does:**
+### 2. Test Features
+- Click "Get Started"
+- Select "Paste User Story" mode
+- Enter test prompt: "Create a contact form with name, email, and message"
+- Click continue and verify form generation
 
-- Starts Next.js development server
-- Enables hot module replacement (auto-refresh on code changes)
-- Runs on http://localhost:3000
-- Shows detailed error messages
-- Runs TypeScript type checking
+### 3. Check Dark Mode
+- Click moon/sun icon in top navigation
+- Theme should switch smoothly
 
-**Access the app:**
-Open your browser and navigate to: **http://localhost:3000**
+## Common Issues
 
-### Production Mode
-
-Build and run the optimized production version:
+### Port 3000 Already in Use
 
 ```bash
-# Step 1: Build the application
-npm run build
-
-# Step 2: Start the production server
-npm start
-```
-
-**Build output:**
-
-```
-   ▲ Next.js 15.0.3
-
-   Creating an optimized production build ...
- ✓ Compiled successfully
- ✓ Linting and checking validity of types
- ✓ Collecting page data
- ✓ Generating static pages (3/3)
- ✓ Finalizing page optimization
-
-Route (app)                              Size     First Load JS
-┌ ○ /                                   137 B          87.2 kB
-└ ○ /_not-found                         871 B          85.9 kB
-```
-
-**Production benefits:**
-
-- Optimized bundle size
-- Minified code
-- Better performance
-- Production-ready deployment
-
----
-
-## Troubleshooting
-
-### Issue: Port 3000 already in use
-
-**Error:**
-
-```
-Error: listen EADDRINUSE: address already in use :::3000
-```
-
-**Solution 1 - Use a different port:**
-
-```bash
+# Use different port
 PORT=3001 npm run dev
 ```
 
-**Solution 2 - Kill the process using port 3000:**
-
-On macOS/Linux:
+### Module Not Found Errors
 
 ```bash
-lsof -ti:3000 | xargs kill -9
-```
-
-On Windows (PowerShell):
-
-```powershell
-Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Process
-```
-
-### Issue: Module not found errors
-
-**Error:**
-
-```
-Module not found: Can't resolve 'react'
-```
-
-**Solution:**
-
-```bash
-# Remove node_modules and package-lock.json
+# Clear cache and reinstall
 rm -rf node_modules package-lock.json
-
-# Reinstall all dependencies
 npm install
+npm run prepare-build
 ```
 
-### Issue: Permission errors during installation
-
-**Error:**
-
-```
-EACCES: permission denied
-```
-
-**Solution (avoid using sudo):**
-
-Fix npm permissions:
+### Import Version Errors
 
 ```bash
-mkdir ~/.npm-global
-npm config set prefix '~/.npm-global'
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
-source ~/.profile
-```
+# Run fix script
+npm run prepare-build
 
-Then retry:
-
-```bash
-npm install
-```
-
-### Issue: Build or type errors
-
-**Error:**
-
-```
-Type error: Cannot find module
-```
-
-**Solution:**
-
-```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Clear TypeScript cache
-rm -rf tsconfig.tsbuildinfo
-
-# Rebuild
+# Then rebuild
 npm run build
 ```
 
-### Issue: Slow installation
-
-**Solutions:**
-
-1. Use a faster DNS (8.8.8.8)
-2. Clear npm cache: `npm cache clean --force`
-3. Use a different registry: `npm config set registry https://registry.npmjs.org/`
-4. Try yarn or pnpm instead
-
-### Issue: Module resolution errors in VS Code
-
-**Solution:**
-
-1. Open VS Code
-2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
-3. Type: "TypeScript: Restart TS Server"
-4. Select and run
-
----
-
-## Verification Steps
-
-After installation, verify everything works:
-
-### 1. Development Server
+### TypeScript Errors
 
 ```bash
-npm run dev
-```
-
-✓ Server starts without errors
-✓ Accessible at http://localhost:3000
-✓ Landing page loads correctly
-
-### 2. Linting
-
-```bash
-npm run lint
-```
-
-✓ No linting errors
-
-### 3. Type Checking
-
-```bash
+# Check types without building
 npx tsc --noEmit
 ```
 
-✓ No type errors
+## Production Build
 
-### 4. Production Build
+### Build Application
 
 ```bash
 npm run build
 ```
 
-✓ Build completes successfully
-✓ No compilation errors
+This command:
+1. Runs `prepare-build` automatically (via prebuild script)
+2. Type-checks all TypeScript files
+3. Bundles optimized production code
+4. Generates static assets
 
----
-
-## Environment Setup (Optional)
-
-### Environment Variables
-
-The application works out of the box with default values. Environment variables are **optional** but allow customization.
-
-#### Create .env.local file
-
-For local development overrides:
+### Start Production Server
 
 ```bash
-# Copy the example file
-cp .env.example .env.local
+npm start
 ```
 
-#### Required Variables (None)
+App runs at: **http://localhost:3000**
 
-The application currently requires **no environment variables** to run. All features work with sensible defaults.
+### Verify Production Build
 
-#### Optional Variables
+1. Check build output for errors
+2. Test all features in production mode
+3. Verify performance (should be faster than dev)
+4. Check bundle size in `.next` folder
 
-Edit `.env.local` to customize:
+## Project Structure
 
-```env
-# Application Configuration
-NODE_ENV=development
-PORT=3000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Feature Flags
-NEXT_PUBLIC_ENABLE_SPEECH=true
-NEXT_PUBLIC_ENABLE_UPLOAD=true
-NEXT_PUBLIC_ENABLE_DARK_MODE=true
-
-# Mock Configuration
-NEXT_PUBLIC_USE_MOCK_AI=true
-NEXT_PUBLIC_MOCK_API_DELAY=2000
+```
+journey-360/
+├── app/                   # Next.js pages (App Router)
+│   ├── page.tsx          # Landing page
+│   ├── layout.tsx        # Root layout
+│   ├── prompt/           # Input screen
+│   └── builder/          # Form editor
+├── components/           # React components
+│   ├── ui/              # shadcn/ui components
+│   └── *.tsx            # Feature components
+├── imports/             # Figma imports
+├── styles/              # CSS and design tokens
+│   └── globals.css      # Design system variables
+├── types/               # TypeScript types
+├── utils/               # Utilities
+└── .env.local          # Environment variables (create this)
 ```
 
-#### Future Integration Variables
+## Available Scripts
 
-When integrating external services (not currently used):
+```bash
+# Development
+npm run dev              # Start dev server (port 3000)
 
-```env
-# AI Services (OpenAI, Anthropic, etc.)
-# OPENAI_API_KEY=sk-your-api-key-here
+# Building
+npm run build            # Build for production
+npm start                # Start production server
 
-# Database (Supabase, PostgreSQL, MongoDB)
-# NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+# Utilities
+npm run lint             # Run ESLint
+npm run prepare-build    # Fix versioned imports
 
-# Authentication (NextAuth)
-# NEXTAUTH_URL=http://localhost:3000
-# NEXTAUTH_SECRET=your-secret
-
-# Analytics (Google Analytics, Sentry)
-# NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# Legacy (if needed)
+npm run fix-imports      # Alternative import fixer
 ```
 
-**See `.env.example` for complete list of available variables.**
+## Design System Customization
 
-**Important Notes:**
-- `.env.local` is gitignored and won't be committed
-- `NEXT_PUBLIC_*` variables are exposed to the browser
-- Never put secrets in `NEXT_PUBLIC_*` variables
-- Server-side variables (without NEXT_PUBLIC_) are safe for API keys
+Edit `/styles/globals.css` to customize:
 
----
-
-## IDE Setup
-
-### VS Code (Recommended)
-
-**Install recommended extensions:**
-
-1. ESLint
-2. Prettier
-3. Tailwind CSS IntelliSense
-4. TypeScript and JavaScript Language Features
-
-**Settings (`.vscode/settings.json`):**
-
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "typescript.tsdk": "node_modules/typescript/lib"
+### Colors
+```css
+:root {
+  --color-primary: 33 150 243;      /* Blue */
+  --color-accent: 236 64 122;       /* Pink */
+  --color-success: 76 175 80;       /* Green */
 }
 ```
 
-### WebStorm
+### Spacing
+```css
+:root {
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+```
 
-- TypeScript support is built-in
-- Configure Node.js interpreter: Settings → Languages → Node.js
-- Enable ESLint: Settings → Languages → JavaScript → Code Quality Tools → ESLint
+### Border Radius
+```css
+:root {
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-input: 6px;
+  --radius-pill: 9999px;
+}
+```
 
----
+All components automatically use these variables.
+
+## Browser Requirements
+
+### Supported Browsers
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Opera 76+
+
+### Speech Recognition
+- Requires HTTPS in production
+- Works on localhost for development
+- Chrome/Edge recommended for best support
+
+### Permissions
+- Microphone access (for speech input)
+- Notification permission (optional)
+
+## Development Tips
+
+### Hot Reload
+- Changes auto-reload in development
+- CSS changes reload instantly
+- Component changes may require browser refresh
+
+### Clear Cache
+```bash
+# Next.js cache
+rm -rf .next
+
+# Full clean
+rm -rf .next node_modules
+npm install
+```
+
+### Debug Mode
+Add to `.env.local`:
+```bash
+NEXT_PUBLIC_DEBUG=true
+```
 
 ## Next Steps
 
-After successful installation:
+1. ✅ Complete installation
+2. 📖 Read [README.md](./README.md) for feature overview
+3. 🎨 Review [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)
+4. 🚀 Start building forms!
 
-1. **Read the Quick Start**: See `QUICK_START.md`
-2. **Explore the app**: Navigate through all 3 screens
-3. **Check documentation**: See `README.md` for detailed features
-4. **Try the Travel Insurance journey**: Enter any prompt and explore
-5. **Customize styles**: Edit `/styles/globals.css` to change colors
-6. **Review code**: Explore `/components` and `/utils` directories
+## Need Help?
 
----
+- **Build Issues**: See [BUILD_CHECKLIST.md](./BUILD_CHECKLIST.md)
+- **Errors**: Check [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+- **Features**: Read [README.md](./README.md)
 
-## Getting Help
+## Success Checklist
 
-If you encounter issues not covered here:
-
-1. Check `TROUBLESHOOTING.md` (if available)
-2. Review `README.md` for feature documentation
-3. See `MIGRATION_NOTES.md` for Next.js structure
-4. Check the Next.js documentation: https://nextjs.org/docs
-5. Review package.json for dependency versions
-
----
-
-## Uninstallation
-
-To remove the project:
-
-```bash
-# Remove dependencies
-rm -rf node_modules
-
-# Remove build artifacts
-rm -rf .next
-
-# Remove lock files
-rm package-lock.json
-
-# Remove the entire project (if desired)
-cd ..
-rm -rf ai-360-auto-build-deployable-journeys
-```
+- [ ] Node.js 18+ installed
+- [ ] Repository cloned
+- [ ] Dependencies installed (`npm install`)
+- [ ] Import fixes applied (`npm run prepare-build`)
+- [ ] Dev server running (`npm run dev`)
+- [ ] App loads at http://localhost:3000
+- [ ] No console errors
+- [ ] Features work (try creating a form)
+- [ ] Dark mode toggles successfully
 
 ---
 
-## Summary
-
-| Step       | Command                 | Time     |
-| ---------- | ----------------------- | -------- |
-| 1. Clone   | `git clone <url>`       | < 1 min  |
-| 2. Install | `npm install`           | 2-5 min  |
-| 3. Run     | `npm run dev`           | < 10 sec |
-| 4. Access  | `http://localhost:3000` | Instant  |
-
-**Total setup time**: ~3-6 minutes
-
----
-
-**Last Updated**: November 4, 2025  
-**Node.js Required**: 18.0.0+  
-**Next.js Version**: 15.0.3  
-**Status**: Ready for local development ✅
+**Ready to build!** 🚀

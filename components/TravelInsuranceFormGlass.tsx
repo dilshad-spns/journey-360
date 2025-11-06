@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Badge } from "./ui/badge";
 import {
   Check,
   ChevronLeft,
@@ -26,6 +27,9 @@ import {
   Sparkles,
   CheckCircle2,
   Circle,
+  Monitor,
+  Tablet,
+  Smartphone,
 } from "lucide-react";
 import {
   countries,
@@ -41,8 +45,8 @@ import {
   NomineeIllustration,
   SuccessIllustration,
 } from "./TravelInsuranceIllustrations";
-
 import suitcaseImage from "../assets/889ee1478755e2ac5774c502ce329fc5b855d3ee.png";
+import thumbsUpImage from "../assets/afec21c807652581e66568c73b3d799382091884.png";
 
 interface TravelInsuranceFormGlassProps {
   showStepper?: boolean;
@@ -94,6 +98,9 @@ export function TravelInsuranceFormGlass({
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [policyNumber, setPolicyNumber] = useState("");
+  const [viewportMode, setViewportMode] = useState<
+    "desktop" | "tablet" | "mobile"
+  >("desktop");
 
   const {
     register,
@@ -142,7 +149,7 @@ export function TravelInsuranceFormGlass({
     }
   }, []);
 
-  const watchAll = watch();
+  const watchAll: any = watch();
   const watchNumTravellers = watch("numTravellers");
   const watchPaymentMethod = watch("paymentMethod");
   const watchCoveragePlan = watch("coveragePlan");
@@ -319,12 +326,26 @@ export function TravelInsuranceFormGlass({
     } as React.CSSProperties;
   };
 
+  // Get container max width based on viewport mode
+  const getContainerMaxWidth = () => {
+    switch (viewportMode) {
+      case "mobile":
+        return "375px";
+      case "tablet":
+        return "768px";
+      case "desktop":
+        return "1024px";
+      default:
+        return "1024px";
+    }
+  };
+
   // Success Screen
   if (isSubmitted) {
     return (
       <div
-        className='min-h-screen flex items-center justify-center p-4 bg-accent'
-        style={getThemeStyles()}
+        className='min-h-screen flex items-center justify-center p-4'
+        style={{ ...getThemeStyles(), backgroundColor: "#F8F8F8" }}
       >
         <div
           className='max-w-2xl w-full bg-card border border-border shadow-xl overflow-hidden'
@@ -333,42 +354,21 @@ export function TravelInsuranceFormGlass({
           }}
         >
           {/* Success Illustration */}
-          <div
-            className='relative overflow-hidden'
-            style={{
-              height:
-                spacing === "compact"
-                  ? "180px"
-                  : spacing === "spacious"
-                  ? "280px"
-                  : "230px",
-            }}
-          >
-            <ImageWithFallback
-              src='https://images.unsplash.com/photo-1760348082270-3a46a3512850?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjZWxlYnJhdGlvbiUyMHN1Y2Nlc3MlMjBoYXBweXxlbnwxfHx8fDE3NjIzMzA4OTl8MA&ixlib=rb-4.1.0&q=80&w=1080'
-              alt='Success celebration'
-              className='w-full h-full object-cover'
-            />
+          <div className='relative overflow-hidden'>
             <div
-              className='absolute inset-0 bg-success/60 flex items-center justify-center'
-              style={{ opacity: 0.85 }}
+              className='flex items-center justify-center py-6'
+              style={{ backgroundColor: "#e8f5e9" }}
             >
-              <div
-                className='w-20 h-20 flex items-center justify-center bg-white'
-                style={{
-                  borderRadius: borderRadius === "sharp" ? "0px" : "50%",
-                }}
-              >
-                <CheckCircle2
-                  className='w-12 h-12 text-success'
-                  strokeWidth={3}
-                />
-              </div>
+              <img
+                src={thumbsUpImage as any}
+                alt='Success'
+                className='w-32 h-32 object-contain'
+              />
             </div>
           </div>
 
           <div
-            className='p-8 text-center'
+            className='p-4 sm:p-8 text-center'
             style={{
               gap: getSpacingValue(),
               display: "flex",
@@ -382,14 +382,14 @@ export function TravelInsuranceFormGlass({
                 gap: "0.5rem",
               }}
             >
-              <h2 className='text-foreground'>Payment Successful!</h2>
+              <h2 className='text-foreground'>Successful!</h2>
               <p className='text-muted-foreground'>
                 Your travel insurance has been activated
               </p>
             </div>
 
             <div
-              className='p-6 bg-muted border border-border relative overflow-hidden'
+              className='p-3 sm:p-6 bg-muted border border-border overflow-hidden'
               style={{
                 borderRadius: getInputBorderRadius(),
                 display: "flex",
@@ -397,55 +397,67 @@ export function TravelInsuranceFormGlass({
                 gap: "0.75rem",
               }}
             >
-              {/* Decorative corner graphics */}
-              <div className='absolute top-0 right-0 w-20 h-20 opacity-10 pointer-events-none'>
-                <svg viewBox='0 0 100 100' className='w-full h-full'>
-                  <circle
-                    cx='80'
-                    cy='20'
-                    r='40'
-                    fill={themeColors?.[0] || "var(--success)"}
-                  />
-                </svg>
-              </div>
-              <div className='absolute bottom-0 left-0 w-16 h-16 opacity-10 pointer-events-none'>
-                <Shield
-                  className='w-full h-full'
-                  style={{
-                    color: themeColors?.[0]
-                      ? "var(--theme-primary)"
-                      : "var(--primary)",
-                  }}
-                />
-              </div>
-
-              <div className='flex justify-between items-center relative z-10'>
-                <span className='text-muted-foreground flex items-center gap-2'>
-                  <CheckCircle2 className='w-4 h-4 text-success' />
-                  Policy Number
-                </span>
-                <span className='text-foreground'>{policyNumber}</span>
-              </div>
-              <div className='flex justify-between items-center relative z-10'>
-                <span className='text-muted-foreground flex items-center gap-2'>
-                  <Shield className='w-4 h-4 text-success' />
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
+                <span className='text-muted-foreground flex items-center gap-2 flex-shrink-0'>
+                  <Shield className='w-4 h-4 text-success flex-shrink-0' />
                   Coverage Plan
                 </span>
-                <span className='text-foreground capitalize'>
+                <span className='text-foreground capitalize break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
                   {watchCoveragePlan}
                 </span>
               </div>
-              <div className='flex justify-between items-center relative z-10'>
-                <span className='text-muted-foreground flex items-center gap-2'>
-                  <Globe className='w-4 h-4 text-success' />
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
+                <span className='text-muted-foreground flex items-center gap-2 flex-shrink-0'>
+                  <Plane className='w-4 h-4 text-success flex-shrink-0' />
+                  Trip Type
+                </span>
+                <span className='text-foreground capitalize break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
+                  {watchAll.tripType === "single"
+                    ? "Single Trip"
+                    : "Annual Multi-trip"}
+                </span>
+              </div>
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
+                <span className='text-muted-foreground flex items-center gap-2 flex-shrink-0'>
+                  <Globe className='w-4 h-4 text-success flex-shrink-0' />
                   Destination
                 </span>
-                <span className='text-foreground'>
+                <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
                   {
                     countries.find((c) => c.value === watchAll.destination)
                       ?.label
                   }
                 </span>
+              </div>
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
+                <span className='text-muted-foreground flex items-center gap-2 flex-shrink-0'>
+                  <Calendar className='w-4 h-4 text-success flex-shrink-0' />
+                  Travel Dates
+                </span>
+                <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
+                  {watchAll.startDate} - {watchAll.endDate}
+                </span>
+              </div>
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 min-w-0'>
+                <span className='text-muted-foreground flex items-center gap-2 flex-shrink-0'>
+                  <Users className='w-4 h-4 text-success flex-shrink-0' />
+                  Travellers
+                </span>
+                <span className='text-foreground break-words sm:text-right min-w-0 overflow-wrap-anywhere'>
+                  {watchAll.numberOfTravellers}
+                </span>
+              </div>
+              <div className='flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center sm:gap-4 pt-3 border-t border-border min-w-0'>
+                <span className='text-muted-foreground flex-shrink-0'>
+                  Policy Number
+                </span>
+                <Badge
+                  variant='secondary'
+                  className='flex items-center gap-1.5 bg-success/10 text-success border-success/20 w-fit break-all max-w-full'
+                >
+                  <CheckCircle2 className='w-3.5 h-3.5 flex-shrink-0' />
+                  <span className='truncate'>{policyNumber}</span>
+                </Badge>
               </div>
             </div>
 
@@ -672,11 +684,13 @@ export function TravelInsuranceFormGlass({
           ))}
         </div>
 
-        <div className='text-center'>
-          <span className='text-muted-foreground'>
-            Step {currentStep + 1} of {steps.length}
-          </span>
-        </div>
+        {stepperType === ("dots" as any) && (
+          <div className='text-center'>
+            <span className='text-muted-foreground'>
+              Step {currentStep + 1} of {steps.length}
+            </span>
+          </div>
+        )}
       </div>
     );
   };
@@ -766,30 +780,24 @@ export function TravelInsuranceFormGlass({
     >
       {/* Illustration */}
       <div
-        className='relative overflow-hidden bg-card border border-border flex flex-col items-center justify-center'
+        className='relative overflow-hidden bg-card border border-border flex items-center gap-4'
         style={{
           borderRadius: getInputBorderRadius(),
-          height:
-            spacing === "compact"
-              ? "180px"
-              : spacing === "spacious"
-              ? "280px"
-              : "230px",
           padding:
             spacing === "compact"
-              ? "1.5rem"
+              ? "1rem"
               : spacing === "spacious"
-              ? "3rem"
-              : "2rem",
+              ? "1.5rem"
+              : "1.25rem",
         }}
       >
         <TripIllustration
-          className='w-32 h-32 mb-4'
+          className='w-16 h-16 flex-shrink-0'
           strokeColor={
             themeColors?.[0] ? "var(--theme-primary)" : "var(--primary)"
           }
         />
-        <div className='text-center'>
+        <div>
           <h3 className='mb-1 text-foreground'>Trip Information</h3>
           <p className='text-muted-foreground'>
             Let's start with your travel details
@@ -803,58 +811,21 @@ export function TravelInsuranceFormGlass({
             value={watchAll.tripType}
             onValueChange={(value) => setValue("tripType", value)}
           >
-            <div className='grid grid-cols-2 gap-3'>
-              {["single", "annual"].map((type) => (
-                <div
-                  key={type}
-                  className={`p-4 border-2 transition-all cursor-pointer ${
-                    watchAll.tripType === type
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card"
-                  }`}
-                  style={{
-                    borderRadius: getInputBorderRadius(),
-                    borderColor:
-                      watchAll.tripType === type && themeColors?.[0]
-                        ? `var(--theme-primary)`
-                        : undefined,
-                  }}
-                  onClick={() => setValue("tripType", type)}
-                >
-                  <RadioGroupItem value={type} id={type} className='sr-only' />
-                  <Label
-                    htmlFor={type}
-                    className='cursor-pointer text-foreground flex items-center gap-2'
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                        watchAll.tripType === type
-                          ? "border-primary"
-                          : "border-border"
-                      }`}
-                      style={{
-                        borderColor:
-                          watchAll.tripType === type && themeColors?.[0]
-                            ? `var(--theme-primary)`
-                            : undefined,
-                      }}
-                    >
-                      {watchAll.tripType === type && (
-                        <div
-                          className='w-2 h-2 rounded-full bg-primary'
-                          style={{
-                            backgroundColor: themeColors?.[0]
-                              ? `var(--theme-primary)`
-                              : undefined,
-                          }}
-                        />
-                      )}
-                    </div>
-                    {type === "single" ? "Single Trip" : "Annual Multi-trip"}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            <Select
+              value={watchAll.tripType || ""}
+              onValueChange={(value) => setValue("tripType", value)}
+            >
+              <SelectTrigger
+                className='bg-card border-border text-foreground'
+                style={{ borderRadius: getInputBorderRadius() }}
+              >
+                <SelectValue placeholder='Select trip type' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='single'>Single Trip</SelectItem>
+                <SelectItem value='annual'>Annual Multi-trip</SelectItem>
+              </SelectContent>
+            </Select>
           </RadioGroup>
         </FieldWrapper>
 
@@ -887,7 +858,7 @@ export function TravelInsuranceFormGlass({
           <Input
             type='date'
             {...register("travelStartDate")}
-            className='bg-input-background border-border text-foreground'
+            className='bg-input-background border-border text-foreground date-input-white-icon'
             style={{
               height: getInputHeight(),
               borderRadius: getInputBorderRadius(),
@@ -900,7 +871,7 @@ export function TravelInsuranceFormGlass({
           <Input
             type='date'
             {...register("travelEndDate")}
-            className='bg-input-background border-border text-foreground'
+            className='bg-input-background border-border text-foreground date-input-white-icon'
             style={{
               height: getInputHeight(),
               borderRadius: getInputBorderRadius(),
@@ -939,30 +910,24 @@ export function TravelInsuranceFormGlass({
     >
       {/* Illustration */}
       <div
-        className='relative overflow-hidden bg-card border border-border flex flex-col items-center justify-center'
+        className='relative overflow-hidden bg-card border border-border flex items-center gap-4'
         style={{
           borderRadius: getInputBorderRadius(),
-          height:
-            spacing === "compact"
-              ? "180px"
-              : spacing === "spacious"
-              ? "280px"
-              : "230px",
           padding:
             spacing === "compact"
-              ? "1.5rem"
+              ? "1rem"
               : spacing === "spacious"
-              ? "3rem"
-              : "2rem",
+              ? "1.5rem"
+              : "1.25rem",
         }}
       >
         <TravellerIllustration
-          className='w-32 h-32 mb-4'
+          className='w-16 h-16 flex-shrink-0'
           strokeColor={
             themeColors?.[0] ? "var(--theme-primary)" : "var(--primary)"
           }
         />
-        <div className='text-center'>
+        <div>
           <h3 className='mb-1 text-foreground'>Traveller Information</h3>
           <p className='text-muted-foreground'>
             Please provide details for each traveller
@@ -984,17 +949,6 @@ export function TravelInsuranceFormGlass({
               gap: getFieldGap(),
             }}
           >
-            {/* Background passport illustration - only for first traveller */}
-            {index === 0 && (
-              <div className='absolute top-0 right-0 w-32 h-32 opacity-5 pointer-events-none'>
-                <ImageWithFallback
-                  src='https://images.unsplash.com/photo-1613244470042-e69e8ccb303a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXNzcG9ydCUyMHRyYXZlbCUyMGRvY3VtZW50c3xlbnwxfHx8fDE3NjIzNzM4MjB8MA&ixlib=rb-4.1.0&q=80&w=1080'
-                  alt='Passport'
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
-
             {/* Decorative corner accent */}
             <div
               className='absolute top-0 left-0 w-20 h-20 opacity-10 pointer-events-none'
@@ -1108,30 +1062,24 @@ export function TravelInsuranceFormGlass({
     >
       {/* Illustration */}
       <div
-        className='relative overflow-hidden bg-card border border-border flex flex-col items-center justify-center'
+        className='relative overflow-hidden bg-card border border-border flex items-center gap-4'
         style={{
           borderRadius: getInputBorderRadius(),
-          height:
-            spacing === "compact"
-              ? "180px"
-              : spacing === "spacious"
-              ? "280px"
-              : "230px",
           padding:
             spacing === "compact"
-              ? "1.5rem"
+              ? "1rem"
               : spacing === "spacious"
-              ? "3rem"
-              : "2rem",
+              ? "1.5rem"
+              : "1.25rem",
         }}
       >
         <CoverageIllustration
-          className='w-32 h-32 mb-4'
+          className='w-16 h-16 flex-shrink-0'
           strokeColor={
             themeColors?.[0] ? "var(--theme-primary)" : "var(--primary)"
           }
         />
-        <div className='text-center'>
+        <div>
           <h3 className='mb-1 text-foreground'>Choose Your Plan</h3>
           <p className='text-muted-foreground'>
             Select the coverage that fits your needs
@@ -1139,11 +1087,11 @@ export function TravelInsuranceFormGlass({
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        {coveragePlans.map((plan: any, planIndex) => (
+      <div className='grid grid-cols-1 gap-3'>
+        {coveragePlans.map((plan: any, planIndex: number) => (
           <div
             key={plan.id}
-            className={`p-6 border-2 cursor-pointer transition-all duration-300 bg-card relative overflow-hidden ${
+            className={`p-4 border-2 cursor-pointer transition-all duration-300 bg-card relative overflow-hidden ${
               watchCoveragePlan === plan.id
                 ? "border-primary shadow-lg"
                 : "border-border hover:border-primary/50"
@@ -1207,12 +1155,12 @@ export function TravelInsuranceFormGlass({
 
             {plan.recommended && (
               <div
-                className='absolute -top-3 right-4 px-3 py-1 text-xs text-white bg-accent flex items-center gap-1'
+                className='absolute -top-3 right-4 px-3 py-1 text-xs text-white flex items-center gap-1'
                 style={{
                   borderRadius: getButtonBorderRadius(),
                   backgroundColor: themeColors?.[1]
                     ? `var(--theme-accent)`
-                    : undefined,
+                    : "#F8F8F8",
                 }}
               >
                 <Sparkles className='w-3 h-3' />
@@ -1220,26 +1168,28 @@ export function TravelInsuranceFormGlass({
               </div>
             )}
 
-            <h4 className='text-foreground mb-2 relative z-10'>{plan.name}</h4>
+            <h4 className='text-foreground mb-1 relative z-10'>{plan.name}</h4>
             <div
-              className='mb-4'
+              className='mb-2'
               style={{
                 color: themeColors?.[0]
                   ? `var(--theme-primary)`
                   : "var(--primary)",
               }}
             >
-              <span className='text-2xl'>${plan.price}</span>
-              <span className='text-muted-foreground text-sm'> /trip</span>
+              <span style={{ fontSize: "clamp(18px, 4vw, 24px)" }}>
+                ${plan.price}
+              </span>
+              <span className='text-muted-foreground'> /trip</span>
             </div>
-            <p className='text-muted-foreground text-sm mb-4'>
+            <p className='text-muted-foreground mb-2'>
               Coverage: {plan.coverage}
             </p>
-            <ul className='space-y-2'>
+            <ul className='space-y-1'>
               {plan.features.map((feature: any, index: number) => (
                 <li
                   key={index}
-                  className='text-sm text-muted-foreground flex items-start gap-2'
+                  className='text-muted-foreground flex items-start gap-2'
                 >
                   <Check className='w-4 h-4 text-success mt-0.5 flex-shrink-0' />
                   <span>{feature}</span>
@@ -1264,30 +1214,24 @@ export function TravelInsuranceFormGlass({
     >
       {/* Illustration */}
       <div
-        className='relative overflow-hidden bg-card border border-border flex flex-col items-center justify-center'
+        className='relative overflow-hidden bg-card border border-border flex items-center gap-4'
         style={{
           borderRadius: getInputBorderRadius(),
-          height:
-            spacing === "compact"
-              ? "180px"
-              : spacing === "spacious"
-              ? "280px"
-              : "230px",
           padding:
             spacing === "compact"
-              ? "1.5rem"
+              ? "1rem"
               : spacing === "spacious"
-              ? "3rem"
-              : "2rem",
+              ? "1.5rem"
+              : "1.25rem",
         }}
       >
         <NomineeIllustration
-          className='w-32 h-32 mb-4'
+          className='w-16 h-16 flex-shrink-0'
           strokeColor={
             themeColors?.[0] ? "var(--theme-primary)" : "var(--primary)"
           }
         />
-        <div className='text-center'>
+        <div>
           <h3 className='mb-1 text-foreground'>Nominee Details</h3>
           <p className='text-muted-foreground'>
             Who should we contact in case of emergency?
@@ -1364,36 +1308,38 @@ export function TravelInsuranceFormGlass({
     >
       {/* Illustration */}
       <div
-        className='relative overflow-hidden bg-accent/5 border border-border'
+        className='relative overflow-hidden bg-card border border-border flex items-center gap-4'
         style={{
           borderRadius: getInputBorderRadius(),
-          height:
+          padding:
             spacing === "compact"
-              ? "150px"
+              ? "1rem"
               : spacing === "spacious"
-              ? "250px"
-              : "200px",
+              ? "1.5rem"
+              : "1.25rem",
         }}
       >
-        <ImageWithFallback
-          src='https://images.unsplash.com/photo-1563013544-824ae1b704d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVkaXQlMjBjYXJkJTIwcGF5bWVudHxlbnwxfHx8fDE3NjIzNTEwMDR8MA&ixlib=rb-4.1.0&q=80&w=1080'
-          alt='Credit card payment'
-          className='w-full h-full object-cover'
-        />
         <div
-          className='absolute inset-0 bg-primary/60 flex items-center justify-center'
+          className='w-16 h-16 flex-shrink-0 rounded-full flex items-center justify-center'
           style={{
-            backgroundColor: themeColors?.[0]
-              ? `var(--theme-primary)`
-              : "var(--primary)",
-            opacity: 0.7,
+            backgroundColor: `color-mix(in srgb, ${
+              themeColors?.[0] || "var(--primary)"
+            } 12%, var(--card))`,
+            border: `2px solid color-mix(in srgb, ${
+              themeColors?.[0] || "var(--primary)"
+            } 20%, var(--border))`,
           }}
         >
-          <div className='text-center text-white p-4'>
-            <CreditCard className='w-12 h-12 mx-auto mb-2' />
-            <h3 className='mb-1'>Payment Details</h3>
-            <p className='text-white/90'>Enter your payment information</p>
-          </div>
+          <CreditCard
+            className='w-8 h-8'
+            style={{ color: themeColors?.[0] || "var(--primary)" }}
+          />
+        </div>
+        <div>
+          <h3 className='mb-1 text-foreground'>Payment Details</h3>
+          <p className='text-muted-foreground'>
+            Enter your payment information
+          </p>
         </div>
       </div>
 
@@ -1559,9 +1505,10 @@ export function TravelInsuranceFormGlass({
 
   return (
     <div
-      className='min-h-screen bg-accent/20 relative overflow-hidden'
+      className='min-h-screen relative overflow-hidden'
       style={{
         ...getThemeStyles(),
+        backgroundColor: "var(--container-bg)",
         padding:
           spacing === "compact"
             ? "1rem"
@@ -1607,14 +1554,6 @@ export function TravelInsuranceFormGlass({
       </div>
 
       {/* Floating SVG Shapes */}
-      <div className='absolute top-20 left-10 opacity-10 pointer-events-none hidden lg:block'>
-        <svg width='120' height='120' viewBox='0 0 120 120' fill='none'>
-          <path
-            d='M60 10L90 90L10 50L110 50L30 90L60 10Z'
-            fill={themeColors?.[0] || "var(--primary)"}
-          />
-        </svg>
-      </div>
       <div className='absolute bottom-40 right-20 opacity-10 pointer-events-none hidden lg:block'>
         <svg width='100' height='100' viewBox='0 0 100 100' fill='none'>
           <circle
@@ -1634,7 +1573,12 @@ export function TravelInsuranceFormGlass({
         </svg>
       </div>
 
-      <div className='max-w-4xl mx-auto relative z-10'>
+      <div
+        className='mx-auto relative z-10 transition-all duration-300'
+        style={{
+          maxWidth: getContainerMaxWidth(),
+        }}
+      >
         {/* Main Card */}
         <div
           className='overflow-hidden bg-card border border-border shadow-xl'
@@ -1644,72 +1588,99 @@ export function TravelInsuranceFormGlass({
         >
           {/* Header */}
           <div
-            className='text-center border-b border-border bg-background relative overflow-hidden'
+            className='border-b border-border relative overflow-hidden'
             style={{
+              background: `linear-gradient(135deg,
+                color-mix(in srgb, ${
+                  themeColors?.[0] || "var(--primary)"
+                } 8%, var(--background)) 0%,
+                var(--background) 50%,
+                color-mix(in srgb, ${
+                  themeColors?.[1] || "var(--accent)"
+                } 6%, var(--background)) 100%)`,
               padding: getSpacingValue(),
             }}
           >
-            {/* Background Illustration */}
-            <div className='absolute inset-0 opacity-5 pointer-events-none'>
-              <ImageWithFallback
-                src='https://images.unsplash.com/photo-1642009071428-119813340e22?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b3JsZCUyMG1hcCUyMHRyYXZlbHxlbnwxfHx8fDE3NjIzNjQ2OTN8MA&ixlib=rb-4.1.0&q=80&w=1080'
-                alt='World map'
-                className='w-full h-full object-cover'
-              />
-            </div>
-
-            {/* Decorative Icons */}
-            <div className='absolute top-4 left-4 opacity-20 pointer-events-none'>
-              <Plane
-                className='w-8 h-8'
+            {/* Decorative Background Patterns */}
+            <div className='absolute inset-0 pointer-events-none opacity-10'>
+              {/* Grid Pattern */}
+              <div
+                className='absolute inset-0'
                 style={{
-                  color: themeColors?.[0]
-                    ? `var(--theme-primary)`
-                    : "var(--accent)",
+                  backgroundImage: `linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)`,
+                  backgroundSize: "40px 40px",
                 }}
               />
-            </div>
-            <div className='absolute top-4 right-4 opacity-20 pointer-events-none'>
-              <Globe
-                className='w-8 h-8'
+              {/* Radial gradient overlay */}
+              <div
+                className='absolute inset-0'
                 style={{
-                  color: themeColors?.[1]
-                    ? `var(--theme-accent)`
-                    : "var(--primary)",
-                }}
-              />
-            </div>
-            <div className='absolute bottom-4 left-8 opacity-20 pointer-events-none'>
-              <MapPin
-                className='w-6 h-6'
-                style={{
-                  color: themeColors?.[0]
-                    ? `var(--theme-primary)`
-                    : "var(--accent)",
-                }}
-              />
-            </div>
-            <div className='absolute bottom-4 right-8 opacity-20 pointer-events-none'>
-              <Shield
-                className='w-6 h-6'
-                style={{
-                  color: themeColors?.[1]
-                    ? `var(--theme-accent)`
-                    : "var(--primary)",
+                  background: `radial-gradient(circle at 30% 50%, color-mix(in srgb, ${
+                    themeColors?.[0] || "var(--primary)"
+                  } 15%, transparent) 0%, transparent 60%)`,
                 }}
               />
             </div>
 
-            <div className='relative z-10'>
-              <ImageWithFallback
-                src={suitcaseImage as any}
-                alt='Travel Insurance'
-                className='w-24 h-24 mx-auto mb-4 object-contain'
-              />
-              <h2 className='text-foreground mb-2'>Travel Insurance Journey</h2>
-              <p className='text-muted-foreground'>
-                Get insured for your trip in just 5 easy steps
-              </p>
+            {/* Main Content */}
+            <div className='relative z-10 flex flex-col md:flex-row items-center justify-center gap-6 max-w-3xl mx-auto'>
+              {/* Icon */}
+              <div className='relative flex-shrink-0'>
+                <ImageWithFallback
+                  src={suitcaseImage as any}
+                  alt='Travel Insurance'
+                  className='w-24 h-24 object-contain'
+                />
+              </div>
+
+              {/* Text Content */}
+              <div className='text-center md:text-left flex-1'>
+                <div
+                  className='inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3'
+                  style={{
+                    background: `color-mix(in srgb, ${
+                      themeColors?.[0] || "var(--primary)"
+                    } 12%, var(--card))`,
+                    border: `1px solid color-mix(in srgb, ${
+                      themeColors?.[0] || "var(--primary)"
+                    } 20%, var(--border))`,
+                  }}
+                >
+                  <Sparkles
+                    className='w-3.5 h-3.5'
+                    style={{ color: themeColors?.[0] || "var(--primary)" }}
+                  />
+                  <span
+                    style={{
+                      color: themeColors?.[0] || "var(--primary)",
+                      fontSize: "13px",
+                    }}
+                  >
+                    Quick & Easy Process
+                  </span>
+                </div>
+                <h2
+                  className='text-foreground mb-2'
+                  style={{ letterSpacing: "-0.02em" }}
+                >
+                  Travel Insurance Journey
+                </h2>
+                <p
+                  className='text-muted-foreground'
+                  style={{ maxWidth: "500px" }}
+                >
+                  Get comprehensive coverage for your trip in just 5 simple
+                  steps.
+                  <span
+                    style={{
+                      color: themeColors?.[0] || "var(--primary)",
+                      marginLeft: "4px",
+                    }}
+                  >
+                    Travel safe, travel smart.
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
 

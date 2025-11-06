@@ -1,610 +1,269 @@
 # Environment Variables Documentation
 
-Complete reference for all environment variables in AI 360 - Auto-Build Deployable Journeys.
+## Overview
 
----
+Journey 360 uses environment variables to configure AI service integration and feature flags. All variables are optional and have sensible defaults.
 
-## Quick Start
+## Setup
 
-### No Configuration Needed
-
-The application works **immediately** without any environment variables. All features are enabled with sensible defaults.
-
-### Optional Customization
-
-To customize behavior, create a `.env.local` file:
-
+1. Copy the example file:
 ```bash
 cp .env.example .env.local
 ```
 
-Then edit `.env.local` with your preferred values.
+2. Update values in `.env.local` with your configuration
 
----
+3. Restart the development server:
+```bash
+npm run dev
+```
 
 ## Environment Files
 
-### File Priority (highest to lowest)
+- `.env.example` - Template with all available variables
+- `.env.local` - Your local configuration (gitignored)
+- `.env.production` - Production configuration (if needed)
 
-1. `.env.local` - Local overrides (gitignored, use for development)
-2. `.env.development` - Development defaults (can be committed)
-3. `.env.production` - Production defaults (can be committed)
-4. `.env` - Global defaults (can be committed)
+**Important**: Never commit `.env.local` or `.env.production` to version control.
 
-### Which File to Use
+## AI Service Variables
 
-**For local development:**
-- Use `.env.local` (never committed)
-- Overrides all other env files
+These variables configure the AI service integration for converting natural language to Form Schema JSON.
 
-**For team-wide defaults:**
-- Use `.env.development` (committed to repo)
-- Shared across team members
+### Core Configuration
 
-**For deployment:**
-- Set variables directly on hosting platform
-- Don't rely on `.env.production` file
+#### `NEXT_PUBLIC_AI_SERVICE_URL`
+- **Type**: String (URL)
+- **Required**: No
+- **Default**: None
+- **Description**: Base URL for your AI service API endpoint
+- **Example**: `https://api.openai.com/v1` or `https://api.anthropic.com/v1`
 
----
+#### `NEXT_PUBLIC_AI_SERVICE_API_KEY`
+- **Type**: String
+- **Required**: No (required if AI parsing is enabled)
+- **Default**: None
+- **Description**: API key for authenticating with your AI service
+- **Security**: Keep this secret! Never expose in client-side code
+- **Example**: `sk-proj-abc123...`
 
-## Current Configuration Variables
+### Model Configuration
 
-### Application Settings
+#### `NEXT_PUBLIC_AI_MODEL`
+- **Type**: String
+- **Required**: No
+- **Default**: `gpt-4`
+- **Description**: AI model to use for schema generation
+- **Options**:
+  - `gpt-4` - Most capable, best for complex forms
+  - `gpt-3.5-turbo` - Faster, cheaper, good for simple forms
+  - `claude-3-opus` - Anthropic's most capable model
+  - `claude-3-sonnet` - Balanced performance and cost
 
-#### NODE_ENV
-- **Type:** `string`
-- **Values:** `development` | `production` | `test`
-- **Default:** `development`
-- **Required:** No
-- **Description:** Node environment mode
-- **Usage:**
-  ```env
-  NODE_ENV=development
-  ```
+#### `NEXT_PUBLIC_AI_MAX_TOKENS`
+- **Type**: Number
+- **Required**: No
+- **Default**: `2000`
+- **Description**: Maximum tokens in AI response
+- **Range**: 100 - 4000
+- **Cost Impact**: Higher values = higher API costs
 
-#### PORT
-- **Type:** `number`
-- **Default:** `3000`
-- **Required:** No
-- **Description:** Port for development server
-- **Usage:**
-  ```env
-  PORT=3001
-  ```
-- **Note:** Production port is set by hosting platform
+#### `NEXT_PUBLIC_AI_TEMPERATURE`
+- **Type**: Number (float)
+- **Required**: No
+- **Default**: `0.7`
+- **Description**: Controls randomness in AI responses
+- **Range**: 0.0 - 1.0
+- **Recommendations**:
+  - `0.0-0.3`: Deterministic, consistent schemas
+  - `0.4-0.7`: Balanced creativity and consistency (recommended)
+  - `0.8-1.0`: More creative, less predictable
 
-#### NEXT_PUBLIC_APP_URL
-- **Type:** `string`
-- **Default:** `http://localhost:3000`
-- **Required:** No
-- **Description:** Full application URL (used for redirects and API calls)
-- **Usage:**
-  ```env
-  # Development
-  NEXT_PUBLIC_APP_URL=http://localhost:3000
-  
-  # Production
-  NEXT_PUBLIC_APP_URL=https://yourdomain.com
-  ```
-
----
+#### `NEXT_PUBLIC_AI_TIMEOUT`
+- **Type**: Number (milliseconds)
+- **Required**: No
+- **Default**: `30000` (30 seconds)
+- **Description**: Timeout for AI service requests
+- **Range**: 5000 - 60000
 
 ## Feature Flags
 
-### NEXT_PUBLIC_ENABLE_SPEECH
-- **Type:** `boolean`
-- **Default:** `true`
-- **Required:** No
-- **Description:** Enable/disable speech recognition feature
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_ENABLE_SPEECH=true
-  ```
-- **Impact:** 
-  - `true`: Speech input option available on input screen
-  - `false`: Speech input option hidden
+Control which features are enabled in your deployment.
 
-### NEXT_PUBLIC_ENABLE_UPLOAD
-- **Type:** `boolean`
-- **Default:** `true`
-- **Required:** No
-- **Description:** Enable/disable file upload feature
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_ENABLE_UPLOAD=true
-  ```
-- **Impact:**
-  - `true`: Upload option available on landing page
-  - `false`: Upload option hidden
+#### `NEXT_PUBLIC_ENABLE_AI_PARSER`
+- **Type**: Boolean
+- **Required**: No
+- **Default**: `false`
+- **Description**: Enable AI-powered schema generation
+- **Values**: `true` | `false`
+- **Note**: Requires AI service configuration
 
-### NEXT_PUBLIC_ENABLE_DARK_MODE
-- **Type:** `boolean`
-- **Default:** `true`
-- **Required:** No
-- **Description:** Enable/disable dark mode toggle
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_ENABLE_DARK_MODE=true
-  ```
-- **Impact:**
-  - `true`: Dark mode toggle shown in top nav
-  - `false`: Dark mode toggle hidden
+#### `NEXT_PUBLIC_ENABLE_MOCK_API`
+- **Type**: Boolean
+- **Required**: No
+- **Default**: `true`
+- **Description**: Enable mock API generation feature
 
----
+#### `NEXT_PUBLIC_ENABLE_TEST_GEN`
+- **Type**: Boolean
+- **Required**: No
+- **Default**: `true`
+- **Description**: Enable automatic test generation
 
-## Mock Configuration
+#### `NEXT_PUBLIC_ENABLE_SPEECH`
+- **Type**: Boolean
+- **Required**: No
+- **Default**: `true`
+- **Description**: Enable speech-to-text input
+- **Note**: Requires HTTPS or localhost
 
-### NEXT_PUBLIC_USE_MOCK_AI
-- **Type:** `boolean`
-- **Default:** `true`
-- **Required:** No
-- **Description:** Use mock AI parser (Travel Insurance scenario)
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_USE_MOCK_AI=true
-  ```
-- **Impact:**
-  - `true`: Always generates Travel Insurance journey
-  - `false`: Uses real AI parsing (requires AI service configuration)
+## Application Settings
 
-### NEXT_PUBLIC_MOCK_API_DELAY
-- **Type:** `number` (milliseconds)
-- **Default:** `2000`
-- **Required:** No
-- **Description:** Simulated processing delay for mock AI
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_MOCK_API_DELAY=1500
-  ```
-- **Impact:** Time in milliseconds before showing generated form
+#### `NODE_ENV`
+- **Type**: String
+- **Set by**: Next.js automatically
+- **Values**: `development` | `production` | `test`
+- **Description**: Current environment
 
----
+#### `NEXT_PUBLIC_BASE_URL`
+- **Type**: String (URL)
+- **Required**: No
+- **Default**: Auto-detected
+- **Description**: Base URL for your application
+- **Example**: `https://journey360.example.com`
 
-## Future Integration Variables
+## Development Settings
 
-### AI Services (Not Currently Active)
+#### `NEXT_PUBLIC_DEBUG`
+- **Type**: Boolean
+- **Required**: No
+- **Default**: `false`
+- **Description**: Enable debug logging in console
+- **Recommendation**: Only enable in development
 
-#### OPENAI_API_KEY
-- **Type:** `string`
-- **Required:** When using OpenAI
-- **Description:** OpenAI API key for real AI parsing
-- **Usage:**
-  ```env
-  OPENAI_API_KEY=sk-proj-abcd1234...
-  ```
-- **Where to get:** https://platform.openai.com/api-keys
-- **Security:** Server-side only (no NEXT_PUBLIC_ prefix)
+## AI Service Integration Flow
 
-#### OPENAI_MODEL
-- **Type:** `string`
-- **Default:** `gpt-4`
-- **Required:** No
-- **Description:** OpenAI model to use
-- **Usage:**
-  ```env
-  OPENAI_MODEL=gpt-4
-  ```
-- **Options:** `gpt-4`, `gpt-4-turbo`, `gpt-3.5-turbo`
-
-#### OPENAI_MAX_TOKENS
-- **Type:** `number`
-- **Default:** `2000`
-- **Required:** No
-- **Description:** Maximum tokens for AI response
-- **Usage:**
-  ```env
-  OPENAI_MAX_TOKENS=3000
-  ```
-
----
-
-### Database (Not Currently Active)
-
-#### NEXT_PUBLIC_SUPABASE_URL
-- **Type:** `string`
-- **Required:** When using Supabase
-- **Description:** Supabase project URL
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=https://abcdefgh.supabase.co
-  ```
-- **Where to get:** Supabase Dashboard → Settings → API
-
-#### NEXT_PUBLIC_SUPABASE_ANON_KEY
-- **Type:** `string`
-- **Required:** When using Supabase
-- **Description:** Supabase anonymous key (public)
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
-  ```
-- **Where to get:** Supabase Dashboard → Settings → API
-- **Note:** Safe to expose (anon key, not service role key)
-
-#### SUPABASE_SERVICE_ROLE_KEY
-- **Type:** `string`
-- **Required:** For admin operations
-- **Description:** Supabase service role key (secret)
-- **Usage:**
-  ```env
-  SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
-  ```
-- **Security:** Server-side only, very sensitive
-- **Warning:** Never expose this key to the browser
-
-#### DATABASE_URL
-- **Type:** `string`
-- **Required:** When using PostgreSQL directly
-- **Description:** PostgreSQL connection string
-- **Usage:**
-  ```env
-  DATABASE_URL=postgresql://user:password@localhost:5432/ai360
-  ```
-
-#### MONGODB_URI
-- **Type:** `string`
-- **Required:** When using MongoDB
-- **Description:** MongoDB connection string
-- **Usage:**
-  ```env
-  MONGODB_URI=mongodb://localhost:27017/ai360
-  ```
-
----
-
-### Authentication (Not Currently Active)
-
-#### NEXTAUTH_URL
-- **Type:** `string`
-- **Required:** When using NextAuth
-- **Description:** NextAuth canonical URL
-- **Usage:**
-  ```env
-  # Development
-  NEXTAUTH_URL=http://localhost:3000
-  
-  # Production
-  NEXTAUTH_URL=https://yourdomain.com
-  ```
-
-#### NEXTAUTH_SECRET
-- **Type:** `string`
-- **Required:** Yes (for NextAuth)
-- **Description:** Secret for encrypting tokens
-- **Usage:**
-  ```env
-  NEXTAUTH_SECRET=your-secret-here
-  ```
-- **Generate:**
-  ```bash
-  openssl rand -base64 32
-  ```
-
-#### OAuth Provider Keys
-- **Required:** When using OAuth
-- **Examples:**
-  ```env
-  # GitHub
-  GITHUB_ID=your-github-oauth-app-id
-  GITHUB_SECRET=your-github-oauth-secret
-  
-  # Google
-  GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-  GOOGLE_CLIENT_SECRET=your-client-secret
-  
-  # Microsoft
-  AZURE_AD_CLIENT_ID=your-azure-client-id
-  AZURE_AD_CLIENT_SECRET=your-azure-secret
-  AZURE_AD_TENANT_ID=your-tenant-id
-  ```
-
----
-
-### Analytics & Monitoring (Not Currently Active)
-
-#### NEXT_PUBLIC_GA_MEASUREMENT_ID
-- **Type:** `string`
-- **Required:** When using Google Analytics
-- **Description:** Google Analytics Measurement ID
-- **Usage:**
-  ```env
-  NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-  ```
-- **Where to get:** Google Analytics → Admin → Data Streams
-
-#### SENTRY_DSN
-- **Type:** `string`
-- **Required:** When using Sentry
-- **Description:** Sentry Data Source Name
-- **Usage:**
-  ```env
-  SENTRY_DSN=https://abc123@o123456.ingest.sentry.io/123456
-  ```
-- **Where to get:** Sentry → Project Settings → Client Keys
-
----
-
-### External Services (Not Currently Active)
-
-#### Email Services
-
-```env
-# SendGrid
-SENDGRID_API_KEY=SG.abc123...
-
-# Resend
-RESEND_API_KEY=re_abc123...
-
-# Mailgun
-MAILGUN_API_KEY=key-abc123...
-MAILGUN_DOMAIN=mg.yourdomain.com
+```
+User Input (Text/Speech)
+        ↓
+AI Service Parser (utils/aiParser.ts)
+        ↓
+Uses Environment Variables:
+  • NEXT_PUBLIC_AI_SERVICE_URL
+  • NEXT_PUBLIC_AI_SERVICE_API_KEY
+  • NEXT_PUBLIC_AI_MODEL
+  • NEXT_PUBLIC_AI_MAX_TOKENS
+  • NEXT_PUBLIC_AI_TEMPERATURE
+        ↓
+AI Service API Call
+        ↓
+Form Schema JSON Response
+        ↓
+Form Renderer (components/FormRenderer.tsx)
 ```
 
-#### File Storage
+## Example Configurations
 
-```env
-# AWS S3
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-AWS_REGION=us-east-1
-AWS_S3_BUCKET=your-bucket-name
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=123456789012345
-CLOUDINARY_API_SECRET=abcdefghijklmnopqrstuvwxyz
+### Development (AI Disabled)
+```bash
+NEXT_PUBLIC_ENABLE_AI_PARSER=false
+NEXT_PUBLIC_ENABLE_MOCK_API=true
+NEXT_PUBLIC_ENABLE_TEST_GEN=true
+NEXT_PUBLIC_DEBUG=true
 ```
 
----
-
-## Development Tools
-
-### ANALYZE
-- **Type:** `boolean`
-- **Default:** `false`
-- **Description:** Enable webpack bundle analyzer
-- **Usage:**
-  ```bash
-  ANALYZE=true npm run build
-  ```
-- **Output:** Opens bundle visualization in browser
-
-### DEBUG
-- **Type:** `string`
-- **Default:** (none)
-- **Description:** Enable debug logging
-- **Usage:**
-  ```env
-  DEBUG=*
-  ```
-- **Patterns:**
-  - `*` - Everything
-  - `next:*` - Next.js only
-  - `app:*` - Application only
-
-### NEXT_TELEMETRY_DISABLED
-- **Type:** `boolean`
-- **Default:** `false`
-- **Description:** Disable Next.js anonymous telemetry
-- **Usage:**
-  ```env
-  NEXT_TELEMETRY_DISABLED=1
-  ```
-
----
-
-## Security Variables (Production)
-
-### CORS_ORIGINS
-- **Type:** `string` (comma-separated)
-- **Description:** Allowed CORS origins
-- **Usage:**
-  ```env
-  CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
-  ```
-
-### Rate Limiting
-
-```env
-# Maximum requests per window
-RATE_LIMIT_MAX_REQUESTS=100
-
-# Time window in milliseconds (default: 15 minutes)
-RATE_LIMIT_WINDOW_MS=900000
+### Development (AI Enabled with OpenAI)
+```bash
+NEXT_PUBLIC_AI_SERVICE_URL=https://api.openai.com/v1
+NEXT_PUBLIC_AI_SERVICE_API_KEY=sk-proj-your-key
+NEXT_PUBLIC_AI_MODEL=gpt-4
+NEXT_PUBLIC_AI_MAX_TOKENS=2000
+NEXT_PUBLIC_AI_TEMPERATURE=0.7
+NEXT_PUBLIC_ENABLE_AI_PARSER=true
 ```
 
----
+### Production
+```bash
+NODE_ENV=production
+NEXT_PUBLIC_BASE_URL=https://journey360.example.com
+NEXT_PUBLIC_AI_SERVICE_URL=https://api.your-service.com/v1
+NEXT_PUBLIC_AI_SERVICE_API_KEY=your-production-key
+NEXT_PUBLIC_AI_MODEL=gpt-4
+NEXT_PUBLIC_ENABLE_AI_PARSER=true
+NEXT_PUBLIC_DEBUG=false
+```
 
-## Platform-Specific Variables
+## Security Best Practices
 
-### Vercel
+1. **Never commit** `.env.local` or `.env.production` files
+2. **Rotate API keys** regularly
+3. **Use different keys** for dev/staging/production
+4. **Monitor API usage** to detect unauthorized access
+5. **Set rate limits** on your AI service account
+6. **Use environment-specific** configurations
 
-Variables automatically set by Vercel:
-- `VERCEL` - Always `1` on Vercel
-- `VERCEL_ENV` - `production`, `preview`, or `development`
-- `VERCEL_URL` - Deployment URL
+## Implementation Notes
 
-### Netlify
+### Current State (v1.0)
+- AI service integration is **prepared but not implemented**
+- Schema generation currently uses **mock/template-based logic**
+- All AI variables are **optional** and have no effect when `ENABLE_AI_PARSER=false`
 
-Variables automatically set by Netlify:
-- `NETLIFY` - Always `true` on Netlify
-- `CONTEXT` - `production`, `deploy-preview`, or `branch-deploy`
-- `DEPLOY_URL` - Deployment URL
+### Future Implementation (v2.0)
+When implementing AI service integration:
 
----
+1. Update `utils/aiParser.ts`:
+```typescript
+const AI_SERVICE_URL = process.env.NEXT_PUBLIC_AI_SERVICE_URL;
+const AI_API_KEY = process.env.NEXT_PUBLIC_AI_SERVICE_API_KEY;
+const AI_MODEL = process.env.NEXT_PUBLIC_AI_MODEL || 'gpt-4';
 
-## Best Practices
+async function callAIService(prompt: string) {
+  const response = await fetch(`${AI_SERVICE_URL}/completions`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      prompt: prompt,
+      max_tokens: parseInt(process.env.NEXT_PUBLIC_AI_MAX_TOKENS || '2000'),
+      temperature: parseFloat(process.env.NEXT_PUBLIC_AI_TEMPERATURE || '0.7'),
+    }),
+  });
+  return response.json();
+}
+```
 
-### Security
-
-1. **Never commit `.env.local`**
-   - Already in `.gitignore`
-   - Contains sensitive local config
-
-2. **Use NEXT_PUBLIC_ wisely**
-   - Only for non-sensitive config
-   - Exposed to browser/clients
-   - Never for API keys or secrets
-
-3. **Server-side secrets**
-   - No `NEXT_PUBLIC_` prefix
-   - Only accessible in API routes
-   - Safe for sensitive data
-
-4. **Rotate secrets regularly**
-   - API keys
-   - Database passwords
-   - Auth secrets
-
-### Organization
-
-1. **Group related variables**
-   ```env
-   # Database
-   DATABASE_URL=...
-   DB_POOL_SIZE=...
-   
-   # Email
-   SMTP_HOST=...
-   SMTP_PORT=...
-   ```
-
-2. **Use comments**
-   ```env
-   # Production database (read/write)
-   DATABASE_URL=postgresql://...
-   
-   # Analytics database (read-only)
-   ANALYTICS_DB_URL=postgresql://...
-   ```
-
-3. **Document required vs optional**
-   ```env
-   # Required for production
-   NEXTAUTH_SECRET=...
-   
-   # Optional - defaults to false
-   ENABLE_BETA_FEATURES=true
-   ```
-
----
+2. Toggle feature in `components/InputRequirementScreen.tsx`:
+```typescript
+const enableAI = process.env.NEXT_PUBLIC_ENABLE_AI_PARSER === 'true';
+```
 
 ## Troubleshooting
 
-### Variable Not Working
+### AI Service Not Working
+1. Check API key is correct
+2. Verify service URL is accessible
+3. Check API quota/rate limits
+4. Review AI service logs
+5. Test with curl/Postman first
 
-1. **Check spelling**
-   - Variables are case-sensitive
-   - `NEXT_PUBLIC_API_URL` ≠ `NEXT_PUBLIC_api_url`
+### Environment Variables Not Loading
+1. Restart dev server after changes
+2. Check file name is exactly `.env.local`
+3. Verify variables start with `NEXT_PUBLIC_`
+4. Check for typos in variable names
 
-2. **Restart server**
-   ```bash
-   # Stop server (Ctrl+C)
-   npm run dev
-   ```
-   - Environment variables are loaded at startup
-   - Changes require restart
+### CORS Errors
+- AI service must allow requests from your domain
+- Configure CORS headers on AI service
+- Consider using API proxy route
 
-3. **Check file location**
-   - Must be in project root
-   - Named exactly `.env.local`
+## Support
 
-4. **Verify syntax**
-   ```env
-   # ✅ Correct
-   API_KEY=abc123
-   
-   # ❌ Wrong (spaces)
-   API_KEY = abc123
-   
-   # ❌ Wrong (quotes not needed)
-   API_KEY="abc123"
-   ```
-
-### NEXT_PUBLIC_ Not Available in Browser
-
-1. **Check prefix**
-   - Must start with `NEXT_PUBLIC_`
-   - Case-sensitive
-
-2. **Restart development server**
-   - Changes require rebuild
-
-3. **Check build**
-   ```bash
-   npm run build
-   # Variables are embedded at build time
-   ```
-
-### Different Values in Dev vs Production
-
-**Expected behavior:**
-- `.env.local` - Development only
-- Platform variables - Production only
-
-**Solution:**
-- Set production values on hosting platform
-- Don't rely on committed `.env.production`
-
----
-
-## Examples
-
-### Minimal Setup (Current)
-
-No `.env.local` needed! Application works with defaults.
-
-### Custom Port
-
-```env
-# .env.local
-PORT=3001
-```
-
-```bash
-npm run dev
-# Runs on http://localhost:3001
-```
-
-### Enable All Features
-
-```env
-# .env.local
-NEXT_PUBLIC_ENABLE_SPEECH=true
-NEXT_PUBLIC_ENABLE_UPLOAD=true
-NEXT_PUBLIC_ENABLE_DARK_MODE=true
-NEXT_PUBLIC_MOCK_API_DELAY=1000
-```
-
-### Production with Supabase
-
-```env
-# Set on hosting platform
-NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://yourdomain.com
-NEXT_PUBLIC_SUPABASE_URL=https://yourproject.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
-```
-
----
-
-## Summary
-
-| Variable | Required | Default | Purpose |
-|----------|----------|---------|---------|
-| NODE_ENV | No | `development` | Environment mode |
-| PORT | No | `3000` | Dev server port |
-| NEXT_PUBLIC_APP_URL | No | `http://localhost:3000` | App URL |
-| NEXT_PUBLIC_ENABLE_SPEECH | No | `true` | Speech input |
-| NEXT_PUBLIC_ENABLE_UPLOAD | No | `true` | File upload |
-| NEXT_PUBLIC_ENABLE_DARK_MODE | No | `true` | Dark mode |
-| NEXT_PUBLIC_MOCK_API_DELAY | No | `2000` | Mock delay (ms) |
-
-**All other variables are for future integrations and not currently required.**
-
----
-
-**Last Updated:** November 4, 2025  
-**Version:** 1.1.0  
-**Status:** Complete ✅
+For issues with:
+- **Environment setup**: Check this documentation
+- **AI service**: Contact your AI provider
+- **Application**: See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)

@@ -7,7 +7,11 @@ import { TopNav } from '../components/TopNav';
 import { Toaster } from '../components/ui/sonner';
 import '../styles/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export default function RootLayout({
   children,

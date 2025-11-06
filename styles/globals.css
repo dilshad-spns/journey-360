@@ -14,6 +14,14 @@
   --text-base: 14px;
   --text-label: 12px;
   
+  /* Responsive Typography Variables for Mobile */
+  --text-h1-mobile: 24px;
+  --text-h2-mobile: 20px;
+  --text-h3-mobile: 16px;
+  --text-h4-mobile: 14px;
+  --text-base-mobile: 12px;
+  --text-label-mobile: 11px;
+  
   /* The default background color for the application. */
   --background: rgba(250, 251, 252, 1);
   /* The default color for elements or text that appears on top of the background. */
@@ -82,6 +90,9 @@
   --destructive-hover: rgba(220, 38, 38, 1);
   --destructive-hover-bg: rgba(254, 226, 226, 1);
   --border-hover: rgba(148, 163, 184, 1);
+  /* Selected state colors for form configurator */
+  --selected-bg: rgba(238, 246, 250, 1);
+  --selected-border: rgba(0, 107, 208, 1);
   /* Shadow for small elevations, such as cards or modals. */
   --elevation-sm: 0px 0px 1px 0px rgba(3, 11, 23, 0.3), 0px 1px 1px 0px rgba(3, 11, 23, 0.15);
   /* Shadow for medium elevations, such as dropdowns or popovers. */
@@ -128,6 +139,8 @@
   --sidebar-border: rgba(222, 223, 225, 1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
   --sidebar-ring: rgba(0, 28, 86, 1);
+  /* The background color for page containers and outer wrappers. */
+  --container-bg: rgba(248, 248, 248, 1);
 }
 
 .dark {
@@ -185,6 +198,9 @@
   --destructive-hover: rgba(252, 165, 165, 1);
   --destructive-hover-bg: rgba(30, 27, 32, 1);
   --border-hover: rgba(148, 163, 184, 1);
+  /* Selected state colors for form configurator - dark mode */
+  --selected-bg: rgba(30, 58, 95, 1);
+  --selected-border: rgba(96, 165, 250, 1);
   --font-weight-semi-bold: 600;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
@@ -207,6 +223,8 @@
   --sidebar-accent-foreground: rgba(255, 255, 255, 1);
   --sidebar-border: rgba(66, 82, 110, 1);
   --sidebar-ring: rgba(96, 165, 250, 1);
+  /* The background color for page containers and outer wrappers in dark mode. */
+  --container-bg: rgba(23, 30, 45, 1);
 }
 
 @theme inline {
@@ -268,6 +286,9 @@
   --color-destructive-hover: var(--destructive-hover);
   --color-destructive-hover-bg: var(--destructive-hover-bg);
   --color-border-hover: var(--border-hover);
+  --color-selected-bg: var(--selected-bg);
+  --color-selected-border: var(--selected-border);
+  --color-container-bg: var(--container-bg);
 }
 
 @layer base {
@@ -284,9 +305,17 @@
   .dark input[type="date"]::-webkit-calendar-picker-indicator,
   .dark input[type="time"]::-webkit-calendar-picker-indicator,
   .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1.2);
-    opacity: 0.9;
+    filter: invert(1) brightness(2);
+    opacity: 1;
     cursor: pointer;
+  }
+
+  /* FORCE white calendar icon in dark mode with custom class */
+  .dark .date-input-white-icon::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(100) !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    background-color: transparent !important;
   }
 
   /* Firefox date input icons */
@@ -310,59 +339,105 @@
 @layer base {
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
-      font-size: var(--text-h1);
+      font-size: var(--text-h1-mobile);
       font-weight: var(--font-weight-semi-bold);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     h2 {
-      font-size: var(--text-h2);
+      font-size: var(--text-h2-mobile);
       font-weight: var(--font-weight-medium);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     h3 {
-      font-size: var(--text-h3);
+      font-size: var(--text-h3-mobile);
       font-weight: var(--font-weight-medium);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     h4 {
-      font-size: var(--text-h4);
+      font-size: var(--text-h4-mobile);
       font-weight: var(--font-weight-medium);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     p {
-      font-size: var(--text-base);
+      font-size: var(--text-base-mobile);
       font-weight: var(--font-weight-normal);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     label {
-      font-size: var(--text-label);
+      font-size: var(--text-label-mobile);
       font-weight: var(--font-weight-semi-bold);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     button {
-      font-size: var(--text-base);
+      font-size: var(--text-base-mobile);
       font-weight: var(--font-weight-medium);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
     input {
-      font-size: var(--text-base);
+      font-size: var(--text-base-mobile);
       font-weight: var(--font-weight-normal);
       font-family: 'Inter', sans-serif;
       line-height: 1.5;
+    }
+    
+    span {
+      font-size: var(--text-base-mobile);
+      font-weight: var(--font-weight-normal);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+    }
+    
+    /* Responsive typography for tablets and up */
+    @media (min-width: 640px) {
+      h1 {
+        font-size: var(--text-h1);
+      }
+
+      h2 {
+        font-size: var(--text-h2);
+      }
+
+      h3 {
+        font-size: var(--text-h3);
+      }
+
+      h4 {
+        font-size: var(--text-h4);
+      }
+
+      p {
+        font-size: var(--text-base);
+      }
+
+      label {
+        font-size: var(--text-label);
+      }
+
+      button {
+        font-size: var(--text-base);
+      }
+
+      input {
+        font-size: var(--text-base);
+      }
+      
+      span {
+        font-size: var(--text-base);
+      }
     }
   }
 }

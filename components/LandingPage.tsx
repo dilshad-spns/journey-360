@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { FileText, Mic, Upload, Sparkles, Clock, ArrowRight, Zap, Shield, Code, Sun, Moon } from 'lucide-react';
+import { FileText, Mic, Upload, Sparkles, Clock, ArrowRight, Zap, Shield, Code, Sun, Moon, Frame, Plane, Car, ExternalLink } from 'lucide-react';
 
 interface LandingPageProps {
   onSelectMode: (mode: 'text' | 'speech' | 'upload', prompt?: string) => void;
@@ -108,6 +109,7 @@ Non-Functional / System Notes
 - Validation messages must be concise and inline.
 - Progress indicator (e.g., 1/5 steps) should persist throughout the journey.
 - API failures should trigger graceful fallback with user-friendly messages.`,
+    'Create "Death Claim Journey" for Universal Life Product — North America Agent Portal. Design a complete 4-step journey flow for the "Death Claim Submission" process inside the North America Agent Portal for the Universal Life (UL) product. This journey allows insurance agents to submit death claims on behalf of existing clients with Claim Main Details (Request Date auto-populated, Effective Date picker, Primary Medical Reason dropdown), Required Documents (table with upload functionality, status tracking, received dates), Claim Assessment (dynamic questionnaire from Decisionator with approval/referral/rejection logic), and Payment Details (payee selection, payment percentage, bank details confirmation). Include success screen with Claim ID, status badges, and note-taking capability.',
     'Build a complete life insurance quote and buy journey with personal information collection, health questionnaire with conditional logic, beneficiary designation, coverage amount calculator based on income and dependents, policy comparison across term life and whole life options, underwriting document upload, payment setup with automatic premium scheduling, and digital policy delivery',
     'Design an end-to-end insurance claim submission journey featuring incident details capture with date/time/location, damage assessment with photo upload capabilities, witness information collection, police report attachment, repair estimate submission, claim amount calculation, supporting documentation management, adjuster assignment workflow, and real-time claim status tracking with notification preferences',
   ];
