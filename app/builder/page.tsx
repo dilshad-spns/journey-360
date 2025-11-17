@@ -29,18 +29,31 @@ export default function BuilderPage() {
 
       setRequirements(storedRequirements);
 
-      // Simulate AI processing
-      setTimeout(() => {
-        const generatedSchema = AIParser.parseUserStory(storedRequirements);
-        const generatedTests = TestGenerator.generateTests(generatedSchema);
-        const generatedMockApi =
-          MockApiGenerator.generateEndpoints(generatedSchema);
+      // Process requirements asynchronously
+      const processRequirements = async () => {
+        try {
+          // Wait for schema to be generated
+          const generatedSchema = await AIParser.parseUserStory(
+            storedRequirements
+          );
 
-        setSchema(generatedSchema);
-        setTests(generatedTests);
-        setMockApi(generatedMockApi);
-        setIsProcessing(false);
-      }, 2000);
+          // Only generate tests and mock API after schema is ready
+          const generatedTests = TestGenerator.generateTests(generatedSchema);
+          const generatedMockApi =
+            MockApiGenerator.generateEndpoints(generatedSchema);
+
+          setSchema(generatedSchema);
+          setTests(generatedTests);
+          setMockApi(generatedMockApi);
+          setIsProcessing(false);
+        } catch (error) {
+          console.error("Error processing requirements:", error);
+          setIsProcessing(false);
+          router.push("/");
+        }
+      };
+
+      processRequirements();
     }
   }, [router]);
 
@@ -57,9 +70,11 @@ export default function BuilderPage() {
       sessionStorage.setItem("requirements", newRequirements);
     }
 
-    // Simulate regeneration
-    setTimeout(() => {
-      const generatedSchema = AIParser.parseUserStory(newRequirements);
+    try {
+      // Wait for schema to be generated
+      const generatedSchema = await AIParser.parseUserStory(newRequirements);
+
+      // Only generate tests and mock API after schema is ready
       const generatedTests = TestGenerator.generateTests(generatedSchema);
       const generatedMockApi =
         MockApiGenerator.generateEndpoints(generatedSchema);
@@ -68,7 +83,10 @@ export default function BuilderPage() {
       setTests(generatedTests);
       setMockApi(generatedMockApi);
       setIsProcessing(false);
-    }, 1500);
+    } catch (error) {
+      console.error("Error regenerating schema:", error);
+      setIsProcessing(false);
+    }
   };
 
   if (isProcessing || !schema) {
@@ -89,13 +107,15 @@ export default function BuilderPage() {
   }
 
   return (
-    <FormEditorPage
-      requirements={requirements}
-      schema={schema}
-      tests={tests}
-      mockApi={mockApi}
-      onSchemaUpdate={handleSchemaUpdate}
-      onRegenerate={handleRegenerate}
-    />
+    <div className='h-screen overflow-hidden flex flex-col'>
+      <FormEditorPage
+        requirements={requirements}
+        schema={schema}
+        tests={tests}
+        mockApi={mockApi}
+        onSchemaUpdate={handleSchemaUpdate}
+        onRegenerate={handleRegenerate}
+      />
+    </div>
   );
 }

@@ -10,7 +10,6 @@ import { DeploymentDialog } from "./components/DeploymentDialog";
 import { AIParser } from "./utils/aiParser";
 import { TestGenerator } from "./utils/testGenerator";
 import { MockApiGenerator } from "./utils/mockApi";
-import { infinityAnimation } from "./utils/infinityAnimation";
 import JSZip from "jszip";
 import type { FormSchema, TestCase, MockApiEndpoint } from "./types/schema";
 
@@ -31,9 +30,10 @@ interface AppState {
 export default function App() {
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("darkMode") === "true";
+      const saved = localStorage.getItem("darkMode");
+      return saved !== null ? saved === "true" : true;
     }
-    return false;
+    return true;
   });
 
   const [state, setState] = useState<AppState>({
@@ -145,9 +145,11 @@ export default function App() {
       isProcessing: true,
     }));
 
-    // Simulate AI processing
-    setTimeout(() => {
-      const schema = AIParser.parseUserStory(requirements);
+    try {
+      // Wait for schema parsing to complete
+      const schema = await AIParser.parseUserStory(requirements);
+
+      // Only generate tests and mock API after schema is ready
       const tests = TestGenerator.generateTests(schema);
       const mockApi = MockApiGenerator.generateEndpoints(schema);
 
@@ -159,7 +161,14 @@ export default function App() {
         mockApi,
         isProcessing: false,
       }));
-    }, 7000);
+    } catch (error) {
+      console.error("Error processing requirements:", error);
+      toast.error("Failed to process requirements");
+      setState((prev) => ({
+        ...prev,
+        isProcessing: false,
+      }));
+    }
   };
 
   const handleSchemaUpdate = (schema: FormSchema) => {
@@ -177,19 +186,19 @@ export default function App() {
     }));
 
     // Simulate regeneration
-    setTimeout(() => {
-      const schema = AIParser.parseUserStory(newRequirements);
-      const tests = TestGenerator.generateTests(schema);
-      const mockApi = MockApiGenerator.generateEndpoints(schema);
+    // setTimeout(() => {
+    //   const schema = AIParser.parseUserStory(newRequirements);
+    //   const tests = TestGenerator.generateTests(schema);
+    //   const mockApi = MockApiGenerator.generateEndpoints(schema);
 
-      setState((prev) => ({
-        ...prev,
-        schema,
-        tests,
-        mockApi,
-        isProcessing: false,
-      }));
-    }, 1500);
+    //   setState((prev) => ({
+    //     ...prev,
+    //     schema,
+    //     tests,
+    //     mockApi,
+    //     isProcessing: false,
+    //   }));
+    // }, 1500);
   };
 
   const handleLogout = () => {
