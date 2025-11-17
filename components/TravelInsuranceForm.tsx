@@ -1,54 +1,43 @@
-import React, { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Checkbox } from "./ui/checkbox";
-import { Card } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { Badge } from "./ui/badge";
-import {
-  AlertCircle,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  Calendar,
-  Users,
-  Shield,
-  CreditCard,
+import React, { useState, useEffect } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form@7.55.0';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Checkbox } from './ui/checkbox';
+import { Card } from './ui/card';
+import { Textarea } from './ui/textarea';
+import { 
+  AlertCircle, 
+  Check, 
+  ChevronLeft, 
+  ChevronRight, 
+  MapPin, 
+  Calendar, 
+  Users, 
+  Shield, 
+  CreditCard, 
   FileText,
   Plane,
   Globe,
   Heart,
   Star,
   Sparkles,
-  CheckCircle2,
-} from "lucide-react";
-import {
-  countries,
-  coveragePlans,
-  addOnCoverages,
-} from "../utils/travelInsuranceData";
-import { toast } from "sonner";
-import Progress from "../imports/Progress-220-208";
+  CheckCircle2
+} from 'lucide-react';
+import { countries, coveragePlans, addOnCoverages } from '../utils/travelInsuranceData';
+import { toast } from 'sonner@2.0.3';
+import Progress from '../imports/Progress-220-208';
 
 interface TravelInsuranceFormProps {
   showStepper?: boolean;
-  stepperType?: "dots" | "numbers" | "progress" | "breadcrumb";
-  borderRadius?: "sharp" | "rounded" | "pill";
-  spacing?: "compact" | "comfortable" | "spacious";
-  labelPosition?: "top" | "left" | "inline";
-  inputSize?: "sm" | "md" | "lg";
-  template?: "simple" | "two-column" | "carded";
+  stepperType?: 'dots' | 'numbers' | 'progress' | 'breadcrumb';
+  borderRadius?: 'sharp' | 'rounded' | 'pill';
+  spacing?: 'compact' | 'comfortable' | 'spacious';
+  labelPosition?: 'top' | 'left' | 'inline';
+  inputSize?: 'sm' | 'md' | 'lg';
+  template?: 'simple' | 'two-column' | 'carded';
   themeColors?: string[];
   onFormDataChange?: (data: any) => void;
 }
@@ -90,137 +79,144 @@ interface FormData {
 
 const getStatesByCountry = (countryCode: string) => {
   const stateData: Record<string, string[]> = {
-    US: ["California", "New York", "Texas", "Florida", "Illinois"],
-    IN: ["Maharashtra", "Karnataka", "Delhi", "Tamil Nadu", "Gujarat"],
-    CA: ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba"],
-    AU: [
-      "New South Wales",
-      "Victoria",
-      "Queensland",
-      "Western Australia",
-      "South Australia",
-    ],
-    GB: ["England", "Scotland", "Wales", "Northern Ireland"],
+    'US': ['California', 'New York', 'Texas', 'Florida', 'Illinois'],
+    'IN': ['Maharashtra', 'Karnataka', 'Delhi', 'Tamil Nadu', 'Gujarat'],
+    'CA': ['Ontario', 'Quebec', 'British Columbia', 'Alberta', 'Manitoba'],
+    'AU': ['New South Wales', 'Victoria', 'Queensland', 'Western Australia', 'South Australia'],
+    'GB': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
   };
-  return stateData[countryCode] || ["State 1", "State 2", "State 3"];
+  return stateData[countryCode] || ['State 1', 'State 2', 'State 3'];
 };
 
 const getCitiesByState = (state: string) => {
-  return ["City 1", "City 2", "City 3", "City 4", "City 5"];
+  return ['City 1', 'City 2', 'City 3', 'City 4', 'City 5'];
 };
 
-const TravelInsuranceFormComponent = ({
-  showStepper = true,
-  stepperType = "numbers",
-  borderRadius = "rounded",
-  spacing = "comfortable",
-  labelPosition = "top",
-  inputSize = "md",
-  template = "simple",
+const TravelInsuranceFormComponent = ({ 
+  showStepper = true, 
+  stepperType = 'numbers',
+  borderRadius = 'rounded',
+  spacing = 'comfortable',
+  labelPosition = 'top',
+  inputSize = 'md',
+  template = 'simple',
   themeColors,
-  onFormDataChange,
+  onFormDataChange
 }: TravelInsuranceFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [policyNumber, setPolicyNumber] = useState("");
-
+  const [policyNumber, setPolicyNumber] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
   // Local state for conditional rendering (prevents re-renders from watch)
   const [numTravellers, setNumTravellers] = useState(1);
-  const [tripType, setTripType] = useState("");
-  const [destination, setDestination] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [coveragePlan, setCoveragePlan] = useState("");
+  const [tripType, setTripType] = useState('');
+  const [destination, setDestination] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [coveragePlan, setCoveragePlan] = useState('');
   const [addOns, setAddOns] = useState<string[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [travellers, setTravellers] = useState<TravellerInfo[]>([]);
   const [declaration, setDeclaration] = useState(false);
   const [terms, setTerms] = useState(false);
+
+  // Detect dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(isDark);
+    };
+    
+    checkDarkMode();
+    
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', checkDarkMode);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', checkDarkMode);
+    };
+  }, []);
 
   // Create scoped theme style object
   const getThemeStyle = (): React.CSSProperties => {
     if (themeColors && themeColors.length >= 2) {
       return {
-        "--primary": themeColors[0],
-        "--primary-foreground": "rgba(255, 255, 255, 1)",
-        "--accent": themeColors[1],
-        "--accent-foreground": "rgba(255, 255, 255, 1)",
-        "--ring": themeColors[0],
+        '--primary': themeColors[0],
+        '--primary-foreground': 'rgba(255, 255, 255, 1)',
+        '--accent': themeColors[1],
+        '--accent-foreground': 'rgba(255, 255, 255, 1)',
+        '--ring': themeColors[0],
       } as React.CSSProperties;
     }
     return {};
   };
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    control,
-    reset,
-    getValues,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { register, handleSubmit, watch, setValue, control, reset, getValues, formState: { errors } } = useForm<FormData>({
     defaultValues: {
-      tripType: "",
-      destination: "",
-      travelStartDate: "",
-      travelEndDate: "",
+      tripType: '',
+      destination: '',
+      travelStartDate: '',
+      travelEndDate: '',
       numTravellers: 1,
       travellers: [],
-      coveragePlan: "",
+      coveragePlan: '',
       addOns: [],
-      paymentMethod: "",
+      paymentMethod: '',
       declaration: false,
       terms: false,
-    },
+    }
   });
 
-  const { fields: travellerFields, replace: replaceTravellers } = useFieldArray(
-    {
-      control,
-      name: "travellers",
-    }
-  );
+  const { fields: travellerFields, replace: replaceTravellers } = useFieldArray({
+    control,
+    name: 'travellers'
+  });
 
   // Sync local state with form values for conditional rendering
   useEffect(() => {
     const subscription = watch((formData, { name }) => {
-      if (name === "numTravellers" && formData.numTravellers !== undefined) {
+      if (name === 'numTravellers' && formData.numTravellers !== undefined) {
         setNumTravellers(formData.numTravellers);
       }
-      if (name === "tripType" && formData.tripType) {
+      if (name === 'tripType' && formData.tripType) {
         setTripType(formData.tripType);
       }
-      if (name === "destination" && formData.destination) {
+      if (name === 'destination' && formData.destination) {
         setDestination(formData.destination);
       }
-      if (name === "travelStartDate" && formData.travelStartDate) {
+      if (name === 'travelStartDate' && formData.travelStartDate) {
         setStartDate(formData.travelStartDate);
       }
-      if (name === "travelEndDate" && formData.travelEndDate) {
+      if (name === 'travelEndDate' && formData.travelEndDate) {
         setEndDate(formData.travelEndDate);
       }
-      if (name === "coveragePlan" && formData.coveragePlan) {
+      if (name === 'coveragePlan' && formData.coveragePlan) {
         setCoveragePlan(formData.coveragePlan);
       }
-      if (name === "addOns") {
-        setAddOns((formData.addOns || []) as any);
+      if (name === 'addOns') {
+        setAddOns(formData.addOns || []);
       }
-      if (name === "paymentMethod" && formData.paymentMethod) {
+      if (name === 'paymentMethod' && formData.paymentMethod) {
         setPaymentMethod(formData.paymentMethod);
       }
-      if (name === "declaration" && formData.declaration !== undefined) {
+      if (name === 'declaration' && formData.declaration !== undefined) {
         setDeclaration(formData.declaration);
       }
-      if (name === "terms" && formData.terms !== undefined) {
+      if (name === 'terms' && formData.terms !== undefined) {
         setTerms(formData.terms);
       }
-      if (name?.startsWith("travellers")) {
-        setTravellers((formData.travellers || []) as any);
+      if (name?.startsWith('travellers')) {
+        setTravellers(formData.travellers || []);
       }
     });
-
+    
     return () => subscription.unsubscribe();
   }, []);
 
@@ -237,172 +233,127 @@ const TravelInsuranceFormComponent = ({
   // Configuration helper functions
   const getBorderRadiusValue = () => {
     switch (borderRadius) {
-      case "sharp":
-        return "0px";
-      case "rounded":
-        return "var(--radius-input)";
-      case "pill":
-        return "var(--radius-pill)";
-      default:
-        return "var(--radius-input)";
+      case 'sharp': return '0px';
+      case 'rounded': return 'var(--radius-input)';
+      case 'pill': return 'var(--radius-pill)';
+      default: return 'var(--radius-input)';
     }
   };
 
   const getButtonBorderRadius = () => {
     switch (borderRadius) {
-      case "sharp":
-        return "0px";
-      case "rounded":
-        return "var(--radius-button)";
-      case "pill":
-        return "var(--radius-pill)";
-      default:
-        return "var(--radius-button)";
+      case 'sharp': return '0px';
+      case 'rounded': return 'var(--radius-button)';
+      case 'pill': return 'var(--radius-pill)';
+      default: return 'var(--radius-button)';
     }
   };
 
   const getCardBorderRadius = () => {
     switch (borderRadius) {
-      case "sharp":
-        return "0px";
-      case "rounded":
-        return "var(--radius-card)";
-      case "pill":
-        return "var(--radius-pill)";
-      default:
-        return "var(--radius-card)";
+      case 'sharp': return '0px';
+      case 'rounded': return 'var(--radius-card)';
+      case 'pill': return 'var(--radius-pill)';
+      default: return 'var(--radius-card)';
     }
   };
 
   const getSpacingClass = () => {
     switch (spacing) {
-      case "compact":
-        return "space-y-3";
-      case "comfortable":
-        return "space-y-6";
-      case "spacious":
-        return "space-y-8";
-      default:
-        return "space-y-6";
+      case 'compact': return 'space-y-3';
+      case 'comfortable': return 'space-y-6';
+      case 'spacious': return 'space-y-8';
+      default: return 'space-y-6';
     }
   };
 
   const getFieldGap = () => {
     switch (spacing) {
-      case "compact":
-        return "0.5rem";
-      case "comfortable":
-        return "0.75rem";
-      case "spacious":
-        return "1rem";
-      default:
-        return "0.75rem";
+      case 'compact': return '0.5rem';
+      case 'comfortable': return '0.75rem';
+      case 'spacious': return '1rem';
+      default: return '0.75rem';
     }
   };
 
   const getPadding = () => {
     switch (spacing) {
-      case "compact":
-        return "1rem";
-      case "comfortable":
-        return "1.5rem";
-      case "spacious":
-        return "2rem";
-      default:
-        return "1.5rem";
+      case 'compact': return '1rem';
+      case 'comfortable': return '1.5rem';
+      case 'spacious': return '2rem';
+      default: return '1.5rem';
     }
   };
 
   const getCardPadding = () => {
     switch (spacing) {
-      case "compact":
-        return "1rem";
-      case "comfortable":
-        return "1.5rem";
-      case "spacious":
-        return "2rem";
-      default:
-        return "1.5rem";
+      case 'compact': return '1rem';
+      case 'comfortable': return '1.5rem';
+      case 'spacious': return '2rem';
+      default: return '1.5rem';
     }
   };
 
   const getInputHeight = () => {
     switch (inputSize) {
-      case "sm":
-        return "2rem";
-      case "md":
-        return "2.5rem";
-      case "lg":
-        return "3rem";
-      default:
-        return "2.5rem";
+      case 'sm': return '2rem';
+      case 'md': return '2.5rem';
+      case 'lg': return '3rem';
+      default: return '2.5rem';
     }
   };
 
   const getInputPadding = () => {
     switch (inputSize) {
-      case "sm":
-        return "0.375rem 0.75rem";
-      case "md":
-        return "0.5rem 1rem";
-      case "lg":
-        return "0.75rem 1.25rem";
-      default:
-        return "0.5rem 1rem";
+      case 'sm': return '0.375rem 0.75rem';
+      case 'md': return '0.5rem 1rem';
+      case 'lg': return '0.75rem 1.25rem';
+      default: return '0.5rem 1rem';
     }
   };
 
   const getFieldWrapperClass = () => {
-    if (labelPosition === "left")
-      return "flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4";
-    if (labelPosition === "inline") return "flex items-center gap-2";
-    return "flex flex-col";
+    if (labelPosition === 'left') return 'flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4';
+    if (labelPosition === 'inline') return 'flex items-center gap-2';
+    return 'flex flex-col';
   };
 
   const getLabelStyle = () => {
-    if (labelPosition === "left")
-      return {
-        width: "100%",
-        maxWidth: "200px",
-        flexShrink: 0,
-        paddingTop: "0.5rem",
-      };
-    if (labelPosition === "inline") return { flexShrink: 0 };
+    if (labelPosition === 'left') return { width: '100%', maxWidth: '200px', flexShrink: 0, paddingTop: '0.5rem' };
+    if (labelPosition === 'inline') return { flexShrink: 0 };
     return {};
   };
 
   // Update traveller fields when number changes
   React.useEffect(() => {
-    const num = parseInt(String(numTravellers)) || 1;
+    const num = parseInt(String(watchNumTravellers)) || 1;
     const currentLength = travellerFields.length;
-
+    
     // Only update if the actual count is different
     if (num !== currentLength && num > 0 && num <= 10) {
-      const currentTravellers = getValues("travellers") || [];
+      const currentTravellers = getValues('travellers') || [];
       const newTravellers: TravellerInfo[] = [];
       for (let i = 0; i < num; i++) {
-        newTravellers.push(
-          currentTravellers[i] || {
-            fullName: "",
-            dateOfBirth: "",
-            gender: "",
-            passportNumber: "",
-            nationality: "",
-            relationship: i === 0 ? "self" : "",
-            hasMedicalConditions: "no",
-            medicalDetails: "",
-            country: "",
-            state: "",
-            city: "",
-            addressLine1: "",
-            addressLine2: "",
-            zipCode: "",
-          }
-        );
+        newTravellers.push(currentTravellers[i] || {
+          fullName: '',
+          dateOfBirth: '',
+          gender: '',
+          passportNumber: '',
+          nationality: '',
+          relationship: i === 0 ? 'self' : '',
+          hasMedicalConditions: 'no',
+          medicalDetails: '',
+          country: '',
+          state: '',
+          city: '',
+          addressLine1: '',
+          addressLine2: '',
+          zipCode: '',
+        });
       }
       replaceTravellers(newTravellers);
     }
-  }, [numTravellers, travellerFields.length, getValues, replaceTravellers]);
+  }, [watchNumTravellers, travellerFields.length, getValues, replaceTravellers]);
 
   // Watch all form data and notify parent component using subscription
   React.useEffect(() => {
@@ -416,69 +367,49 @@ const TravelInsuranceFormComponent = ({
   }, []); // Empty dependency array - watch and onFormDataChange are stable references
 
   const validateDateRange = () => {
-    if (startDate && endDate && tripType === "single") {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const diffDays = Math.ceil(
-        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-      );
+    if (watchStartDate && watchEndDate && watchTripType === 'single') {
+      const start = new Date(watchStartDate);
+      const end = new Date(watchEndDate);
+      const diffDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
       return diffDays <= 180;
     }
     return true;
   };
 
-  const steps = [
-    "Trip Information",
-    "Traveller Information",
-    "Coverage Selection",
-    "Summary & Payment",
-  ];
+  const steps = ['Trip Information', 'Traveller Information', 'Coverage Selection', 'Summary & Payment'];
 
   const stepIcons = [
-    <Plane className='h-5 w-5' key='plane' />,
-    <Users className='h-5 w-5' key='users' />,
-    <Shield className='h-5 w-5' key='shield' />,
-    <div className='h-5 w-5' key='progress'>
-      <Progress />
-    </div>,
+    <Plane className="h-5 w-5" key="plane" />,
+    <Users className="h-5 w-5" key="users" />,
+    <Shield className="h-5 w-5" key="shield" />,
+    <div className="h-5 w-5" key="progress"><Progress /></div>
   ];
 
   const onSubmit = (data: FormData) => {
-    const policyNum = `TRV-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 6)
-      .toUpperCase()}`;
+    const policyNum = `TRV-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
     setPolicyNumber(policyNum);
     setIsSubmitted(true);
-    toast.success("Policy issued successfully!");
+    toast.success('Policy issued successfully!');
   };
 
   const handleNext = () => {
     if (currentStep === 0) {
-      if (
-        !tripType ||
-        !destination ||
-        !startDate ||
-        !endDate ||
-        !numTravellers
-      ) {
-        toast.error("Please fill all required fields");
+      if (!watchTripType || !watchDestination || !watchStartDate || !watchEndDate || !watchNumTravellers) {
+        toast.error('Please fill all required fields');
         return;
       }
       if (!validateDateRange()) {
-        toast.error("Trip duration cannot exceed 180 days for single trip");
+        toast.error('Trip duration cannot exceed 180 days for single trip');
         return;
       }
     }
-
+    
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
       // Announce to screen readers
       setTimeout(() => {
-        const announcement = `Now on step ${nextStep + 1} of ${steps.length}: ${
-          steps[nextStep]
-        }`;
+        const announcement = `Now on step ${nextStep + 1} of ${steps.length}: ${steps[nextStep]}`;
         toast.success(announcement);
       }, 100);
     }
@@ -488,8 +419,8 @@ const TravelInsuranceFormComponent = ({
     reset();
     setCurrentStep(0);
     setIsSubmitted(false);
-    setPolicyNumber("");
-    toast.success("Starting new insurance journey");
+    setPolicyNumber('');
+    toast.success('Starting new insurance journey');
   };
 
   const handlePrevious = () => {
@@ -498,9 +429,7 @@ const TravelInsuranceFormComponent = ({
       setCurrentStep(prevStep);
       // Announce to screen readers
       setTimeout(() => {
-        const announcement = `Now on step ${prevStep + 1} of ${steps.length}: ${
-          steps[prevStep]
-        }`;
+        const announcement = `Now on step ${prevStep + 1} of ${steps.length}: ${steps[prevStep]}`;
         toast.success(announcement);
       }, 100);
     }
@@ -508,76 +437,63 @@ const TravelInsuranceFormComponent = ({
 
   // Stepper renderers
   const renderDotsStepper = () => (
-    <nav aria-label='Progress' className='mb-8'>
-      <div className='flex justify-center items-center gap-3' role='list'>
+    <nav aria-label="Progress" className="mb-8">
+      <div className="flex justify-center items-center gap-3" role="list">
         {steps.map((step, index) => (
           <div
             key={index}
-            role='listitem'
+            role="listitem"
             className={`w-3 h-3 rounded-full transition-all ${
               index === currentStep
-                ? "bg-primary scale-125"
+                ? 'bg-primary scale-125'
                 : index < currentStep
-                ? "bg-success"
-                : "bg-muted"
+                ? 'bg-success'
+                : 'bg-muted'
             }`}
-            style={{ transition: "all var(--transition-normal)" }}
-            aria-current={index === currentStep ? "step" : undefined}
+            style={{ transition: 'all var(--transition-normal)' }}
+            aria-current={index === currentStep ? 'step' : undefined}
             aria-label={`Step ${index + 1}: ${step}`}
           />
         ))}
       </div>
-      <p className='text-center text-muted-foreground mt-4' aria-live='polite'>
+      <p className="text-center text-muted-foreground mt-4" aria-live="polite">
         Step {currentStep + 1} of {steps.length}: {steps[currentStep]}
       </p>
     </nav>
   );
 
   const renderNumbersStepper = () => (
-    <nav aria-label='Progress' className='mb-8'>
-      <ol className='flex justify-between items-start gap-2 overflow-x-auto'>
+    <nav aria-label="Progress" className="mb-8">
+      <ol className="flex justify-between items-start gap-2 overflow-x-auto">
         {steps.map((step, index) => (
-          <li
-            key={index}
-            className='flex flex-col items-center flex-1 min-w-0 relative'
-          >
+          <li key={index} className="flex flex-col items-center flex-1 min-w-0 relative">
             {index < steps.length - 1 && (
-              <div
-                className='absolute left-[50%] top-5 h-[2px] w-full -z-10'
+              <div 
+                className="absolute left-[50%] top-5 h-[2px] w-full -z-10"
                 style={{
-                  backgroundColor:
-                    index < currentStep
-                      ? "hsl(var(--success))"
-                      : "hsl(var(--muted))",
-                  transition: "background-color var(--transition-normal)",
+                  backgroundColor: index < currentStep ? 'hsl(var(--success))' : 'hsl(var(--muted))',
+                  transition: 'background-color var(--transition-normal)'
                 }}
               />
             )}
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 relative z-10 ${
                 index === currentStep
-                  ? "bg-primary text-primary-foreground"
+                  ? 'bg-primary text-primary-foreground'
                   : index < currentStep
-                  ? "bg-success text-success-foreground"
-                  : "bg-muted text-muted-foreground"
+                  ? 'bg-success text-success-foreground'
+                  : 'bg-muted text-muted-foreground'
               }`}
-              style={{
-                transition: "all var(--transition-normal)",
-                borderRadius: borderRadius === "sharp" ? "0px" : "50%",
+              style={{ 
+                transition: 'all var(--transition-normal)',
+                borderRadius: borderRadius === 'sharp' ? '0px' : '50%'
               }}
-              aria-current={index === currentStep ? "step" : undefined}
+              aria-current={index === currentStep ? 'step' : undefined}
               aria-label={`Step ${index + 1}: ${step}`}
             >
-              {index < currentStep ? <Check className='h-5 w-5' /> : index + 1}
+              {index < currentStep ? <Check className="h-5 w-5" /> : index + 1}
             </div>
-            <span
-              className={`mt-2 text-center break-words px-1 hidden sm:block ${
-                index === currentStep
-                  ? "text-foreground"
-                  : "text-muted-foreground"
-              }`}
-              style={{ fontSize: "0.875rem" }}
-            >
+            <span className={`mt-2 text-center break-words px-1 hidden sm:block ${index === currentStep ? 'text-foreground' : 'text-muted-foreground'}`} style={{ fontSize: '0.875rem' }}>
               {step}
             </span>
           </li>
@@ -589,76 +505,58 @@ const TravelInsuranceFormComponent = ({
   const renderProgressStepper = () => {
     const progress = ((currentStep + 1) / steps.length) * 100;
     return (
-      <div className='mb-8' role='region' aria-label='Progress'>
-        <div className='flex justify-between items-center mb-2 flex-wrap gap-2'>
-          <span className='text-foreground'>
-            Step {currentStep + 1} of {steps.length}
-          </span>
-          <span className='text-muted-foreground'>
-            {Math.round(progress)}% Complete
-          </span>
+      <div className="mb-8" role="region" aria-label="Progress">
+        <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
+          <span className="text-foreground">Step {currentStep + 1} of {steps.length}</span>
+          <span className="text-muted-foreground">{Math.round(progress)}% Complete</span>
         </div>
-        <div
-          className='w-full bg-muted h-2 overflow-hidden'
+        <div 
+          className="w-full bg-muted h-2 overflow-hidden" 
           style={{ borderRadius: getBorderRadiusValue() }}
-          role='progressbar'
+          role="progressbar"
           aria-valuenow={Math.round(progress)}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label='Form completion progress'
+          aria-label="Form completion progress"
         >
           <div
-            className='h-full bg-primary transition-all'
-            style={{
-              width: `${progress}%`,
-              transition: "width var(--transition-normal)",
-            }}
+            className="h-full bg-primary transition-all"
+            style={{ width: `${progress}%`, transition: 'width var(--transition-normal)' }}
           />
         </div>
-        <p className='text-muted-foreground mt-2' aria-live='polite'>
-          {steps[currentStep]}
-        </p>
+        <p className="text-muted-foreground mt-2" aria-live="polite">{steps[currentStep]}</p>
       </div>
     );
   };
 
   const renderBreadcrumbStepper = () => (
-    <nav aria-label='Progress' className='mb-8'>
-      <ol className='flex items-center justify-center flex-wrap gap-2'>
+    <nav aria-label="Progress" className="mb-8">
+      <ol className="flex items-center justify-center flex-wrap gap-2">
         {steps.map((step, index) => (
           <React.Fragment key={index}>
-            <li className='flex items-center gap-2'>
+            <li className="flex items-center gap-2">
               <span
                 className={`px-3 py-2 rounded-full flex items-center gap-2 transition-all ${
                   index === currentStep
-                    ? "bg-primary text-primary-foreground"
+                    ? 'bg-primary text-primary-foreground'
                     : index < currentStep
-                    ? "bg-success text-success-foreground"
-                    : "bg-muted text-muted-foreground"
+                    ? 'bg-success text-success-foreground'
+                    : 'bg-muted text-muted-foreground'
                 }`}
-                style={{
+                style={{ 
                   borderRadius: getButtonBorderRadius(),
-                  transition: "all var(--transition-normal)",
-                  minHeight: "44px",
-                  fontSize: "0.875rem",
+                  transition: 'all var(--transition-normal)',
+                  minHeight: '44px',
+                  fontSize: '0.875rem'
                 }}
-                aria-current={index === currentStep ? "step" : undefined}
+                aria-current={index === currentStep ? 'step' : undefined}
               >
-                {index < currentStep ? (
-                  <Check className='h-4 w-4' />
-                ) : (
-                  <span>{index + 1}</span>
-                )}
-                <span className='hidden sm:inline'>{step}</span>
+                {index < currentStep ? <Check className="h-4 w-4" /> : <span>{index + 1}</span>}
+                <span className="hidden sm:inline">{step}</span>
               </span>
             </li>
             {index < steps.length - 1 && (
-              <ChevronRight
-                className={`h-5 w-5 hidden sm:block ${
-                  index < currentStep ? "text-success" : "text-muted-foreground"
-                }`}
-                aria-hidden='true'
-              />
+              <ChevronRight className={`h-5 w-5 hidden sm:block ${index < currentStep ? 'text-success' : 'text-muted-foreground'}`} aria-hidden="true" />
             )}
           </React.Fragment>
         ))}
@@ -669,54 +567,39 @@ const TravelInsuranceFormComponent = ({
   const renderStepper = () => {
     if (!showStepper) return null;
     switch (stepperType) {
-      case "dots":
-        return renderDotsStepper();
-      case "numbers":
-        return renderNumbersStepper();
-      case "progress":
-        return renderProgressStepper();
-      case "breadcrumb":
-        return renderBreadcrumbStepper();
-      default:
-        return renderNumbersStepper();
+      case 'dots': return renderDotsStepper();
+      case 'numbers': return renderNumbersStepper();
+      case 'progress': return renderProgressStepper();
+      case 'breadcrumb': return renderBreadcrumbStepper();
+      default: return renderNumbersStepper();
     }
   };
 
   // Form field wrapper component
-  const FormField = ({
-    label,
-    required,
-    error,
+  const FormField = ({ 
+    label, 
+    required, 
+    error, 
     children,
-    icon,
-  }: {
-    label: string;
-    required?: boolean;
-    error?: string;
+    icon
+  }: { 
+    label: string; 
+    required?: boolean; 
+    error?: string; 
     children: React.ReactNode;
     icon?: React.ReactNode;
   }) => {
-    const errorId = error
-      ? `error-${label.replace(/\s+/g, "-").toLowerCase()}`
-      : undefined;
+    const errorId = error ? `error-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined;
     return (
       <div className={getFieldWrapperClass()} style={{ gap: getFieldGap() }}>
-        <Label
-          style={getLabelStyle()}
-          className='break-words flex items-center gap-2'
-        >
-          {icon && <span className='text-primary'>{icon}</span>}
-          {label} {required && <span aria-label='required'>*</span>}
+        <Label style={getLabelStyle()} className="break-words flex items-center gap-2">
+          {icon && <span className="text-primary">{icon}</span>}
+          {label} {required && <span aria-label="required">*</span>}
         </Label>
-        <div className='flex-1 min-w-0'>
+        <div className="flex-1 min-w-0">
           {children}
           {error && (
-            <p
-              className='text-destructive mt-1 break-words'
-              id={errorId}
-              role='alert'
-              aria-live='polite'
-            >
+            <p className="text-destructive mt-1 break-words" id={errorId} role="alert" aria-live="polite">
               {error}
             </p>
           )}
@@ -727,8 +610,7 @@ const TravelInsuranceFormComponent = ({
 
   // Get container class based on template
   const getContainerClass = () => {
-    if (template === "two-column")
-      return "grid grid-cols-1 md:grid-cols-2 gap-4";
+    if (template === 'two-column') return 'grid grid-cols-1 md:grid-cols-2 gap-4';
     return getSpacingClass();
   };
 
@@ -736,115 +618,71 @@ const TravelInsuranceFormComponent = ({
   const renderStep1 = () => {
     const fields = (
       <>
-        <div
-          className='mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20'
-          style={{ borderRadius: getCardBorderRadius() }}
-        >
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center'>
-              <Plane className='h-5 w-5 text-primary' />
+        <div className="mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Plane className="h-5 w-5 text-primary" />
             </div>
-            <h3 className='text-foreground'>Plan Your Journey</h3>
+            <h3 className="text-foreground">Plan Your Journey</h3>
           </div>
-          <p className='text-muted-foreground'>
-            Let's start with your travel details
-          </p>
+          <p className="text-muted-foreground">Let's start with your travel details</p>
         </div>
 
-        {template === "carded" ? (
-          <Card
-            className='p-4 bg-card border border-border'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <FormField
-              label='Trip Type'
-              required
-              error={errors.tripType?.message}
-              icon={<Globe className='h-4 w-4' />}
-            >
-              <Select
-                value={tripType}
-                onValueChange={(value) => {
-                  setValue("tripType", value);
-                  setTripType(value);
-                }}
-              >
-                <SelectTrigger
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+        {template === 'carded' ? (
+          <Card className="p-4 bg-card border border-border" style={{ borderRadius: getCardBorderRadius() }}>
+            <FormField label="Trip Type" required error={errors.tripType?.message} icon={<Globe className="h-4 w-4" />}>
+              <Select value={watchTripType} onValueChange={(value) => setValue('tripType', value)}>
+                <SelectTrigger 
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 >
-                  <SelectValue placeholder='Select trip type' />
+                  <SelectValue placeholder="Select trip type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='single'>Single Trip</SelectItem>
-                  <SelectItem value='annual'>Annual Multi-trip</SelectItem>
+                  <SelectItem value="single">Single Trip</SelectItem>
+                  <SelectItem value="annual">Annual Multi-trip</SelectItem>
                 </SelectContent>
               </Select>
             </FormField>
           </Card>
         ) : (
-          <FormField
-            label='Trip Type'
-            required
-            error={errors.tripType?.message}
-            icon={<Globe className='h-4 w-4' />}
-          >
-            <Select
-              value={tripType}
-              onValueChange={(value) => {
-                setValue("tripType", value);
-                setTripType(value);
-              }}
-            >
-              <SelectTrigger
-                className='bg-input-background border-border text-foreground'
-                style={{
+          <FormField label="Trip Type" required error={errors.tripType?.message} icon={<Globe className="h-4 w-4" />}>
+            <Select value={watchTripType} onValueChange={(value) => setValue('tripType', value)}>
+              <SelectTrigger 
+                className="bg-input-background border-border text-foreground"
+                style={{ 
                   borderRadius: getBorderRadiusValue(),
                   height: getInputHeight(),
-                  padding: getInputPadding(),
+                  padding: getInputPadding()
                 }}
               >
-                <SelectValue placeholder='Select trip type' />
+                <SelectValue placeholder="Select trip type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='single'>Single Trip</SelectItem>
-                <SelectItem value='annual'>Annual Multi-trip</SelectItem>
+                <SelectItem value="single">Single Trip</SelectItem>
+                <SelectItem value="annual">Annual Multi-trip</SelectItem>
               </SelectContent>
             </Select>
           </FormField>
         )}
 
-        {template === "carded" ? (
-          <Card
-            className='p-4 bg-card border border-border'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <FormField
-              label='Destination'
-              required
-              error={errors.destination?.message}
-              icon={<MapPin className='h-4 w-4' />}
-            >
-              <Select
-                value={destination}
-                onValueChange={(value) => {
-                  setValue("destination", value);
-                  setDestination(value);
-                }}
-              >
-                <SelectTrigger
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+        {template === 'carded' ? (
+          <Card className="p-4 bg-card border border-border" style={{ borderRadius: getCardBorderRadius() }}>
+            <FormField label="Destination" required error={errors.destination?.message} icon={<MapPin className="h-4 w-4" />}>
+              <Select value={watchDestination} onValueChange={(value) => setValue('destination', value)}>
+                <SelectTrigger 
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 >
-                  <SelectValue placeholder='Select destination country' />
+                  <SelectValue placeholder="Select destination country" />
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((country) => (
@@ -857,28 +695,17 @@ const TravelInsuranceFormComponent = ({
             </FormField>
           </Card>
         ) : (
-          <FormField
-            label='Destination'
-            required
-            error={errors.destination?.message}
-            icon={<MapPin className='h-4 w-4' />}
-          >
-            <Select
-              value={destination}
-              onValueChange={(value) => {
-                setValue("destination", value);
-                setDestination(value);
-              }}
-            >
-              <SelectTrigger
-                className='bg-input-background border-border text-foreground'
-                style={{
+          <FormField label="Destination" required error={errors.destination?.message} icon={<MapPin className="h-4 w-4" />}>
+            <Select value={destination} onValueChange={(value) => { setValue('destination', value); setDestination(value); }}>
+              <SelectTrigger 
+                className="bg-input-background border-border text-foreground"
+                style={{ 
                   borderRadius: getBorderRadiusValue(),
                   height: getInputHeight(),
-                  padding: getInputPadding(),
+                  padding: getInputPadding()
                 }}
               >
-                <SelectValue placeholder='Select destination country' />
+                <SelectValue placeholder="Select destination country" />
               </SelectTrigger>
               <SelectContent>
                 {countries.map((country) => (
@@ -891,150 +718,103 @@ const TravelInsuranceFormComponent = ({
           </FormField>
         )}
 
-        {template === "carded" ? (
-          <Card
-            className='p-4 bg-card border border-border'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <FormField
-              label='Travel Start Date'
-              required
-              error={errors.travelStartDate?.message}
-              icon={<Calendar className='h-4 w-4' />}
-            >
+        {template === 'carded' ? (
+          <Card className="p-4 bg-card border border-border" style={{ borderRadius: getCardBorderRadius() }}>
+            <FormField label="Travel Start Date" required error={errors.travelStartDate?.message} icon={<Calendar className="h-4 w-4" />}>
               <Input
-                type='date'
-                {...register("travelStartDate", {
-                  required: "Start date is required",
-                })}
-                className='bg-input-background border-border text-foreground'
-                style={{
+                type="date"
+                {...register('travelStartDate', { required: 'Start date is required' })}
+                className="bg-input-background border-border text-foreground"
+                style={{ 
                   borderRadius: getBorderRadiusValue(),
                   height: getInputHeight(),
-                  padding: getInputPadding(),
+                  padding: getInputPadding()
                 }}
               />
             </FormField>
           </Card>
         ) : (
-          <FormField
-            label='Travel Start Date'
-            required
-            error={errors.travelStartDate?.message}
-            icon={<Calendar className='h-4 w-4' />}
-          >
+          <FormField label="Travel Start Date" required error={errors.travelStartDate?.message} icon={<Calendar className="h-4 w-4" />}>
             <Input
-              type='date'
-              {...register("travelStartDate", {
-                required: "Start date is required",
-              })}
-              className='bg-input-background border-border text-foreground'
-              style={{
+              type="date"
+              {...register('travelStartDate', { required: 'Start date is required' })}
+              className="bg-input-background border-border text-foreground"
+              style={{ 
                 borderRadius: getBorderRadiusValue(),
                 height: getInputHeight(),
-                padding: getInputPadding(),
+                padding: getInputPadding()
               }}
             />
           </FormField>
         )}
 
-        {template === "carded" ? (
-          <Card
-            className='p-4 bg-card border border-border'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <FormField
-              label='Travel End Date'
-              required
-              error={errors.travelEndDate?.message}
-              icon={<Calendar className='h-4 w-4' />}
-            >
+        {template === 'carded' ? (
+          <Card className="p-4 bg-card border border-border" style={{ borderRadius: getCardBorderRadius() }}>
+            <FormField label="Travel End Date" required error={errors.travelEndDate?.message} icon={<Calendar className="h-4 w-4" />}>
               <Input
-                type='date'
-                {...register("travelEndDate", {
-                  required: "End date is required",
-                })}
-                className='bg-input-background border-border text-foreground'
-                style={{
+                type="date"
+                {...register('travelEndDate', { required: 'End date is required' })}
+                className="bg-input-background border-border text-foreground"
+                style={{ 
                   borderRadius: getBorderRadiusValue(),
                   height: getInputHeight(),
-                  padding: getInputPadding(),
+                  padding: getInputPadding()
                 }}
               />
             </FormField>
           </Card>
         ) : (
-          <FormField
-            label='Travel End Date'
-            required
-            error={errors.travelEndDate?.message}
-            icon={<Calendar className='h-4 w-4' />}
-          >
+          <FormField label="Travel End Date" required error={errors.travelEndDate?.message} icon={<Calendar className="h-4 w-4" />}>
             <Input
-              type='date'
-              {...register("travelEndDate", {
-                required: "End date is required",
-              })}
-              className='bg-input-background border-border text-foreground'
-              style={{
+              type="date"
+              {...register('travelEndDate', { required: 'End date is required' })}
+              className="bg-input-background border-border text-foreground"
+              style={{ 
                 borderRadius: getBorderRadiusValue(),
                 height: getInputHeight(),
-                padding: getInputPadding(),
+                padding: getInputPadding()
               }}
             />
           </FormField>
         )}
 
-        {template === "carded" ? (
-          <Card
-            className='p-4 bg-card border border-border'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <FormField
-              label='Number of Travellers'
-              required
-              error={errors.numTravellers?.message}
-              icon={<Users className='h-4 w-4' />}
-            >
+        {template === 'carded' ? (
+          <Card className="p-4 bg-card border border-border" style={{ borderRadius: getCardBorderRadius() }}>
+            <FormField label="Number of Travellers" required error={errors.numTravellers?.message} icon={<Users className="h-4 w-4" />}>
               <Input
-                type='number'
-                min='1'
-                max='10'
-                {...register("numTravellers", {
-                  required: "Number of travellers is required",
-                  min: { value: 1, message: "At least 1 traveller required" },
-                  max: { value: 10, message: "Maximum 10 travellers allowed" },
+                type="number"
+                min="1"
+                max="10"
+                {...register('numTravellers', { 
+                  required: 'Number of travellers is required',
+                  min: { value: 1, message: 'At least 1 traveller required' },
+                  max: { value: 10, message: 'Maximum 10 travellers allowed' }
                 })}
-                className='bg-input-background border-border text-foreground'
-                style={{
+                className="bg-input-background border-border text-foreground"
+                style={{ 
                   borderRadius: getBorderRadiusValue(),
                   height: getInputHeight(),
-                  padding: getInputPadding(),
+                  padding: getInputPadding()
                 }}
               />
             </FormField>
           </Card>
         ) : (
-          <FormField
-            label='Number of Travellers'
-            required
-            error={errors.numTravellers?.message}
-            icon={<Users className='h-4 w-4' />}
-          >
+          <FormField label="Number of Travellers" required error={errors.numTravellers?.message} icon={<Users className="h-4 w-4" />}>
             <Input
-              type='number'
-              min='1'
-              max='10'
-              {...register("numTravellers", {
-                required: "Number of travellers is required",
-                min: { value: 1, message: "At least 1 traveller required" },
-                max: { value: 10, message: "Maximum 10 travellers allowed" },
+              type="number"
+              min="1"
+              max="10"
+              {...register('numTravellers', { 
+                required: 'Number of travellers is required',
+                min: { value: 1, message: 'At least 1 traveller required' },
+                max: { value: 10, message: 'Maximum 10 travellers allowed' }
               })}
-              className='bg-input-background border-border text-foreground'
-              style={{
+              className="bg-input-background border-border text-foreground"
+              style={{ 
                 borderRadius: getBorderRadiusValue(),
                 height: getInputHeight(),
-                padding: getInputPadding(),
+                padding: getInputPadding()
               }}
             />
           </FormField>
@@ -1043,41 +823,19 @@ const TravelInsuranceFormComponent = ({
     );
 
     return (
-      <div
-        className={
-          template === "two-column"
-            ? "grid grid-cols-1 md:grid-cols-2 gap-4"
-            : getSpacingClass()
-        }
-      >
+      <div className={template === 'two-column' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : getSpacingClass()}>
         {fields}
-        {tripType === "single" &&
-          startDate &&
-          endDate &&
-          !validateDateRange() && (
-            <div
-              className={template === "two-column" ? "md:col-span-2" : ""}
-              role='alert'
-              aria-live='polite'
-            >
-              <div
-                className='flex items-start gap-2 p-4 bg-warning/10 border border-warning'
-                style={{ borderRadius: getCardBorderRadius() }}
-              >
-                <AlertCircle
-                  className='h-5 w-5 text-warning flex-shrink-0 mt-0.5'
-                  aria-hidden='true'
-                />
-                <div className='break-words'>
-                  <p className='text-warning'>Trip duration exceeds 180 days</p>
-                  <p className='text-warning/80'>
-                    Single trip policies are limited to 180 days. Consider an
-                    annual multi-trip policy.
-                  </p>
-                </div>
+        {watchTripType === 'single' && watchStartDate && watchEndDate && !validateDateRange() && (
+          <div className={template === 'two-column' ? 'md:col-span-2' : ''} role="alert" aria-live="polite">
+            <div className="flex items-start gap-2 p-4 bg-warning/10 border border-warning" style={{ borderRadius: getCardBorderRadius() }}>
+              <AlertCircle className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="break-words">
+                <p className="text-warning">Trip duration exceeds 180 days</p>
+                <p className="text-warning/80">Single trip policies are limited to 180 days. Consider an annual multi-trip policy.</p>
               </div>
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   };
@@ -1085,131 +843,103 @@ const TravelInsuranceFormComponent = ({
   // Render Step 2: Traveller Information
   const renderStep2 = () => (
     <div className={getSpacingClass()}>
-      <div
-        className='mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20'
-        style={{ borderRadius: getCardBorderRadius() }}
-      >
-        <div className='flex items-center gap-3 mb-2'>
-          <div className='w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center'>
-            <Users className='h-5 w-5 text-primary' />
+      <div className="mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <Users className="h-5 w-5 text-primary" />
           </div>
-          <h3 className='text-foreground'>Traveller Details</h3>
+          <h3 className="text-foreground">Traveller Details</h3>
         </div>
-        <p className='text-muted-foreground'>
-          Provide information for all travellers
-        </p>
+        <p className="text-muted-foreground">Provide information for all travellers</p>
       </div>
 
       {travellerFields.map((field, index) => (
-        <Card
-          key={field.id}
-          className='p-4 sm:p-6 bg-card border border-border transition-all hover:border-primary/30'
-          style={{
-            borderRadius: getCardBorderRadius(),
-            boxShadow: "var(--elevation-sm)",
-          }}
-        >
-          <div className='flex items-center gap-3 mb-4'>
-            <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
-              <span className='text-primary'>{index + 1}</span>
+        <Card key={field.id} className="p-4 sm:p-6 bg-card border border-border transition-all hover:border-primary/30" style={{ borderRadius: getCardBorderRadius(), boxShadow: 'var(--elevation-sm)' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-primary">{index + 1}</span>
             </div>
-            <h3 className='text-foreground break-words'>
-              Traveller {index + 1}
-            </h3>
-            {index === 0 && (
-              <Badge className='bg-primary/10 text-primary border-primary/20'>
-                Primary
-              </Badge>
-            )}
+            <h3 className="text-foreground break-words">Traveller {index + 1}</h3>
+            {index === 0 && <Badge className="bg-primary/10 text-primary border-primary/20">Primary</Badge>}
           </div>
           <div className={getSpacingClass()}>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <FormField label='Full Name' required>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField label="Full Name" required>
                 <Input
-                  {...register(`travellers.${index}.fullName`, {
-                    required: "Name is required",
-                  })}
-                  placeholder='Enter full name'
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  {...register(`travellers.${index}.fullName`, { required: 'Name is required' })}
+                  placeholder="Enter full name"
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 />
               </FormField>
 
-              <FormField label='Date of Birth' required>
+              <FormField label="Date of Birth" required>
                 <Input
-                  type='date'
-                  {...register(`travellers.${index}.dateOfBirth`, {
-                    required: "Date of birth is required",
-                  })}
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  type="date"
+                  {...register(`travellers.${index}.dateOfBirth`, { required: 'Date of birth is required' })}
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 />
               </FormField>
 
-              <FormField label='Gender' required>
-                <Select
-                  value={travellers?.[index]?.gender || ""}
-                  onValueChange={(value) =>
-                    setValue(`travellers.${index}.gender`, value)
-                  }
+              <FormField label="Gender" required>
+                <Select 
+                  value={watchTravellers?.[index]?.gender || ''} 
+                  onValueChange={(value) => setValue(`travellers.${index}.gender`, value)}
                 >
-                  <SelectTrigger
-                    className='bg-input-background border-border text-foreground'
-                    style={{
+                  <SelectTrigger 
+                    className="bg-input-background border-border text-foreground"
+                    style={{ 
                       borderRadius: getBorderRadiusValue(),
                       height: getInputHeight(),
-                      padding: getInputPadding(),
+                      padding: getInputPadding()
                     }}
                   >
-                    <SelectValue placeholder='Select gender' />
+                    <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='male'>Male</SelectItem>
-                    <SelectItem value='female'>Female</SelectItem>
-                    <SelectItem value='other'>Other</SelectItem>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </FormField>
 
-              <FormField label='Passport Number' required>
+              <FormField label="Passport Number" required>
                 <Input
-                  {...register(`travellers.${index}.passportNumber`, {
-                    required: "Passport number is required",
-                  })}
-                  placeholder='Enter passport number'
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  {...register(`travellers.${index}.passportNumber`, { required: 'Passport number is required' })}
+                  placeholder="Enter passport number"
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 />
               </FormField>
 
-              <FormField label='Nationality' required>
-                <Select
-                  value={travellers?.[index]?.nationality || ""}
-                  onValueChange={(value) =>
-                    setValue(`travellers.${index}.nationality`, value)
-                  }
+              <FormField label="Nationality" required>
+                <Select 
+                  value={watchTravellers?.[index]?.nationality || ''} 
+                  onValueChange={(value) => setValue(`travellers.${index}.nationality`, value)}
                 >
-                  <SelectTrigger
-                    className='bg-input-background border-border text-foreground'
-                    style={{
+                  <SelectTrigger 
+                    className="bg-input-background border-border text-foreground"
+                    style={{ 
                       borderRadius: getBorderRadiusValue(),
                       height: getInputHeight(),
-                      padding: getInputPadding(),
+                      padding: getInputPadding()
                     }}
                   >
-                    <SelectValue placeholder='Select nationality' />
+                    <SelectValue placeholder="Select nationality" />
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((country) => (
@@ -1221,87 +951,59 @@ const TravelInsuranceFormComponent = ({
                 </Select>
               </FormField>
 
-              <FormField label='Relationship' required>
-                <Select
-                  value={travellers?.[index]?.relationship || ""}
-                  onValueChange={(value) =>
-                    setValue(`travellers.${index}.relationship`, value)
-                  }
+              <FormField label="Relationship" required>
+                <Select 
+                  value={watchTravellers?.[index]?.relationship || ''} 
+                  onValueChange={(value) => setValue(`travellers.${index}.relationship`, value)}
                 >
-                  <SelectTrigger
-                    className='bg-input-background border-border text-foreground'
-                    style={{
+                  <SelectTrigger 
+                    className="bg-input-background border-border text-foreground"
+                    style={{ 
                       borderRadius: getBorderRadiusValue(),
                       height: getInputHeight(),
-                      padding: getInputPadding(),
+                      padding: getInputPadding()
                     }}
                   >
-                    <SelectValue placeholder='Select relationship' />
+                    <SelectValue placeholder="Select relationship" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='self'>Self</SelectItem>
-                    <SelectItem value='spouse'>Spouse</SelectItem>
-                    <SelectItem value='child'>Child</SelectItem>
-                    <SelectItem value='parent'>Parent</SelectItem>
-                    <SelectItem value='sibling'>Sibling</SelectItem>
-                    <SelectItem value='friend'>Friend</SelectItem>
-                    <SelectItem value='other'>Other</SelectItem>
+                    <SelectItem value="self">Self</SelectItem>
+                    <SelectItem value="spouse">Spouse</SelectItem>
+                    <SelectItem value="child">Child</SelectItem>
+                    <SelectItem value="parent">Parent</SelectItem>
+                    <SelectItem value="sibling">Sibling</SelectItem>
+                    <SelectItem value="friend">Friend</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </FormField>
             </div>
 
-            <FormField
-              label='Pre-existing Medical Conditions?'
-              required
-              icon={<Heart className='h-4 w-4' />}
-            >
-              <RadioGroup
-                value={travellers?.[index]?.hasMedicalConditions || "no"}
-                onValueChange={(value) =>
-                  setValue(`travellers.${index}.hasMedicalConditions`, value)
-                }
+            <FormField label="Pre-existing Medical Conditions?" required icon={<Heart className="h-4 w-4" />}>
+              <RadioGroup 
+                value={travellers?.[index]?.hasMedicalConditions || 'no'} 
+                onValueChange={(value) => setValue(`travellers.${index}.hasMedicalConditions`, value)}
               >
-                <div className='flex items-center space-x-3'>
-                  <RadioGroupItem
-                    value='no'
-                    id={`no-${index}`}
-                    className='border-border bg-input-background'
-                  />
-                  <Label
-                    htmlFor={`no-${index}`}
-                    className='cursor-pointer text-foreground'
-                  >
-                    No
-                  </Label>
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="no" id={`no-${index}`} className="border-border bg-input-background" />
+                  <Label htmlFor={`no-${index}`} className="cursor-pointer text-foreground">No</Label>
                 </div>
-                <div className='flex items-center space-x-3'>
-                  <RadioGroupItem
-                    value='yes'
-                    id={`yes-${index}`}
-                    className='border-border bg-input-background'
-                  />
-                  <Label
-                    htmlFor={`yes-${index}`}
-                    className='cursor-pointer text-foreground'
-                  >
-                    Yes
-                  </Label>
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="yes" id={`yes-${index}`} className="border-border bg-input-background" />
+                  <Label htmlFor={`yes-${index}`} className="cursor-pointer text-foreground">Yes</Label>
                 </div>
               </RadioGroup>
             </FormField>
 
-            {travellers?.[index]?.hasMedicalConditions === "yes" && (
-              <FormField label='Medical Condition Details' required>
+            {travellers?.[index]?.hasMedicalConditions === 'yes' && (
+              <FormField label="Medical Condition Details" required>
                 <Textarea
-                  {...register(`travellers.${index}.medicalDetails`, {
-                    required: "Please provide details",
-                  })}
-                  placeholder='Please describe the medical condition'
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  {...register(`travellers.${index}.medicalDetails`, { required: 'Please provide details' })}
+                  placeholder="Please describe the medical condition"
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                   rows={3}
                 />
@@ -1316,107 +1018,76 @@ const TravelInsuranceFormComponent = ({
   // Render Step 3: Coverage Selection
   const renderStep3 = () => (
     <div className={getSpacingClass()}>
-      <div
-        className='mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20'
-        style={{ borderRadius: getCardBorderRadius() }}
-      >
-        <div className='flex items-center gap-3 mb-2'>
-          <div className='w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center'>
-            <Shield className='h-5 w-5 text-primary' />
+      <div className="mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <Shield className="h-5 w-5 text-primary" />
           </div>
-          <h3 className='text-foreground'>Choose Your Coverage</h3>
+          <h3 className="text-foreground">Choose Your Coverage</h3>
         </div>
-        <p className='text-muted-foreground'>
-          Select the plan that best fits your needs
-        </p>
+        <p className="text-muted-foreground">Select the plan that best fits your needs</p>
       </div>
 
-      <FormField label='Coverage Plan' required>
-        <div
-          className='flex flex-col lg:grid lg:grid-cols-3 gap-4'
-          role='radiogroup'
-          aria-label='Coverage Plan'
-        >
+      <FormField label="Coverage Plan" required>
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4" role="radiogroup" aria-label="Coverage Plan">
           {coveragePlans.map((plan, planIndex) => {
             const planIcons = [
-              <Shield className='h-6 w-6' key='basic' />,
-              <Star className='h-6 w-6' key='silver' />,
-              <Sparkles className='h-6 w-6' key='gold' />,
+              <Shield className="h-6 w-6" key="basic" />,
+              <Star className="h-6 w-6" key="silver" />,
+              <Sparkles className="h-6 w-6" key="gold" />
             ];
-
+            
             return (
               <Card
                 key={plan.id}
-                role='radio'
+                role="radio"
                 tabIndex={0}
                 aria-checked={coveragePlan === plan.id}
                 className={`p-4 sm:p-6 cursor-pointer transition-all border-2 flex flex-col focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   coveragePlan === plan.id
-                    ? "border-primary bg-primary/5 scale-105 shadow-lg"
-                    : "border-border bg-card hover:border-primary/50 hover:shadow-md"
+                    ? 'border-primary bg-primary/5 scale-105 shadow-lg'
+                    : 'border-border bg-card hover:border-primary/50 hover:shadow-md'
                 }`}
-                onClick={() => {
-                  setValue("coveragePlan", plan.id);
-                  setCoveragePlan(plan.id);
-                }}
+                onClick={() => { setValue('coveragePlan', plan.id); setCoveragePlan(plan.id); }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    setValue("coveragePlan", plan.id);
+                    setValue('coveragePlan', plan.id);
                     setCoveragePlan(plan.id);
                   }
                 }}
-                style={{
+                style={{ 
                   borderRadius: getCardBorderRadius(),
-                  transition: "all var(--transition-normal)",
-                  width: "100%",
+                  transition: 'all var(--transition-normal)',
+                  width: '100%'
                 }}
               >
-                <div className='flex items-center justify-between mb-4 gap-2'>
-                  <div className='flex items-center gap-3'>
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        coveragePlan === plan.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-primary/10 text-primary"
-                      }`}
-                    >
+                <div className="flex items-center justify-between mb-4 gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      coveragePlan === plan.id ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'
+                    }`}>
                       {planIcons[planIndex]}
                     </div>
-                    <h4 className='text-foreground break-words'>{plan.name}</h4>
+                    <h4 className="text-foreground break-words">{plan.name}</h4>
                   </div>
-                  {coveragePlan === plan.id && (
-                    <CheckCircle2
-                      className='h-6 w-6 text-primary flex-shrink-0'
-                      aria-hidden='true'
-                    />
-                  )}
+                  {coveragePlan === plan.id && <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0" aria-hidden="true" />}
                 </div>
-                <p className='text-muted-foreground mb-4 break-words'>
-                  {plan.description}
-                </p>
-                <div className='space-y-2 flex-1'>
+                <p className="text-muted-foreground mb-4 break-words">{plan.description}</p>
+                <div className="space-y-2 flex-1">
                   {plan.features.map((feature, idx) => (
-                    <div key={idx} className='flex items-start gap-2'>
-                      <Check
-                        className='h-4 w-4 text-success mt-0.5 flex-shrink-0'
-                        aria-hidden='true'
-                      />
-                      <span className='text-foreground break-words'>
-                        {feature}
-                      </span>
+                    <div key={idx} className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-success mt-0.5 flex-shrink-0" aria-hidden="true" />
+                      <span className="text-foreground break-words">{feature}</span>
                     </div>
                   ))}
                 </div>
-                <div className='mt-auto pt-4 border-t border-border'>
-                  <div className='flex items-baseline gap-2 flex-wrap'>
-                    <span
-                      className='text-foreground'
-                      style={{ fontSize: "1.5rem", fontWeight: "600" }}
-                    >
+                <div className="mt-auto pt-4 border-t border-border">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-foreground" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
                       ${plan.price}
                     </span>
-                    <span className='text-muted-foreground'>per person</span>
+                    <span className="text-muted-foreground">per person</span>
                   </div>
                 </div>
               </Card>
@@ -1425,30 +1096,30 @@ const TravelInsuranceFormComponent = ({
         </div>
       </FormField>
 
-      <div className='pt-4'>
-        <div className='flex items-center gap-2 mb-4'>
-          <Sparkles className='h-5 w-5 text-primary' />
-          <h4 className='text-foreground'>Add Extra Protection</h4>
+      <div className="pt-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h4 className="text-foreground">Add Extra Protection</h4>
         </div>
-        <div className='space-y-3'>
+        <div className="space-y-3">
           {addOnCoverages.map((addon) => (
             <Card
               key={addon.id}
               className={`p-4 bg-card border transition-all cursor-pointer ${
-                addOns.includes(addon.id)
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/30"
+                addOns.includes(addon.id) 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-border hover:border-primary/30'
               }`}
-              style={{ borderRadius: getCardBorderRadius(), minHeight: "44px" }}
+              style={{ borderRadius: getCardBorderRadius(), minHeight: '44px' }}
               onClick={() => {
                 const newAddOns = addOns.includes(addon.id)
                   ? addOns.filter((id: string) => id !== addon.id)
                   : [...addOns, addon.id];
-                setValue("addOns", newAddOns);
+                setValue('addOns', newAddOns);
                 setAddOns(newAddOns);
               }}
             >
-              <div className='flex items-start gap-3 flex-wrap sm:flex-nowrap'>
+              <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
                 <Checkbox
                   id={addon.id}
                   checked={addOns.includes(addon.id)}
@@ -1456,30 +1127,20 @@ const TravelInsuranceFormComponent = ({
                     const newAddOns = checked
                       ? [...addOns, addon.id]
                       : addOns.filter((id: string) => id !== addon.id);
-                    setValue("addOns", newAddOns);
+                    setValue('addOns', newAddOns);
                     setAddOns(newAddOns);
                   }}
-                  className='mt-1 flex-shrink-0'
+                  className="mt-1 flex-shrink-0"
                 />
-                <div className='flex-1 min-w-0'>
-                  <Label
-                    htmlFor={addon.id}
-                    className='cursor-pointer text-foreground break-words'
-                  >
+                <div className="flex-1 min-w-0">
+                  <Label htmlFor={addon.id} className="cursor-pointer text-foreground break-words">
                     {addon.name}
                   </Label>
-                  <p className='text-muted-foreground break-words'>
-                    {addon.description}
-                  </p>
+                  <p className="text-muted-foreground break-words">{addon.description}</p>
                 </div>
-                <div className='flex items-center gap-1 flex-shrink-0'>
-                  <span
-                    className='text-foreground'
-                    style={{ fontWeight: "600" }}
-                  >
-                    +${addon.price}
-                  </span>
-                  <span className='text-muted-foreground'>/person</span>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <span className="text-foreground" style={{ fontWeight: '600' }}>+${addon.price}</span>
+                  <span className="text-muted-foreground">/person</span>
                 </div>
               </div>
             </Card>
@@ -1491,276 +1152,183 @@ const TravelInsuranceFormComponent = ({
 
   // Render Step 4: Summary & Payment
   const renderStep4 = () => {
-    const selectedPlan = coveragePlans.find((p) => p.id === coveragePlan);
-    const selectedAddOns = addOnCoverages.filter((a) => addOns.includes(a.id));
+    const selectedPlan = coveragePlans.find(p => p.id === coveragePlan);
+    const selectedAddOns = addOnCoverages.filter(a => addOns.includes(a.id));
     const subtotal = (selectedPlan?.price || 0) * numTravellers;
-    const addOnsTotal =
-      selectedAddOns.reduce((sum, addon) => sum + addon.price, 0) *
-      numTravellers;
+    const addOnsTotal = selectedAddOns.reduce((sum, addon) => sum + addon.price, 0) * numTravellers;
     const total = subtotal + addOnsTotal;
 
     return (
       <div className={getSpacingClass()}>
-        <div
-          className='mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20'
-          style={{ borderRadius: getCardBorderRadius() }}
-        >
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center'>
-              <FileText className='h-5 w-5 text-primary' />
+        <div className="mb-6 p-6 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
-            <h3 className='text-foreground'>Review & Pay</h3>
+            <h3 className="text-foreground">Review & Pay</h3>
           </div>
-          <p className='text-muted-foreground'>
-            Verify your details and complete payment
-          </p>
+          <p className="text-muted-foreground">Verify your details and complete payment</p>
         </div>
 
-        <Card
-          className='p-4 sm:p-6 bg-card border border-border'
-          style={{
-            borderRadius: getCardBorderRadius(),
-            boxShadow: "var(--elevation-md)",
-          }}
-        >
-          <div className='flex items-center gap-2 mb-4'>
-            <FileText className='h-5 w-5 text-primary' />
-            <h3 className='text-foreground break-words'>Booking Summary</h3>
+        <Card className="p-4 sm:p-6 bg-card border border-border" style={{ borderRadius: getCardBorderRadius(), boxShadow: 'var(--elevation-md)' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <FileText className="h-5 w-5 text-primary" />
+            <h3 className="text-foreground break-words">Booking Summary</h3>
           </div>
-          <div className='space-y-3'>
-            <div className='flex justify-between gap-4 flex-wrap'>
-              <span className='text-muted-foreground'>Trip Type:</span>
-              <span className='text-foreground text-right break-words'>
-                {tripType === "single" ? "Single Trip" : "Annual Multi-trip"}
-              </span>
+          <div className="space-y-3">
+            <div className="flex justify-between gap-4 flex-wrap">
+              <span className="text-muted-foreground">Trip Type:</span>
+              <span className="text-foreground text-right break-words">{tripType === 'single' ? 'Single Trip' : 'Annual Multi-trip'}</span>
             </div>
-            <div className='flex justify-between gap-4 flex-wrap'>
-              <span className='text-muted-foreground'>Destination:</span>
-              <span className='text-foreground text-right break-words'>
-                {countries.find((c) => c.value === destination)?.label}
-              </span>
+            <div className="flex justify-between gap-4 flex-wrap">
+              <span className="text-muted-foreground">Destination:</span>
+              <span className="text-foreground text-right break-words">{countries.find(c => c.value === destination)?.label}</span>
             </div>
-            <div className='flex justify-between gap-4 flex-wrap'>
-              <span className='text-muted-foreground'>Travel Dates:</span>
-              <span className='text-foreground text-right break-words'>
-                {startDate} to {endDate}
-              </span>
+            <div className="flex justify-between gap-4 flex-wrap">
+              <span className="text-muted-foreground">Travel Dates:</span>
+              <span className="text-foreground text-right break-words">{startDate} to {endDate}</span>
             </div>
-            <div className='flex justify-between gap-4 flex-wrap'>
-              <span className='text-muted-foreground'>
-                Number of Travellers:
-              </span>
-              <span className='text-foreground text-right'>
-                {numTravellers}
-              </span>
+            <div className="flex justify-between gap-4 flex-wrap">
+              <span className="text-muted-foreground">Number of Travellers:</span>
+              <span className="text-foreground text-right">{numTravellers}</span>
             </div>
-            <div className='flex justify-between gap-4 flex-wrap'>
-              <span className='text-muted-foreground'>Coverage Plan:</span>
-              <span className='text-foreground text-right break-words'>
-                {selectedPlan?.name}
-              </span>
+            <div className="flex justify-between gap-4 flex-wrap">
+              <span className="text-muted-foreground">Coverage Plan:</span>
+              <span className="text-foreground text-right break-words">{selectedPlan?.name}</span>
             </div>
             {selectedAddOns.length > 0 && (
-              <div className='flex justify-between gap-4 flex-wrap'>
-                <span className='text-muted-foreground'>Add-ons:</span>
-                <span className='text-foreground text-right break-words'>
-                  {selectedAddOns.map((a) => a.name).join(", ")}
-                </span>
+              <div className="flex justify-between gap-4 flex-wrap">
+                <span className="text-muted-foreground">Add-ons:</span>
+                <span className="text-foreground text-right break-words">{selectedAddOns.map(a => a.name).join(', ')}</span>
               </div>
             )}
-            <div className='border-t border-border pt-3 mt-3'>
-              <div className='flex justify-between gap-4 flex-wrap'>
-                <span className='text-muted-foreground'>Base Coverage:</span>
-                <span className='text-foreground'>${subtotal}</span>
+            <div className="border-t border-border pt-3 mt-3">
+              <div className="flex justify-between gap-4 flex-wrap">
+                <span className="text-muted-foreground">Base Coverage:</span>
+                <span className="text-foreground">${subtotal}</span>
               </div>
               {addOnsTotal > 0 && (
-                <div className='flex justify-between gap-4 flex-wrap'>
-                  <span className='text-muted-foreground'>Add-ons:</span>
-                  <span className='text-foreground'>${addOnsTotal}</span>
+                <div className="flex justify-between gap-4 flex-wrap">
+                  <span className="text-muted-foreground">Add-ons:</span>
+                  <span className="text-foreground">${addOnsTotal}</span>
                 </div>
               )}
-              <div
-                className='flex justify-between gap-4 flex-wrap mt-2 pt-2 border-t border-border bg-primary/5 -mx-6 px-6 py-3 -mb-6 rounded-b'
-                style={{
-                  borderRadius: `0 0 ${getCardBorderRadius()} ${getCardBorderRadius()}`,
-                }}
-              >
-                <span className='text-foreground'>Total Amount:</span>
-                <span
-                  className='text-primary'
-                  style={{ fontSize: "1.5rem", fontWeight: "700" }}
-                >
-                  ${total}
-                </span>
+              <div className="flex justify-between gap-4 flex-wrap mt-2 pt-2 border-t border-border bg-primary/5 -mx-6 px-6 py-3 -mb-6 rounded-b" style={{ borderRadius: `0 0 ${getCardBorderRadius()} ${getCardBorderRadius()}` }}>
+                <span className="text-foreground">Total Amount:</span>
+                <span className="text-primary" style={{ fontSize: '1.5rem', fontWeight: '700' }}>${total}</span>
               </div>
             </div>
           </div>
         </Card>
 
-        <FormField
-          label='Payment Method'
-          required
-          icon={<CreditCard className='h-4 w-4' />}
-        >
-          <RadioGroup
-            value={paymentMethod}
-            onValueChange={(value) => {
-              setValue("paymentMethod", value);
-              setPaymentMethod(value);
-            }}
-            className='space-y-3'
+        <FormField label="Payment Method" required icon={<CreditCard className="h-4 w-4" />}>
+          <RadioGroup 
+            value={watchPaymentMethod} 
+            onValueChange={(value) => setValue('paymentMethod', value)}
+            className="space-y-3"
           >
-            <Card
+            <Card 
               className={`p-4 cursor-pointer transition-all ${
-                paymentMethod === "credit_card"
-                  ? "border-2 border-primary bg-primary/5"
-                  : "border border-border"
+                paymentMethod === 'credit_card' ? 'border-2 border-primary bg-primary/5' : 'border border-border'
               }`}
               style={{ borderRadius: getCardBorderRadius() }}
-              onClick={() => {
-                setValue("paymentMethod", "credit_card");
-                setPaymentMethod("credit_card");
-              }}
+              onClick={() => { setValue('paymentMethod', 'credit_card'); setPaymentMethod('credit_card'); }}
             >
-              <div className='flex items-center space-x-3'>
-                <RadioGroupItem
-                  value='credit_card'
-                  id='credit_card'
-                  className='border-border bg-input-background'
-                />
-                <Label
-                  htmlFor='credit_card'
-                  className='cursor-pointer text-foreground flex items-center gap-2'
-                >
-                  <CreditCard className='h-4 w-4' />
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="credit_card" id="credit_card" className="border-border bg-input-background" />
+                <Label htmlFor="credit_card" className="cursor-pointer text-foreground flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
                   Credit/Debit Card
                 </Label>
               </div>
             </Card>
-            <Card
+            <Card 
               className={`p-4 cursor-pointer transition-all ${
-                paymentMethod === "paypal"
-                  ? "border-2 border-primary bg-primary/5"
-                  : "border border-border"
+                paymentMethod === 'paypal' ? 'border-2 border-primary bg-primary/5' : 'border border-border'
               }`}
               style={{ borderRadius: getCardBorderRadius() }}
-              onClick={() => {
-                setValue("paymentMethod", "paypal");
-                setPaymentMethod("paypal");
-              }}
+              onClick={() => { setValue('paymentMethod', 'paypal'); setPaymentMethod('paypal'); }}
             >
-              <div className='flex items-center space-x-3'>
-                <RadioGroupItem
-                  value='paypal'
-                  id='paypal'
-                  className='border-border bg-input-background'
-                />
-                <Label
-                  htmlFor='paypal'
-                  className='cursor-pointer text-foreground'
-                >
-                  PayPal
-                </Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="paypal" id="paypal" className="border-border bg-input-background" />
+                <Label htmlFor="paypal" className="cursor-pointer text-foreground">PayPal</Label>
               </div>
             </Card>
-            <Card
+            <Card 
               className={`p-4 cursor-pointer transition-all ${
-                paymentMethod === "bank_transfer"
-                  ? "border-2 border-primary bg-primary/5"
-                  : "border border-border"
+                paymentMethod === 'bank_transfer' ? 'border-2 border-primary bg-primary/5' : 'border border-border'
               }`}
               style={{ borderRadius: getCardBorderRadius() }}
-              onClick={() => {
-                setValue("paymentMethod", "bank_transfer");
-                setPaymentMethod("bank_transfer");
-              }}
+              onClick={() => { setValue('paymentMethod', 'bank_transfer'); setPaymentMethod('bank_transfer'); }}
             >
-              <div className='flex items-center space-x-3'>
-                <RadioGroupItem
-                  value='bank_transfer'
-                  id='bank_transfer'
-                  className='border-border bg-input-background'
-                />
-                <Label
-                  htmlFor='bank_transfer'
-                  className='cursor-pointer text-foreground'
-                >
-                  Bank Transfer
-                </Label>
+              <div className="flex items-center space-x-3">
+                <RadioGroupItem value="bank_transfer" id="bank_transfer" className="border-border bg-input-background" />
+                <Label htmlFor="bank_transfer" className="cursor-pointer text-foreground">Bank Transfer</Label>
               </div>
             </Card>
           </RadioGroup>
         </FormField>
 
-        {paymentMethod === "credit_card" && (
-          <Card
-            className='p-4 sm:p-6 bg-card border border-primary/20'
-            style={{ borderRadius: getCardBorderRadius() }}
-          >
-            <div className='flex items-center gap-2 mb-4'>
-              <CreditCard className='h-5 w-5 text-primary' />
-              <h4 className='text-foreground break-words'>Card Details</h4>
+        {paymentMethod === 'credit_card' && (
+          <Card className="p-4 sm:p-6 bg-card border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+            <div className="flex items-center gap-2 mb-4">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <h4 className="text-foreground break-words">Card Details</h4>
             </div>
             <div className={getSpacingClass()}>
-              <FormField label='Cardholder Name' required>
+              <FormField label="Cardholder Name" required>
                 <Input
-                  {...register("cardholderName", {
-                    required: "Name is required",
-                  })}
-                  placeholder='Enter name on card'
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  {...register('cardholderName', { required: 'Name is required' })}
+                  placeholder="Enter name on card"
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 />
               </FormField>
 
-              <FormField label='Card Number' required>
+              <FormField label="Card Number" required>
                 <Input
-                  {...register("cardNumber", {
-                    required: "Card number is required",
-                  })}
-                  placeholder='1234 5678 9012 3456'
-                  className='bg-input-background border-border text-foreground'
-                  style={{
+                  {...register('cardNumber', { required: 'Card number is required' })}
+                  placeholder="1234 5678 9012 3456"
+                  className="bg-input-background border-border text-foreground"
+                  style={{ 
                     borderRadius: getBorderRadiusValue(),
                     height: getInputHeight(),
-                    padding: getInputPadding(),
+                    padding: getInputPadding()
                   }}
                 />
               </FormField>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                <FormField label='Expiry Date' required>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField label="Expiry Date" required>
                   <Input
-                    {...register("cardExpiry", {
-                      required: "Expiry date is required",
-                    })}
-                    placeholder='MM/YY'
-                    className='bg-input-background border-border text-foreground'
-                    style={{
+                    {...register('cardExpiry', { required: 'Expiry date is required' })}
+                    placeholder="MM/YY"
+                    className="bg-input-background border-border text-foreground"
+                    style={{ 
                       borderRadius: getBorderRadiusValue(),
                       height: getInputHeight(),
-                      padding: getInputPadding(),
+                      padding: getInputPadding()
                     }}
                   />
                 </FormField>
 
-                <FormField label='CVV' required>
+                <FormField label="CVV" required>
                   <Input
-                    {...register("cardCvv", { required: "CVV is required" })}
-                    placeholder='123'
-                    type='password'
+                    {...register('cardCvv', { required: 'CVV is required' })}
+                    placeholder="123"
+                    type="password"
                     maxLength={4}
-                    className='bg-input-background border-border text-foreground'
-                    style={{
+                    className="bg-input-background border-border text-foreground"
+                    style={{ 
                       borderRadius: getBorderRadiusValue(),
                       height: getInputHeight(),
-                      padding: getInputPadding(),
+                      padding: getInputPadding()
                     }}
-                    aria-label='Card CVV security code'
+                    aria-label="Card CVV security code"
                   />
                 </FormField>
               </div>
@@ -1768,63 +1336,42 @@ const TravelInsuranceFormComponent = ({
           </Card>
         )}
 
-        <div className='space-y-3'>
-          <Card
+        <div className="space-y-3">
+          <Card 
             className={`p-4 cursor-pointer transition-all ${
-              declaration ? "border-primary/30 bg-primary/5" : "border-border"
+              declaration ? 'border-primary/30 bg-primary/5' : 'border-border'
             }`}
-            style={{ borderRadius: getBorderRadiusValue(), minHeight: "44px" }}
-            onClick={() => {
-              const newValue = !declaration;
-              setValue("declaration", newValue);
-              setDeclaration(newValue);
-            }}
+            style={{ borderRadius: getBorderRadiusValue(), minHeight: '44px' }}
+            onClick={() => { const newValue = !declaration; setValue('declaration', newValue); setDeclaration(newValue); }}
           >
-            <div className='flex items-start gap-3'>
+            <div className="flex items-start gap-3">
               <Checkbox
-                id='declaration'
+                id="declaration"
                 checked={declaration}
-                onCheckedChange={(checked) => {
-                  setValue("declaration", checked as boolean);
-                  setDeclaration(checked as boolean);
-                }}
-                className='mt-1'
+                onCheckedChange={(checked) => { setValue('declaration', checked as boolean); setDeclaration(checked as boolean); }}
+                className="mt-1"
               />
-              <Label
-                htmlFor='declaration'
-                className='cursor-pointer text-foreground break-words flex-1'
-              >
-                I declare that all information provided is accurate and complete
-                to the best of my knowledge.
+              <Label htmlFor="declaration" className="cursor-pointer text-foreground break-words flex-1">
+                I declare that all information provided is accurate and complete to the best of my knowledge.
               </Label>
             </div>
           </Card>
 
-          <Card
+          <Card 
             className={`p-4 cursor-pointer transition-all ${
-              terms ? "border-primary/30 bg-primary/5" : "border-border"
+              terms ? 'border-primary/30 bg-primary/5' : 'border-border'
             }`}
-            style={{ borderRadius: getBorderRadiusValue(), minHeight: "44px" }}
-            onClick={() => {
-              const newValue = !terms;
-              setValue("terms", newValue);
-              setTerms(newValue);
-            }}
+            style={{ borderRadius: getBorderRadiusValue(), minHeight: '44px' }}
+            onClick={() => { const newValue = !terms; setValue('terms', newValue); setTerms(newValue); }}
           >
-            <div className='flex items-start gap-3'>
+            <div className="flex items-start gap-3">
               <Checkbox
-                id='terms'
+                id="terms"
                 checked={terms}
-                onCheckedChange={(checked) => {
-                  setValue("terms", checked as boolean);
-                  setTerms(checked as boolean);
-                }}
-                className='mt-1'
+                onCheckedChange={(checked) => { setValue('terms', checked as boolean); setTerms(checked as boolean); }}
+                className="mt-1"
               />
-              <Label
-                htmlFor='terms'
-                className='cursor-pointer text-foreground break-words flex-1'
-              >
+              <Label htmlFor="terms" className="cursor-pointer text-foreground break-words flex-1">
                 I agree to the terms and conditions and privacy policy.
               </Label>
             </div>
@@ -1836,115 +1383,89 @@ const TravelInsuranceFormComponent = ({
 
   // Render thank you page
   const renderThankYou = () => (
-    <Card
-      className='p-4 sm:p-8 bg-card border border-border text-center overflow-hidden relative'
-      style={{ borderRadius: getCardBorderRadius() }}
-      role='region'
-      aria-live='polite'
+    <Card 
+      className="p-4 sm:p-8 border border-border text-center overflow-hidden relative" 
+      style={{ 
+        borderRadius: getCardBorderRadius(),
+        backgroundColor: isDarkMode ? '#171E2D' : 'var(--card)'
+      }} 
+      role="region" 
+      aria-live="polite"
     >
-      <div className='absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10'></div>
-      <div className='absolute bottom-0 left-0 w-64 h-64 bg-success/5 rounded-full blur-3xl -z-10'></div>
-
-      <div
-        className='w-20 h-20 bg-gradient-to-br from-success to-success/70 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce'
-        style={{
-          borderRadius: borderRadius === "sharp" ? "0px" : "50%",
-          animation: "bounce 1s ease-in-out 2",
-        }}
-        aria-hidden='true'
-      >
-        <CheckCircle2 className='h-10 w-10 text-success-foreground' />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-success/5 rounded-full blur-3xl -z-10"></div>
+      
+      <div className="w-20 h-20 bg-gradient-to-br from-success to-success/70 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce" style={{ borderRadius: borderRadius === 'sharp' ? '0px' : '50%', animation: 'bounce 1s ease-in-out 2' }} aria-hidden="true">
+        <CheckCircle2 className="h-10 w-10 text-success-foreground" />
       </div>
-
-      <div className='flex items-center justify-center gap-2 mb-2'>
-        <Sparkles className='h-6 w-6 text-primary' />
-        <h2 className='text-foreground break-words'>
-          Policy Issued Successfully!
-        </h2>
-        <Sparkles className='h-6 w-6 text-primary' />
+      
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <Sparkles className="h-6 w-6 text-primary" />
+        <h2 className="text-foreground break-words">Policy Issued Successfully!</h2>
+        <Sparkles className="h-6 w-6 text-primary" />
       </div>
-
-      <p className='text-muted-foreground mb-6 break-words'>
+      
+      <p className="text-muted-foreground mb-6 break-words">
         Your travel insurance policy has been issued and confirmed.
       </p>
-
-      <div
-        className='bg-gradient-to-br from-primary/10 to-primary/5 p-6 mb-6 border border-primary/20'
-        style={{ borderRadius: getCardBorderRadius() }}
-      >
-        <p className='text-muted-foreground mb-2'>Policy Number</p>
-        <p
-          className='text-foreground break-all'
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: "700",
-            letterSpacing: "0.05em",
-          }}
-        >
-          {policyNumber}
-        </p>
+      
+      <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 mb-6 border border-primary/20" style={{ borderRadius: getCardBorderRadius() }}>
+        <p className="text-muted-foreground mb-2">Policy Number</p>
+        <p className="text-foreground break-all" style={{ fontSize: '1.25rem', fontWeight: '700', letterSpacing: '0.05em' }}>{policyNumber}</p>
       </div>
 
-      <div
-        className='text-left bg-card border border-border p-6 mb-6'
-        style={{
-          borderRadius: getCardBorderRadius(),
-          boxShadow: "var(--elevation-sm)",
+      <div 
+        className="text-left border border-border p-6 mb-6" 
+        style={{ 
+          borderRadius: getCardBorderRadius(), 
+          boxShadow: 'var(--elevation-sm)',
+          backgroundColor: isDarkMode ? '#1A2332' : 'var(--card)'
         }}
       >
-        <div className='flex items-center gap-2 mb-4'>
-          <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
-            <Check className='h-4 w-4 text-primary' />
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Check className="h-4 w-4 text-primary" />
           </div>
-          <h3 className='text-foreground break-words'>What happens next?</h3>
+          <h3 className="text-foreground break-words">What happens next?</h3>
         </div>
-        <ul className='space-y-3 text-muted-foreground'>
-          <li className='break-words flex items-start gap-2'>
-            <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
+        <ul className="space-y-3 text-muted-foreground">
+          <li className="break-words flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
             <span>Policy documents sent to your email</span>
           </li>
-          <li className='break-words flex items-start gap-2'>
-            <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
-            <span>Coverage effective from {startDate}</span>
+          <li className="break-words flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+            <span>Coverage effective from {watchStartDate}</span>
           </li>
-          <li className='break-words flex items-start gap-2'>
-            <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
+          <li className="break-words flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
             <span>24/7 emergency assistance available</span>
           </li>
-          <li className='break-words flex items-start gap-2'>
-            <CheckCircle2 className='h-5 w-5 text-success flex-shrink-0 mt-0.5' />
+          <li className="break-words flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
             <span>Digital policy card in your inbox</span>
           </li>
         </ul>
       </div>
 
-      <div
-        className='text-left bg-muted/30 p-6 border border-muted'
-        style={{ borderRadius: getCardBorderRadius() }}
-      >
-        <div className='flex items-center gap-2 mb-3'>
-          <AlertCircle className='h-5 w-5 text-primary' />
-          <h4 className='text-foreground break-words'>Important Information</h4>
+      <div className="text-left bg-muted/30 p-6 border border-muted" style={{ borderRadius: getCardBorderRadius() }}>
+        <div className="flex items-center gap-2 mb-3">
+          <AlertCircle className="h-5 w-5 text-primary" />
+          <h4 className="text-foreground break-words">Important Information</h4>
         </div>
-        <ul className='space-y-2 text-muted-foreground'>
-          <li className='break-words'>• Keep your policy number handy</li>
-          <li className='break-words'>
-            • Emergency helpline: 1-800-TRAVEL-HELP
-          </li>
-          <li className='break-words'>• Claims can be filed 24/7 online</li>
+        <ul className="space-y-2 text-muted-foreground">
+          <li className="break-words">• Keep your policy number handy</li>
+          <li className="break-words">• Emergency helpline: 1-800-TRAVEL-HELP</li>
+          <li className="break-words">• Claims can be filed 24/7 online</li>
         </ul>
       </div>
 
       <Button
         onClick={handleRestartJourney}
-        className='w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90'
-        style={{
-          borderRadius: getButtonBorderRadius(),
-          minHeight: "48px",
-          padding: "0.75rem 1.5rem",
-        }}
+        className="w-full mt-6 bg-primary text-primary-foreground hover:bg-primary/90"
+        style={{ borderRadius: getButtonBorderRadius(), minHeight: '48px', padding: '0.75rem 1.5rem' }}
       >
-        <Plane className='h-4 w-4 mr-2' />
+        <Plane className="h-4 w-4 mr-2" />
         Create New Policy
       </Button>
     </Card>
@@ -1953,31 +1474,37 @@ const TravelInsuranceFormComponent = ({
   // Main render
   if (isSubmitted) {
     return (
-      <div
-        className='min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8'
-        style={getThemeStyle()}
+      <div 
+        className="min-h-screen px-4 py-6 sm:px-6 sm:py-8" 
+        style={{
+          ...getThemeStyle(),
+          backgroundColor: isDarkMode ? '#171E2D' : 'var(--background)'
+        }}
       >
-        <div className='max-w-4xl mx-auto'>{renderThankYou()}</div>
+        <div className="max-w-4xl mx-auto">
+          {renderThankYou()}
+        </div>
       </div>
     );
   }
 
   return (
-    <main
-      className='min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8'
-      style={getThemeStyle()}
+    <main 
+      className="min-h-screen px-4 py-6 sm:px-6 sm:py-8" 
+      style={{
+        ...getThemeStyle(),
+        backgroundColor: isDarkMode ? '#171E2D' : 'var(--background)'
+      }}
     >
-      <div className='max-w-4xl mx-auto'>
-        <header className='mb-6 sm:mb-8 text-center'>
-          <div className='flex items-center justify-center gap-3 mb-3'>
-            <div className='w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center'>
-              <Shield className='h-6 w-6 text-primary' />
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-6 sm:mb-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary" />
             </div>
-            <h1 className='text-foreground break-words px-2'>
-              Travel Insurance Quote & Buy
-            </h1>
+            <h1 className="text-foreground break-words px-2">Travel Insurance Quote & Buy</h1>
           </div>
-          <p className='text-muted-foreground break-words px-2'>
+          <p className="text-muted-foreground break-words px-2">
             Complete your travel insurance purchase through our guided journey
           </p>
         </header>
@@ -1985,12 +1512,13 @@ const TravelInsuranceFormComponent = ({
         {renderStepper()}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <Card
-            className='p-4 sm:p-8 bg-card border border-border mb-6'
-            style={{
+          <Card 
+            className="p-4 sm:p-8 border border-border mb-6" 
+            style={{ 
               borderRadius: getCardBorderRadius(),
-              boxShadow: "var(--elevation-md)",
+              boxShadow: 'var(--elevation-md)',
               padding: getCardPadding(),
+              backgroundColor: isDarkMode ? '#171E2D' : 'var(--card)'
             }}
           >
             {currentStep === 0 && renderStep1()}
@@ -1999,49 +1527,49 @@ const TravelInsuranceFormComponent = ({
             {currentStep === 3 && renderStep4()}
           </Card>
 
-          <div className='flex gap-3 justify-between flex-wrap'>
+          <div className="flex gap-3 justify-between flex-wrap">
             <Button
-              type='button'
+              type="button"
               onClick={handlePrevious}
               disabled={currentStep === 0}
-              variant='outline'
-              className='transition-all disabled:opacity-50'
-              style={{
+              variant="outline"
+              className="transition-all disabled:opacity-50"
+              style={{ 
                 borderRadius: getButtonBorderRadius(),
-                minHeight: "48px",
-                padding: "0.75rem 1.5rem",
+                minHeight: '48px',
+                padding: '0.75rem 1.5rem'
               }}
             >
-              <ChevronLeft className='h-4 w-4 mr-1' />
+              <ChevronLeft className="h-4 w-4 mr-1" />
               Previous
             </Button>
 
             {currentStep < steps.length - 1 ? (
               <Button
-                type='button'
+                type="button"
                 onClick={handleNext}
-                className='bg-primary text-primary-foreground hover:bg-primary/90 transition-all ml-auto'
-                style={{
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all ml-auto"
+                style={{ 
                   borderRadius: getButtonBorderRadius(),
-                  minHeight: "48px",
-                  padding: "0.75rem 1.5rem",
+                  minHeight: '48px',
+                  padding: '0.75rem 1.5rem'
                 }}
               >
                 Next
-                <ChevronRight className='h-4 w-4 ml-1' />
+                <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
               <Button
-                type='submit'
-                disabled={!declaration || !terms}
-                className='bg-primary text-primary-foreground hover:bg-primary/90 transition-all ml-auto disabled:opacity-50'
-                style={{
+                type="submit"
+                disabled={!watchDeclaration || !watchTerms}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all ml-auto disabled:opacity-50"
+                style={{ 
                   borderRadius: getButtonBorderRadius(),
-                  minHeight: "48px",
-                  padding: "0.75rem 1.5rem",
+                  minHeight: '48px',
+                  padding: '0.75rem 1.5rem'
                 }}
               >
-                <Check className='h-4 w-4 mr-2' />
+                <Check className="h-4 w-4 mr-2" />
                 Complete Purchase
               </Button>
             )}

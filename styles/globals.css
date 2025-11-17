@@ -6,48 +6,49 @@
 :root {
   --font-size: 16px;
   
-  /* Typography Variables */
-  --text-h1: 32px;
-  --text-h2: 26px;
-  --text-h3: 21px;
-  --text-h4: 18px;
-  --text-base: 14px;
-  --text-label: 12px;
+  /* Typography Variables - Figma-like clean hierarchy */
+  --text-h1: 18px;
+  --text-h2: 14px;
+  --text-h3: 13px;
+  --text-h4: 12px;
+  --text-base: 11px;
+  --text-label: 11px;
   
   /* Responsive Typography Variables for Mobile */
-  --text-h1-mobile: 24px;
-  --text-h2-mobile: 20px;
-  --text-h3-mobile: 16px;
-  --text-h4-mobile: 14px;
-  --text-base-mobile: 12px;
-  --text-label-mobile: 11px;
+  --text-h1-mobile: 16px;
+  --text-h2-mobile: 14px;
+  --text-h3-mobile: 13px;
+  --text-h4-mobile: 12px;
+  --text-base-mobile: 11px;
+  --text-label-mobile: 10px;
   
+  /* Clean Figma-inspired color palette */
   /* The default background color for the application. */
-  --background: rgba(250, 251, 252, 1);
+  --background: rgba(255, 255, 255, 1);
   /* The default color for elements or text that appears on top of the background. */
-  --foreground: rgba(15, 23, 42, 1);
+  --foreground: rgba(0, 0, 0, 1);
   /* The background color for cards, modals, and other containers. */
   --card: rgba(255, 255, 255, 1);
   /* The default color for text or elements that appear on top of cards, modals and other background containers. */
-  --card-foreground: rgba(15, 23, 42, 1);
+  --card-foreground: rgba(0, 0, 0, 1);
   /* The background color for dropdowns and tooltips. */
   --popover: rgba(255, 255, 255, 1);
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
-  --popover-foreground: rgba(15, 23, 42, 1);
+  --popover-foreground: rgba(0, 0, 0, 1);
   /* The primary color used for buttons, links, and other interactive elements. */
-  --primary: rgba(0, 28, 86, 1);
+  --primary: rgba(24, 24, 27, 1);
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(255, 255, 255, 1);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(241, 245, 249, 1);
+  --secondary: rgba(244, 244, 245, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
-  --secondary-foreground: rgba(15, 23, 42, 1);
+  --secondary-foreground: rgba(24, 24, 27, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
-  --muted: rgba(241, 245, 249, 1);
+  --muted: rgba(250, 250, 250, 1);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(100, 116, 139, 1);
+  --muted-foreground: rgba(113, 113, 122, 1);
   /* The accent color used for highlights, links, and other interactive elements. */
-  --accent: rgba(14, 165, 233, 1);
+  --accent: rgba(24, 24, 27, 1);
   /* The default color for text or elements that appear on top of accent colored elements. */
   --accent-foreground: rgba(255, 255, 255, 1);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
@@ -63,11 +64,11 @@
   /* The default color for text or elements that appear on top of warning colored elements. */
   --warning-foreground: rgba(255, 255, 255, 1);
   /* Purple accent for variety */
-  --purple: rgba(168, 85, 247, 1);
+  --purple: rgba(139, 92, 246, 1);
   /* The default color for text or elements that appear on top of purple colored elements. */
   --purple-foreground: rgba(255, 255, 255, 1);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(226, 232, 240, 1);
+  --border: rgba(228, 228, 231, 1);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
   --input: rgba(255, 255, 255, 1);
   /* The default background color for input fields, text areas, and other input elements. */
@@ -79,68 +80,73 @@
   /* The default font weight for normal text. */
   --font-weight-normal: 400;
   /* The color for focus rings, outlines, and other focus indicators. */
-  --ring: rgba(0, 28, 86, 1);
+  --ring: rgba(24, 24, 27, 1);
   /* Loader subtext color for processing states */
-  --loader-subtext: rgba(97, 164, 10, 1);
+  --loader-subtext: rgba(113, 113, 122, 1);
   /* Hover state background colors with proper contrast ratios */
-  --primary-hover: rgba(0, 20, 61, 1);
-  --primary-hover-bg: rgba(226, 232, 240, 1);
-  --accent-hover: rgba(12, 150, 211, 1);
-  --accent-hover-bg: rgba(224, 242, 254, 1);
+  --primary-hover: rgba(63, 63, 70, 1);
+  --primary-hover-bg: rgba(244, 244, 245, 1);
+  --accent-hover: rgba(63, 63, 70, 1);
+  --accent-hover-bg: rgba(244, 244, 245, 1);
   --destructive-hover: rgba(220, 38, 38, 1);
   --destructive-hover-bg: rgba(254, 226, 226, 1);
-  --border-hover: rgba(148, 163, 184, 1);
+  --border-hover: rgba(212, 212, 216, 1);
   /* Selected state colors for form configurator */
-  --selected-bg: rgba(238, 246, 250, 1);
-  --selected-border: rgba(0, 107, 208, 1);
-  /* Shadow for small elevations, such as cards or modals. */
-  --elevation-sm: 0px 0px 1px 0px rgba(3, 11, 23, 0.3), 0px 1px 1px 0px rgba(3, 11, 23, 0.15);
-  /* Shadow for medium elevations, such as dropdowns or popovers. */
-  --elevation-md: 0px 2px 4px 0px rgba(3, 11, 23, 0.1), 0px 6px 12px 0px rgba(3, 11, 23, 0.15);
-  /* Shadow for large elevations, such as modals or dialogs. */
-  --elevation-lg: 0px 8px 16px 0px rgba(3, 11, 23, 0.1), 0px 12px 24px 0px rgba(3, 11, 23, 0.2);
-  /* Transition duration for animations */
-  --transition-fast: 150ms;
-  --transition-normal: 250ms;
-  --transition-slow: 350ms;
+  --selected-bg: rgba(244, 244, 245, 1);
+  --selected-border: rgba(24, 24, 27, 1);
+  /* Shadow for small elevations - minimal Figma-like */
+  --elevation-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  /* Shadow for medium elevations - subtle */
+  --elevation-md: 0px 2px 4px 0px rgba(0, 0, 0, 0.06), 0px 4px 6px 0px rgba(0, 0, 0, 0.04);
+  /* Shadow for large elevations */
+  --elevation-lg: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+  /* Transition duration for animations - snappy like Figma */
+  --transition-fast: 100ms;
+  --transition-normal: 150ms;
+  --transition-slow: 200ms;
   /* The color for chart elements, such as a bar or line in a chart. */
-  --chart-1: rgba(0, 28, 86, 1);
+  --chart-1: rgba(24, 24, 27, 1);
   /* The color for another chart element, such as a bar or line in a chart. */
-  --chart-2: rgba(14, 165, 233, 1);
+  --chart-2: rgba(113, 113, 122, 1);
   /* The color for another chart element, such as a bar or line in a chart. */
-  --chart-3: rgba(168, 85, 247, 1);
+  --chart-3: rgba(139, 92, 246, 1);
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-4: rgba(34, 197, 94, 1);
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-5: rgba(251, 146, 60, 1);
-  /* The default border radius for elements such as buttons, tooltip, and other containers. */
-  --radius: 6px;
+  /* The default border radius - Figma-like minimal corners */
+  --radius: 4px;
   /* The border radius for button elements. */
   --radius-button: 6px;
   /* The border radius for card elements. */
-  --radius-card: 6px;
+  --radius-card: 8px;
   /* The border radius for input elements. */
   --radius-input: 6px;
   /* The border radius for pill-shaped elements. */
-  --radius-pill: 24px;
+  --radius-pill: 999px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: rgba(222, 223, 225, 1);
+  --sidebar: rgba(250, 250, 250, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
-  --sidebar-foreground: rgba(0, 28, 86, 1);
+  --sidebar-foreground: rgba(0, 0, 0, 1);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
-  --sidebar-primary: rgba(0, 28, 86, 1);
+  --sidebar-primary: rgba(24, 24, 27, 1);
   /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
   --sidebar-primary-foreground: rgba(255, 255, 255, 1);
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
-  --sidebar-accent: rgba(0, 187, 255, 1);
+  --sidebar-accent: rgba(244, 244, 245, 1);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
-  --sidebar-accent-foreground: rgba(255, 255, 255, 1);
+  --sidebar-accent-foreground: rgba(24, 24, 27, 1);
   /* The default border color for elements in sidebars and navigation menus. */
-  --sidebar-border: rgba(222, 223, 225, 1);
+  --sidebar-border: rgba(228, 228, 231, 1);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
-  --sidebar-ring: rgba(0, 28, 86, 1);
+  --sidebar-ring: rgba(24, 24, 27, 1);
   /* The background color for page containers and outer wrappers. */
-  --container-bg: rgba(248, 248, 248, 1);
+  --container-bg: rgba(255, 255, 255, 1);
+  /* Icon Variables - Figma-like thin strokes */
+  --icon-stroke: rgba(0, 0, 0, 1);
+  --icon-stroke-width: 1.5;
+  --icon-stroke-width-thin: 1;
+  --icon-stroke-width-thick: 2;
 }
 
 .dark {
@@ -225,6 +231,8 @@
   --sidebar-ring: rgba(96, 165, 250, 1);
   /* The background color for page containers and outer wrappers in dark mode. */
   --container-bg: rgba(23, 30, 45, 1);
+  /* Icon Variables for dark mode */
+  --icon-stroke: rgba(250, 251, 252, 1);
 }
 
 @theme inline {
@@ -296,9 +304,53 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Ensure text selection works everywhere */
+  * {
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
+    -moz-user-select: auto !important;
+    -ms-user-select: auto !important;
+  }
+
+  /* Specifically ensure input and textarea elements allow text selection */
+  input,
+  textarea,
+  [contenteditable="true"],
+  [contenteditable] {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+  }
+
+  /* Prevent selection on buttons and interactive elements only */
+  button:not(input):not(textarea),
+  [role="button"]:not(input):not(textarea),
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  #root {
+    height: 100%;
+    overflow: hidden;
   }
 
   /* Fix date input calendar icon contrast in dark mode */
@@ -330,6 +382,33 @@
   input[type="time"]::-webkit-calendar-picker-indicator,
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
+  }
+
+  /* Make date input text uppercase */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    text-transform: uppercase;
+  }
+
+  /* Make date input placeholders uppercase */
+  input[type="date"]::placeholder,
+  input[type="time"]::placeholder,
+  input[type="datetime-local"]::placeholder {
+    text-transform: uppercase;
+  }
+
+  /* For webkit browsers - make date input internal text uppercase */
+  input[type="date"]::-webkit-datetime-edit,
+  input[type="time"]::-webkit-datetime-edit,
+  input[type="datetime-local"]::-webkit-datetime-edit {
+    text-transform: uppercase;
+  }
+
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+    text-transform: uppercase;
   }
 }
 

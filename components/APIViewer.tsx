@@ -18,13 +18,13 @@ export function APIViewer({ mockApi }: APIViewerProps) {
 
   if (!mockApi || mockApi.length === 0) {
     return (
-      <Card className="p-12 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
-        <div className="text-center text-muted-foreground">
-          <div className="h-16 w-16 mx-auto mb-4 rounded-[var(--radius-card)] bg-primary/10 flex items-center justify-center">
-            <Globe className="h-8 w-8 text-primary" />
+      <Card className="p-8 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
+        <div className="text-center py-6 text-muted-foreground">
+          <div className="mb-3 flex justify-center">
+            <Globe className="h-10 w-10 opacity-20" />
           </div>
-          <h3 className="mb-2">No APIs generated yet</h3>
-          <p>Generate a form schema to see auto-generated mock APIs</p>
+          <h3 className="mb-1.5" style={{ fontSize: '13px' }}>No APIs generated yet</h3>
+          <p style={{ fontSize: '12px' }}>Generate a form schema to see auto-generated Digital APIs</p>
         </div>
       </Card>
     );
@@ -297,9 +297,9 @@ ${JSON.stringify(endpoint.responseBody, null, 2)}
   const outboundApis = mockApi.filter(api => api.method === 'POST' || api.method === 'PUT');
 
   return (
-    <div className="space-y-4 w-full max-w-full overflow-hidden">
+    <div className="space-y-3 w-full max-w-full overflow-hidden">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-foreground">Mock APIs</h3>
+        <h3 style={{ fontSize: '13px' }}>Digital APIs</h3>
         <Button
           onClick={handleDownloadAll}
           variant="outline"
@@ -307,27 +307,27 @@ ${JSON.stringify(endpoint.responseBody, null, 2)}
           className="rounded-[var(--radius-button)] transition-all"
         >
           <Download className="h-3 w-3 mr-1" />
-          Download All
+          <span style={{ fontSize: '11px' }}>Download All</span>
         </Button>
       </div>
 
-      <Card className="p-4 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
-        <div className="space-y-3">
-          <p className="text-muted-foreground">
-            Auto-generated mock APIs for testing and development. Replace with real endpoints when deploying.
+      <Card className="p-3 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
+        <div className="space-y-2.5">
+          <p className="text-muted-foreground" style={{ fontSize: '11px' }}>
+            Auto-generated Digital APIs for testing and development. Replace with real endpoints when deploying.
           </p>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className="bg-primary/5 border-primary/20">
+            <Badge variant="outline" className="bg-primary/5 border-primary/20" style={{ fontSize: '10px' }}>
               {mockApi.length} Total APIs
             </Badge>
-            <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20 text-blue-600">
+            <Badge variant="outline" className="bg-blue-500/10 border-blue-500/20 text-blue-600" style={{ fontSize: '10px' }}>
               {inboundApis.length} Inbound
             </Badge>
-            <Badge variant="outline" className="bg-green-500/10 border-green-500/20 text-green-600">
+            <Badge variant="outline" className="bg-green-500/10 border-green-500/20 text-green-600" style={{ fontSize: '10px' }}>
               {outboundApis.length} Outbound
             </Badge>
           </div>
-          <div className="pt-2 space-y-1 border-t border-border">
+          <div className="pt-2 space-y-1 border-t border-border" style={{ fontSize: '11px' }}>
             <div className="flex items-baseline gap-2">
               <span className="text-muted-foreground">Inbound:</span>
               <span className="text-foreground">APIs to GET data from external systems</span>
@@ -376,17 +376,33 @@ ${JSON.stringify(endpoint.responseBody, null, 2)}
               </AccordionTrigger>
               <AccordionContent className="pt-2 pb-4">
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1 mb-4">
-                    <TabsTrigger value="overview" className="rounded-[var(--radius)] data-[state=active]:bg-card">
+                  <TabsList className="bg-transparent rounded-none p-0 grid grid-cols-4 w-full h-10 border-b border-border mb-4">
+                    <TabsTrigger 
+                      value="overview" 
+                      className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                      style={{ fontSize: '11px' }}
+                    >
                       Overview
                     </TabsTrigger>
-                    <TabsTrigger value="request" className="rounded-[var(--radius)] data-[state=active]:bg-card">
+                    <TabsTrigger 
+                      value="request" 
+                      className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                      style={{ fontSize: '11px' }}
+                    >
                       Request
                     </TabsTrigger>
-                    <TabsTrigger value="response" className="rounded-[var(--radius)] data-[state=active]:bg-card">
+                    <TabsTrigger 
+                      value="response" 
+                      className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                      style={{ fontSize: '11px' }}
+                    >
                       Response
                     </TabsTrigger>
-                    <TabsTrigger value="curl" className="rounded-[var(--radius)] data-[state=active]:bg-card">
+                    <TabsTrigger 
+                      value="curl" 
+                      className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                      style={{ fontSize: '11px' }}
+                    >
                       cURL
                     </TabsTrigger>
                   </TabsList>

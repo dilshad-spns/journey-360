@@ -112,29 +112,29 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
 
   if (!schema) {
     return (
-      <Card className="p-12 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
+      <Card className="p-8 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
         <div className="text-center text-muted-foreground">
-          <div className="h-16 w-16 mx-auto mb-4 rounded-[var(--radius-card)] bg-warning flex items-center justify-center">
-            <Rocket className="h-8 w-8 text-warning-foreground" />
+          <div className="h-12 w-12 mx-auto mb-3 rounded-[var(--radius-card)] bg-warning flex items-center justify-center">
+            <Rocket className="h-6 w-6 text-warning-foreground" />
           </div>
-          <h3 className="mb-2">No form to publish</h3>
-          <p>Generate a schema first to publish your form</p>
+          <h3 className="mb-1.5" style={{ fontSize: '13px' }}>No form to publish</h3>
+          <p style={{ fontSize: '12px' }}>Generate a schema first to publish your form</p>
         </div>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-4 w-full max-w-full overflow-hidden">
+    <div className="space-y-3 w-full max-w-full overflow-hidden">
       <div className="flex items-center justify-between">
-        <h3 className="text-foreground">Publish</h3>
+        <h3 style={{ fontSize: '13px' }}>Publish</h3>
       </div>
 
-      <Card className="p-4 bg-card border border-border rounded-[var(--radius)] w-full max-w-full overflow-hidden" style={{ boxShadow: 'var(--elevation-sm)' }}>
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <div className="space-y-3">
-              <label className="text-foreground">Environment</label>
+      <Card className="p-3 bg-card border border-border rounded-[var(--radius)] w-full max-w-full overflow-hidden" style={{ boxShadow: 'var(--elevation-sm)' }}>
+        <div className="space-y-3">
+          <div className="space-y-2.5">
+            <div className="space-y-2">
+              <label style={{ fontSize: '11px' }}>Environment</label>
               <Select
                 value={deployment.environment}
                 onValueChange={(value: any) =>
@@ -160,7 +160,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <label className="text-foreground">Status:</label>
+              <label className="text-foreground" style={{ fontSize: '11px' }}>Status:</label>
               <Badge
                 className={`rounded-[var(--radius-pill)] px-4 py-2 ${
                   deployment.status === 'deployed'
@@ -169,6 +169,7 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
                     ? 'bg-primary/70 text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground'
                 }`}
+                style={{ fontSize: '10px' }}
               >
                 {deployment.status === 'building' && (
                   <Loader2 className="h-3 w-3 mr-1 animate-spin" />
@@ -300,14 +301,26 @@ export function DeploymentPanel({ schema, mockApi }: DeploymentPanelProps) {
               </p>
 
               <Tabs defaultValue="next" className="w-full">
-                <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1">
-                  <TabsTrigger value="next" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                <TabsList className="bg-transparent rounded-none p-0 grid grid-cols-3 w-full h-10 border-b border-border">
+                  <TabsTrigger 
+                    value="next" 
+                    className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                    style={{ fontSize: '11px' }}
+                  >
                     Next.js
                   </TabsTrigger>
-                  <TabsTrigger value="react" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                  <TabsTrigger 
+                    value="react" 
+                    className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                    style={{ fontSize: '11px' }}
+                  >
                     React
                   </TabsTrigger>
-                  <TabsTrigger value="html" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+                  <TabsTrigger 
+                    value="html" 
+                    className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                    style={{ fontSize: '11px' }}
+                  >
                     HTML
                   </TabsTrigger>
                 </TabsList>
@@ -417,11 +430,19 @@ export default function MyForm() {
           </div>
 
           <Tabs defaultValue="endpoints" className="space-y-4 w-full max-w-full" style={{ boxSizing: 'border-box' }}>
-            <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1">
-              <TabsTrigger value="endpoints" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+            <TabsList className="bg-transparent rounded-none p-0 grid grid-cols-2 w-full h-10 border-b border-border">
+              <TabsTrigger 
+                value="endpoints" 
+                className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                style={{ fontSize: '11px' }}
+              >
                 Endpoints
               </TabsTrigger>
-              <TabsTrigger value="curl" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
+              <TabsTrigger 
+                value="curl" 
+                className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+                style={{ fontSize: '11px' }}
+              >
                 cURL Examples
               </TabsTrigger>
             </TabsList>

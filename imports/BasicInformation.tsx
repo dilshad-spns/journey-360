@@ -75,10 +75,10 @@ function LockUp() {
   );
 }
 
-function TextSubPage() {
+function TextSubPage({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0 w-full" data-name="Text+sub page">
-      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[#030b17] text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14" }}>
+      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14", color: isDarkMode ? '#FAFAFA' : '#030b17' }}>
         <p className="[white-space-collapse:collapse] leading-[20px] overflow-ellipsis overflow-hidden">Basic Information</p>
       </div>
     </div>
@@ -159,10 +159,10 @@ function LockUp1() {
   );
 }
 
-function TextSubPage1() {
+function TextSubPage1({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0 w-full" data-name="Text+sub page">
-      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[#030b17] text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14" }}>
+      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14", color: isDarkMode ? '#FAFAFA' : '#030b17' }}>
         <p className="[white-space-collapse:collapse] leading-[20px] overflow-ellipsis overflow-hidden">Benefit selection</p>
       </div>
     </div>
@@ -241,10 +241,10 @@ function LockUp2() {
   );
 }
 
-function TextSubPage2() {
+function TextSubPage2({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0 w-full" data-name="Text+sub page">
-      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[#030b17] text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14" }}>
+      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14", color: isDarkMode ? '#FAFAFA' : '#030b17' }}>
         <p className="[white-space-collapse:collapse] leading-[20px] overflow-ellipsis overflow-hidden">Personal details</p>
       </div>
     </div>
@@ -323,10 +323,10 @@ function LockUp3() {
   );
 }
 
-function TextSubPage3() {
+function TextSubPage3({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0 w-full" data-name="Text+sub page">
-      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[#030b17] text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14" }}>
+      <div className="flex flex-col font-['DM_Sans:Medium',sans-serif] font-medium justify-center leading-[0] overflow-ellipsis overflow-hidden relative shrink-0 text-[14px] text-center text-nowrap w-full" style={{ fontVariationSettings: "'opsz' 14", color: isDarkMode ? '#FAFAFA' : '#030b17' }}>
         <p className="[white-space-collapse:collapse] leading-[20px] overflow-ellipsis overflow-hidden">Summary</p>
       </div>
     </div>
@@ -416,9 +416,9 @@ function Avatar() {
   );
 }
 
-function PageHeader() {
+function PageHeader({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
-    <div className="box-border content-stretch flex font-['DM_Serif_Display:Regular',sans-serif] gap-[56px] items-center justify-center leading-[0] not-italic px-0 py-[8px] relative shrink-0 text-[#030b17] text-[18px] w-[475px]" data-name="Page header">
+    <div className="box-border content-stretch flex font-['DM_Serif_Display:Regular',sans-serif] gap-[56px] items-center justify-center leading-[0] not-italic px-0 py-[8px] relative shrink-0 text-[18px] w-[475px]" data-name="Page header" style={{ color: isDarkMode ? '#FAFAFA' : '#030b17' }}>
       <div className="basis-0 flex flex-col grow justify-center min-h-px min-w-px relative shrink-0">
         <p className="leading-[28px]">Benefit selection</p>
       </div>
@@ -481,10 +481,10 @@ function Group1() {
   );
 }
 
-function Frame13() {
+function Frame13({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="content-stretch flex flex-col gap-[8px] items-center relative shrink-0 w-full">
-      <p className="font-['DM_Serif_Display:Regular',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#030b17] text-[18px] text-center w-full">Life cover benefit</p>
+      <p className="font-['DM_Serif_Display:Regular',sans-serif] leading-[24px] not-italic relative shrink-0 text-[18px] text-center w-full" style={{ color: isDarkMode ? '#FAFAFA' : '#030b17' }}>Life cover benefit</p>
     </div>
   );
 }
@@ -833,7 +833,7 @@ function Frame2() {
   );
 }
 
-function Frame10() {
+function Frame10({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="basis-0 grow min-h-px min-w-px relative shrink-0 w-[1391px]">
       <div className="absolute h-[77px] left-[-12px] overflow-clip top-[-10px] w-[86px]" data-name="Component 1">
@@ -842,24 +842,24 @@ function Frame10() {
           <g id="Vector"></g>
         </svg>
       </div>
-      <Frame9 />
-      <Frame2 />
+      <Frame9 isDarkMode={isDarkMode} />
+      <Frame2 isDarkMode={isDarkMode} />
     </div>
   );
 }
 
-function Surface() {
+function Surface({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="basis-0 bg-white box-border content-stretch flex flex-col gap-[10px] grow items-start min-h-px min-w-px px-[24px] py-[22px] relative rounded-[6px] shadow-[0px_0px_1px_0px_rgba(3,11,23,0.3),0px_3px_5px_0px_rgba(3,11,23,0.2)] shrink-0" data-name="Surface">
-      <Frame10 />
+      <Frame10 isDarkMode={isDarkMode} />
     </div>
   );
 }
 
-export default function BasicInformation() {
+export default function BasicInformation({ isDarkMode = false }: { isDarkMode?: boolean }) {
   return (
     <div className="bg-[#f5f5f6] content-stretch flex flex-col gap-[10px] items-start relative size-full" data-name="Basic information">
-      <Surface />
+      <Surface isDarkMode={isDarkMode} />
     </div>
   );
 }

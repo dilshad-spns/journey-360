@@ -20,13 +20,13 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
 
   if (!tests || tests.length === 0) {
     return (
-      <Card className="p-12 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
+      <Card className="p-8 bg-card border-border rounded-[var(--radius-card)]" style={{ boxShadow: 'var(--elevation-sm)' }}>
         <div className="text-center text-muted-foreground">
-          <div className="h-16 w-16 mx-auto mb-4 rounded-[var(--radius-card)] bg-success flex items-center justify-center">
-            <TestTube2 className="h-8 w-8 text-success-foreground" />
+          <div className="h-12 w-12 mx-auto mb-3 rounded-[var(--radius-card)] bg-success flex items-center justify-center">
+            <TestTube2 className="h-6 w-6 text-success-foreground" />
           </div>
-          <h3 className="mb-2">No tests generated yet</h3>
-          <p>Generate a form schema to see auto-generated tests</p>
+          <h3 className="mb-1.5" style={{ fontSize: '13px' }}>No tests generated yet</h3>
+          <p style={{ fontSize: '12px' }}>Generate a form schema to see auto-generated tests</p>
         </div>
       </Card>
     );
@@ -51,8 +51,8 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
 
       await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
 
-      // Simulate test result (95% pass rate)
-      results[test.id] = Math.random() > 0.05 ? 'pass' : 'fail';
+      // All tests pass - no failures
+      results[test.id] = 'pass';
       setTestResults({ ...results });
       setProgress(((i + 1) / tests.length) * 100);
     }
@@ -84,13 +84,14 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
   return (
     <div className="space-y-3 w-full max-w-full overflow-y-auto">
       <div className="flex items-center justify-between gap-2 w-full max-w-full">
-        <h3 className="text-foreground truncate min-w-0 flex-1">Unit Tests</h3>
+        <h3 className="truncate min-w-0 flex-1" style={{ fontSize: '13px' }}>Unit Tests</h3>
         <div className="flex gap-2 flex-shrink-0">
           <Button
             onClick={runTests}
             disabled={runningTests}
             size="sm"
             className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary/90 transition-all"
+            style={{ fontSize: '11px' }}
           >
             <Play className="h-3 w-3 mr-1" />
             {runningTests ? 'Running...' : 'Run'}
@@ -108,21 +109,21 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
 
       {/* Test Summary */}
       <Card className="p-3 bg-card border border-border rounded-[var(--radius)] w-full max-w-full overflow-hidden">
-        <div className="space-y-3 w-full max-w-full">
+        <div className="space-y-2.5 w-full max-w-full">
           <div className="flex items-center justify-between flex-wrap gap-2 w-full max-w-full">
-            <h4 className="text-foreground">Summary</h4>
+            <h4 style={{ fontSize: '12px' }}>Summary</h4>
             <div className="flex gap-1.5 flex-wrap">
-              <Badge className="bg-primary text-primary-foreground rounded-[var(--radius-pill)] px-2 py-0.5">
+              <Badge className="bg-primary text-primary-foreground rounded-[var(--radius-pill)] px-2 py-0.5" style={{ fontSize: '10px' }}>
                 <CheckCircle className="h-3 w-3 mr-1" />
                 {passedTests}
               </Badge>
               {failedTests > 0 && (
-                <Badge className="bg-destructive text-destructive-foreground rounded-[var(--radius-pill)] px-2 py-0.5">
+                <Badge className="bg-destructive text-destructive-foreground rounded-[var(--radius-pill)] px-2 py-0.5" style={{ fontSize: '10px' }}>
                   <XCircle className="h-3 w-3 mr-1" />
                   {failedTests}
                 </Badge>
               )}
-              <Badge className="bg-muted text-muted-foreground rounded-[var(--radius-pill)] px-2 py-0.5">
+              <Badge className="bg-muted text-muted-foreground rounded-[var(--radius-pill)] px-2 py-0.5" style={{ fontSize: '10px' }}>
                 <Clock className="h-3 w-3 mr-1" />
                 {totalTests}
               </Badge>
@@ -131,7 +132,7 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
 
           {runningTests && (
             <div className="space-y-1.5 w-full max-w-full">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between" style={{ fontSize: '11px' }}>
                 <span className="text-muted-foreground">Running tests...</span>
                 <span className="text-muted-foreground">{Math.round(progress)}%</span>
               </div>
@@ -140,17 +141,17 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
           )}
 
           <div className="grid grid-cols-3 gap-2 w-full max-w-full">
-            <div className="p-3 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
-              <div className="text-muted-foreground truncate">Unit</div>
-              <div className="mt-1">{unitTests.length}</div>
+            <div className="p-2.5 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
+              <div className="text-muted-foreground truncate" style={{ fontSize: '11px' }}>Unit</div>
+              <div className="mt-1" style={{ fontSize: '13px' }}>{unitTests.length}</div>
             </div>
-            <div className="p-3 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
-              <div className="text-muted-foreground truncate">Validation</div>
-              <div className="mt-1">{validationTests.length}</div>
+            <div className="p-2.5 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
+              <div className="text-muted-foreground truncate" style={{ fontSize: '11px' }}>Validation</div>
+              <div className="mt-1" style={{ fontSize: '13px' }}>{validationTests.length}</div>
             </div>
-            <div className="p-3 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
-              <div className="text-muted-foreground truncate">Integration</div>
-              <div className="mt-1">{integrationTests.length}</div>
+            <div className="p-2.5 bg-background rounded-[var(--radius)] border border-border overflow-hidden min-w-0">
+              <div className="text-muted-foreground truncate" style={{ fontSize: '11px' }}>Integration</div>
+              <div className="mt-1" style={{ fontSize: '13px' }}>{integrationTests.length}</div>
             </div>
           </div>
         </div>
@@ -158,22 +159,36 @@ export function TestViewer({ tests, schema }: TestViewerProps) {
 
       {/* Test Cases */}
       <Tabs defaultValue="all" className="space-y-3 w-full max-w-full overflow-hidden">
-        <div className="w-full max-w-full overflow-hidden">
-          <TabsList className="bg-secondary/50 rounded-[var(--radius)] p-1 flex flex-wrap gap-1 w-full max-w-full">
-            <TabsTrigger value="all" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all whitespace-nowrap flex-1 min-w-[calc(50%-0.25rem)]">
-              All ({tests.length})
-            </TabsTrigger>
-            <TabsTrigger value="unit" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all whitespace-nowrap flex-1 min-w-[calc(50%-0.25rem)]">
-              Unit ({unitTests.length})
-            </TabsTrigger>
-            <TabsTrigger value="validation" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all whitespace-nowrap flex-1 min-w-[calc(50%-0.25rem)]">
-              Validation ({validationTests.length})
-            </TabsTrigger>
-            <TabsTrigger value="integration" className="rounded-[var(--radius)] data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all whitespace-nowrap flex-1 min-w-[calc(50%-0.25rem)]">
-              Integration ({integrationTests.length})
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <TabsList className="bg-transparent rounded-none p-0 grid grid-cols-4 w-full h-10 border-b border-border">
+          <TabsTrigger 
+            value="all" 
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
+          >
+            All ({tests.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="unit" 
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
+          >
+            Unit ({unitTests.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="validation" 
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
+          >
+            Validation ({validationTests.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="integration" 
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
+          >
+            Integration ({integrationTests.length})
+          </TabsTrigger>
+        </TabsList>
 
         <TabsContent value="all" className="space-y-2 w-full max-w-full overflow-hidden">
           {tests.map(test => (
@@ -242,11 +257,12 @@ function TestCard({ test, result }: { test: TestCase; result?: 'pass' | 'fail' |
           <div className="flex-shrink-0">{getStatusIcon()}</div>
           <div className="flex-1 min-w-0 max-w-full overflow-hidden">
             <div className="flex items-center gap-2 mb-1 flex-wrap max-w-full">
-              <h4 className="break-words overflow-wrap-anywhere">{test.description}</h4>
-              <Badge variant="outline" className="border-border rounded-[var(--radius-pill)] flex-shrink-0">
+              <h4 className="break-words overflow-wrap-anywhere" style={{ fontSize: '12px' }}>{test.description}</h4>
+              <Badge className="rounded-[var(--radius-pill)] flex-shrink-0" style={{ fontSize: '10px' }}>
                 {test.type}
               </Badge>
             </div>
+            <p className="text-muted-foreground truncate" style={{ fontSize: '11px' }}>{test.name}</p>
             {result === 'fail' && (
               <p className="text-destructive mt-1 break-words">
                 AssertionError: Expected value to match

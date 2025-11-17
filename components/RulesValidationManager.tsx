@@ -22,8 +22,11 @@ import {
   EyeOff,
   Lock,
   Unlock,
+  Sparkles,
+  Wand2,
 } from 'lucide-react';
 import { FormSchema, FieldSchema, ValidationRule } from '../types/schema';
+import { toast } from 'sonner';
 
 export interface CustomValidationRule {
   id: string;
@@ -57,6 +60,10 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
   const [editingDependency, setEditingDependency] = useState<FieldDependency | null>(null);
   const [isAddingRule, setIsAddingRule] = useState(false);
   const [isAddingDependency, setIsAddingDependency] = useState(false);
+  
+  // AI Prompt state
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // New rule form state
   const [newRule, setNewRule] = useState<Partial<CustomValidationRule>>({
@@ -185,22 +192,77 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
     }
   };
 
+  // AI Generation Handler
+  const handleGenerateWithAI = () => {
+    if (!aiPrompt.trim()) {
+      toast.error('Please enter a description for the rules you want to generate');
+      return;
+    }
+
+    setIsGenerating(true);
+
+    // Simulate AI processing
+    setTimeout(() => {
+      // Mock AI-generated rules based on the prompt
+      const generatedRules: CustomValidationRule[] = [
+        {
+          id: `rule_${Date.now()}_1`,
+          name: 'Travel Date Range Validation',
+          description: 'Ensure end date is after start date',
+          field1: 'travelStartDate',
+          field2: 'travelEndDate',
+          operator: 'before',
+          errorMessage: 'Travel end date must be after the start date',
+        },
+        {
+          id: `rule_${Date.now()}_2`,
+          name: 'Future Date Validation',
+          description: 'Travel start date must be in the future',
+          field1: 'travelStartDate',
+          operator: 'after',
+          errorMessage: 'Travel start date must be in the future',
+        },
+      ];
+
+      const generatedDependencies: FieldDependency[] = [
+        {
+          id: `dep_${Date.now()}_1`,
+          name: 'Show International Fields',
+          description: 'Show passport fields when traveling internationally',
+          sourceField: 'tripType',
+          sourceValue: 'international',
+          targetField: 'passportNumber',
+          action: 'show',
+        },
+      ];
+
+      setCustomRules([...customRules, ...generatedRules]);
+      setDependencies([...dependencies, ...generatedDependencies]);
+      setIsGenerating(false);
+      setAiPrompt('');
+      
+      toast.success(`Generated ${generatedRules.length} validation rules and ${generatedDependencies.length} dependencies`);
+    }, 2000);
+  };
+
   return (
     <div className="pb-6">
       <Tabs defaultValue="validation">
-        <TabsList className="grid w-full grid-cols-2 bg-muted rounded-[var(--radius-card)] p-1">
+        <TabsList className="bg-transparent rounded-none p-0 grid grid-cols-2 w-full h-10 border-b border-border">
           <TabsTrigger 
             value="validation" 
-            className="rounded-[var(--radius-button)] data-[state=active]:bg-card data-[state=active]:shadow-[var(--elevation-sm)]"
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
           >
-            <ShieldCheck className="h-4 w-4 mr-2 flex-shrink-0" />
+            <ShieldCheck className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" strokeWidth={1.5} />
             <span className="truncate">Validation Rules</span>
           </TabsTrigger>
           <TabsTrigger 
             value="dependencies"
-            className="rounded-[var(--radius-button)] data-[state=active]:bg-card data-[state=active]:shadow-[var(--elevation-sm)]"
+            className="rounded-none h-10 data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-secondary/50 data-[state=inactive]:text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-all"
+            style={{ fontSize: '11px' }}
           >
-            <GitBranch className="h-4 w-4 mr-2 flex-shrink-0" />
+            <GitBranch className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" strokeWidth={1.5} />
             <span className="truncate">Field Dependencies</span>
           </TabsTrigger>
         </TabsList>
@@ -209,13 +271,14 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
         <TabsContent value="validation" className="mt-6">
           <div className="flex items-start justify-between gap-4 mb-6">
             <div className="flex-1 min-w-0">
-              <h4 className="text-foreground mb-1">Custom Validation Rules</h4>
-              <p className="text-muted-foreground">Define cross-field validation logic</p>
+              <h4 className="text-foreground mb-1" style={{ fontSize: '13px' }}>Custom Validation Rules</h4>
+              <p className="text-muted-foreground" style={{ fontSize: '12px' }}>Define cross-field validation logic</p>
             </div>
             <Button
               onClick={() => setIsAddingRule(true)}
               size="sm"
               className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary/90 shadow-[var(--elevation-sm)] flex-shrink-0"
+              style={{ fontSize: '11px' }}
             >
               <Plus className="h-4 w-4 mr-1 flex-shrink-0" />
               <span className="hidden sm:inline">Add Rule</span>
@@ -229,7 +292,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
                 <Card className="p-5 bg-card border border-border rounded-[var(--radius-card)] shadow-[var(--elevation-sm)]">
                   <div className="space-y-5">
                     <div className="flex items-center justify-between gap-3">
-                      <h4 className="text-foreground truncate">New Validation Rule</h4>
+                      <h4 className="text-foreground truncate" style={{ fontSize: '13px' }}>New Validation Rule</h4>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -242,7 +305,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Rule Name</Label>
+                        <Label style={{ fontSize: '11px' }}>Rule Name</Label>
                         <Input
                           placeholder="e.g., Travel Date Validation"
                           value={newRule.name}
@@ -252,7 +315,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Description (Optional)</Label>
+                        <Label style={{ fontSize: '11px' }}>Description (Optional)</Label>
                         <Input
                           placeholder="Brief description of the rule"
                           value={newRule.description}
@@ -263,7 +326,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>First Field</Label>
+                          <Label style={{ fontSize: '11px' }}>First Field</Label>
                           <Select
                             value={newRule.field1}
                             onValueChange={(value) => setNewRule({ ...newRule, field1: value })}
@@ -282,7 +345,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
                         </div>
 
                         <div className="space-y-2">
-                          <Label>Operator</Label>
+                          <Label style={{ fontSize: '11px' }}>Operator</Label>
                           <Select
                             value={newRule.operator}
                             onValueChange={(value: any) => setNewRule({ ...newRule, operator: value })}
@@ -305,7 +368,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Second Field (Optional)</Label>
+                        <Label style={{ fontSize: '11px' }}>Second Field (Optional)</Label>
                         <Select
                           value={newRule.field2 || '__none__'}
                           onValueChange={(value) => setNewRule({ ...newRule, field2: value === '__none__' ? undefined : value })}
@@ -325,7 +388,7 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Error Message</Label>
+                        <Label style={{ fontSize: '11px' }}>Error Message</Label>
                         <Textarea
                           placeholder="e.g., Travel start date cannot be greater than end date"
                           value={newRule.errorMessage}
@@ -427,13 +490,14 @@ export function RulesValidationManager({ schema, onSchemaUpdate }: RulesValidati
         <TabsContent value="dependencies" className="mt-6">
           <div className="flex items-start justify-between gap-4 mb-6">
             <div className="flex-1 min-w-0">
-              <h4 className="text-foreground mb-1">Field Dependencies</h4>
-              <p className="text-muted-foreground">Control field behavior based on other field values</p>
+              <h4 className="text-foreground mb-1" style={{ fontSize: '13px' }}>Field Dependencies</h4>
+              <p className="text-muted-foreground" style={{ fontSize: '12px' }}>Control field behavior based on other field values</p>
             </div>
             <Button
               onClick={() => setIsAddingDependency(true)}
               size="sm"
               className="bg-primary text-primary-foreground rounded-[var(--radius-button)] hover:bg-primary/90 shadow-[var(--elevation-sm)] flex-shrink-0"
+              style={{ fontSize: '11px' }}
             >
               <Plus className="h-4 w-4 mr-1 flex-shrink-0" />
               <span className="hidden sm:inline">Add Dependency</span>
