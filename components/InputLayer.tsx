@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Sparkles, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
+import { createWhisperService, WhisperService } from '../utils/whisperService';
+import { toast } from 'sonner';
 
 interface InputLayerProps {
   onUserInput: (input: string) => void;
@@ -15,6 +17,14 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const timerRef = useRef<number | null>(null);
+  const whisperServiceRef = useRef<WhisperService | null>(null);
+
+  // Initialize Whisper service
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      whisperServiceRef.current = createWhisperService();
+    }
+  }, []);
 
   const exampleStories = [
     'Create a travel insurance quote and buy journey',
@@ -35,7 +45,17 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
     setInput(example);
   };
 
-  const toggleRecording = () => {
+  const toggleRecording = async () => {
+    if (!whisperServiceRef.current) {
+      toast.error('Speech service not initialized');
+      return;
+    }
+
+    if (!WhisperService.isSupported()) {
+      toast.error('Audio recording is not supported in this browser');
+      return;
+    }
+
     if (isRecording) {
       // Stop recording
       setIsRecording(false);
@@ -45,16 +65,51 @@ export function InputLayer({ onUserInput, isProcessing }: InputLayerProps) {
       }
       setRecordingTime(0);
       
-      // Simulate speech-to-text result
-      const simulatedText = 'Create a contact form with name, email, and message fields';
-      setInput(simulatedText);
+      toast.info('Processing audio...');
+      
+      try {
+        const audioBlob = await whisperServiceRef.current.stopRecording();
+        
+        if (audioBlob.size < 1000) {
+          toast.error('No speech detected. Please try again.');
+          return;
+        }
+
+        const result = await whisperServiceRef.current.transcribe(audioBlob);
+        
+        if (result.success && result.text) {
+          setInput(prev => prev + (prev ? ' ' : '') + result.text);
+          toast.success('Speech transcribed successfully');
+        } else {
+          toast.error(result.error || 'Failed to transcribe audio');
+        }
+      } catch (error) {
+        console.error('Error processing audio:', error);
+        toast.error('Failed to process audio. Please try again.');
+      }
     } else {
       // Start recording
-      setIsRecording(true);
-      setRecordingTime(0);
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
+      try {
+        await whisperServiceRef.current.startRecording();
+        setIsRecording(true);
+        setRecordingTime(0);
+        timerRef.current = window.setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+        toast.success('Recording... Click again to stop', {
+          duration: 3000,
+          icon: '🎤',
+        });
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        setIsRecording(false);
+        
+        if (error instanceof Error && error.message.includes('permission')) {
+          toast.error('Microphone access denied. Please enable microphone permissions.');
+        } else {
+          toast.error('Failed to start recording. Please check your microphone.');
+        }
+      }
     }
   };
 

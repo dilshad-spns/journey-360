@@ -19,6 +19,7 @@ import {
   Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { createWhisperService, WhisperService } from '../utils/whisperService';
 
 interface MainPromptScreenProps {
   onContinue: (requirements: string) => void;
@@ -30,9 +31,17 @@ export function MainPromptScreen({ onContinue }: MainPromptScreenProps) {
   const [attachments, setAttachments] = useState<Array<{ name: string; type: 'image' | 'document'; data: string }>>([]);
   const [darkMode, setDarkMode] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const whisperServiceRef = useRef<WhisperService | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Initialize Whisper service
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      whisperServiceRef.current = createWhisperService();
+    }
+  }, []);
 
   // Initialize dark mode
   useEffect(() => {
@@ -75,73 +84,63 @@ export function MainPromptScreen({ onContinue }: MainPromptScreenProps) {
   ];
 
   const handleMicrophoneToggle = async () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      toast.error('Speech recognition is not supported in this browser');
+    // Check if Whisper service is available
+    if (!whisperServiceRef.current) {
+      toast.error('Speech service not initialized');
       return;
     }
 
+    if (!WhisperService.isSupported()) {
+      toast.error('Audio recording is not supported in this browser');
+      return;
+    }
+
+    // If currently listening, stop recording and transcribe
     if (isListening) {
-      recognitionRef.current?.stop();
       setIsListening(false);
+      toast.info('Processing audio...');
+      
+      try {
+        const audioBlob = await whisperServiceRef.current.stopRecording();
+        
+        // Check if audio has content
+        if (audioBlob.size < 1000) {
+          toast.error('No speech detected. Please try again.');
+          return;
+        }
+
+        const result = await whisperServiceRef.current.transcribe(audioBlob);
+        
+        if (result.success && result.text) {
+          setRequirements(prev => prev + (prev ? ' ' : '') + result.text);
+          toast.success('Speech transcribed successfully');
+        } else {
+          toast.error(result.error || 'Failed to transcribe audio');
+        }
+      } catch (error) {
+        console.error('Error processing audio:', error);
+        toast.error('Failed to process audio. Please try again.');
+      }
       return;
     }
 
+    // Start recording
     try {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      const recognition = new SpeechRecognition();
-      
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        setIsListening(true);
-        toast.success('Listening... Speak your requirements');
-      };
-
-      recognition.onresult = (event: any) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-
-        if (finalTranscript) {
-          setRequirements(prev => prev + finalTranscript);
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-        
-        if (event.error === 'not-allowed') {
-          toast.error('Microphone access denied. Please enable microphone permissions in your browser settings.');
-        } else if (event.error === 'no-speech') {
-          toast.error('No speech detected. Please try again.');
-        } else if (event.error === 'aborted') {
-          // Silent - user stopped it
-        } else {
-          toast.error(`Speech recognition error: ${event.error}`);
-        }
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
+      await whisperServiceRef.current.startRecording();
+      setIsListening(true);
+      toast.success('Recording... Click again to stop', {
+        duration: 3000,
+        icon: '🎤',
+      });
     } catch (error) {
-      console.error('Error starting speech recognition:', error);
+      console.error('Error starting recording:', error);
       setIsListening(false);
-      toast.error('Failed to start speech recognition. Please check your microphone permissions.');
+      
+      if (error instanceof Error && error.message.includes('permission')) {
+        toast.error('Microphone access denied. Please enable microphone permissions in your browser settings.');
+      } else {
+        toast.error('Failed to start recording. Please check your microphone.');
+      }
     }
   };
 
