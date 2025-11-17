@@ -1,9 +1,29 @@
 // JSON Schema Types for AI 360 System
 
-export type FieldType = 'text' | 'email' | 'number' | 'date' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'file' | 'phone' | 'url';
+export type FieldType =
+  | "text"
+  | "email"
+  | "number"
+  | "date"
+  | "select"
+  | "textarea"
+  | "checkbox"
+  | "radio"
+  | "file"
+  | "phone"
+  | "url";
 
 export interface ValidationRule {
-  type: 'required' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'url' | 'custom';
+  type:
+    | "required"
+    | "minLength"
+    | "maxLength"
+    | "min"
+    | "max"
+    | "pattern"
+    | "email"
+    | "url"
+    | "custom";
   value?: string | number;
   message: string;
 }
@@ -11,6 +31,16 @@ export interface ValidationRule {
 export interface FieldOption {
   label: string;
   value: string;
+}
+
+export interface ApiConfig {
+  url: string;
+  method?: "GET" | "POST";
+  headers?: Record<string, string>;
+  params?: Record<string, any>;
+  dataPath?: string; // JSONPath to extract options from response (e.g., "data.countries")
+  labelKey?: string; // Key to use as label (default: "label")
+  valueKey?: string; // Key to use as value (default: "value")
 }
 
 export interface FieldSchema {
@@ -22,6 +52,7 @@ export interface FieldSchema {
   defaultValue?: any;
   validations?: ValidationRule[];
   options?: FieldOption[];
+  apiConfig?: ApiConfig; // For dynamic options from API
   description?: string;
   wizardStep?: number;
   conditional?: {
@@ -38,7 +69,7 @@ export interface FormSchema {
   submitUrl?: string;
   successMessage?: string;
   errorMessage?: string;
-  layout?: 'simple' | 'two-column' | 'carded';
+  layout?: "simple" | "two-column" | "carded";
   metadata?: {
     createdAt: string;
     userStory: string;
@@ -46,7 +77,7 @@ export interface FormSchema {
 }
 
 export interface MockApiEndpoint {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
   responseBody: any;
   statusCode: number;
@@ -56,15 +87,15 @@ export interface MockApiEndpoint {
 export interface TestCase {
   id: string;
   description: string;
-  type: 'unit' | 'integration' | 'validation';
+  type: "unit" | "integration" | "validation";
   code: string;
   fieldId?: string;
 }
 
 export interface DeploymentConfig {
-  environment: 'development' | 'staging' | 'production';
+  environment: "development" | "staging" | "production";
   url?: string;
-  status: 'draft' | 'building' | 'deployed' | 'failed';
+  status: "draft" | "building" | "deployed" | "failed";
   timestamp?: string;
 }
 
@@ -76,5 +107,5 @@ export interface AI360State {
   mockApi: MockApiEndpoint[];
   tests: TestCase[];
   deployment: DeploymentConfig;
-  activeLayer: 'input' | 'schema' | 'form' | 'tests' | 'deployment';
+  activeLayer: "input" | "schema" | "form" | "tests" | "deployment";
 }
