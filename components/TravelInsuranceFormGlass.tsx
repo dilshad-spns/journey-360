@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form@7.55.0';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -26,7 +26,7 @@ import {
   Smartphone
 } from 'lucide-react';
 import { countries, coveragePlans, addOnCoverages } from '../utils/travelInsuranceData';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { DateInput } from './DateInput';
 import { 

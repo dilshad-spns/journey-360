@@ -15,7 +15,7 @@ import {
   Tablet
 } from 'lucide-react';
 import { Toaster } from '../../components/ui/sonner';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 /**
  * Demo Integration Page
