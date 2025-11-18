@@ -1,273 +1,136 @@
-# Journey 360 – Auto-Build Deployable Journeys
+# Journey 360 - AI Form Builder
 
-AI-powered system that transforms user stories and speech input into complete, production-ready forms with UI, data bindings, mock APIs, validations, and unit tests.
+> Transform natural language and speech into production-ready forms with AI-powered generation.
 
-> **First Time Setup?** Run `npm run reorganize-docs` to organize all documentation into the `/docs` folder for better structure.
-
-## Quick Links
-
-- **[Try Live Demo Forms](http://localhost:3000)** - Explore embeddable journeys
-- **[Travel Insurance Embed](http://localhost:3000/embed/travel)** - 4-step travel form
-- **[Death Claim Embed](http://localhost:3000/embed/motor)** - 4-step claim form
-- **[Integration Demo](http://localhost:3000/demo-integration)** - Live preview with data monitoring
-- **[Code Examples](http://localhost:3000/embed)** - Copy-paste integration code
-
-## Overview
-
-Journey 360 is an 8-layer AI form generation system built with React, TypeScript, Next.js, and Tailwind CSS v4.0. It automatically generates multi-step forms with complete business logic from natural language input.
-
-### Key Features
-
-- **Multiple Input Methods**: Text, speech recognition, or file upload
-- **AI-Powered Generation**: Converts natural language to form schemas
-- **Design System Integration**: Uses CSS variables for complete customization
-- **8 Integrated Layers**: Input → Schema → UI → Bindings → Validation → API → Tests → Deployment
-- **Production-Ready**: Generates deployable forms with validations and tests
-- **Dark Mode**: Full theme support with persistence
-- **Accessible**: WCAG-compliant components
-- **Responsive**: Mobile-first design
-
-### Mock Scenarios Included
-
-1. **Travel Insurance Journey** (4 steps)
-   - Trip details, traveler info, coverage selection, payment
-2. **Death Claim Journey** (4 steps)
-   - Universal Life Product for North America Agent Portal
-
-## Tech Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **UI**: React 18, TypeScript 5
-- **Styling**: Tailwind CSS v4.0, CSS Variables
-- **Components**: shadcn/ui, Radix UI
-- **Forms**: React Hook Form 7.55
-- **Icons**: Lucide React
-- **Notifications**: Sonner
-
-## Quick Start
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Modern browser (Chrome, Edge, Safari, Firefox)
-
-### Installation
-
-**Option 1: Automated Setup (Recommended)**
+## 🚀 Quick Start
 
 ```bash
-# macOS/Linux
-chmod +x setup.sh
-./setup.sh
-
-# Windows
-setup.bat
-```
-
-**Option 2: Manual Setup**
-
-```bash
-# Clone the repository
-git clone <repository-url>
+# Clone and navigate
+git clone https://github.com/dilshad-spns/journey-360.git
 cd journey-360
 
 # Install dependencies
 npm install
 
-# Prepare build (fixes imports)
-npm run prepare-build
-
-# Organize docs (optional but recommended)
-npm run reorganize-docs
-
 # Start development server
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+**Open:** http://localhost:3000
 
-### Production Build
+## 📋 Prerequisites
 
-```bash
-# Build for production
-npm run build
+- Node.js 18+ 
+- npm 9+
+- Modern browser (Chrome, Firefox, Safari, Edge)
 
-# Start production server
-npm start
-```
+## 🎯 Key Features
 
-## Environment Variables
+- **AI Form Generation** - Natural language to form conversion
+- **Speech-to-Text** - Voice input with Whisper API
+- **Multi-step Forms** - 4 stepper types, 3 layouts
+- **Embeddable** - iframe or React component integration
+- **Dark Mode** - Full theme support
 
-Create a `.env.local` file in the root directory:
+## 📖 Available Pages
 
-```bash
-# AI Service Configuration (Future Integration)
-NEXT_PUBLIC_AI_SERVICE_URL=https://api.your-ai-service.com
-NEXT_PUBLIC_AI_SERVICE_API_KEY=your_api_key_here
+| Page | URL | Description |
+|------|-----|-------------|
+| Home | http://localhost:3000 | Main form builder |
+| Travel Demo | http://localhost:3000/embed/travel | 4-step travel form |
+| Claim Demo | http://localhost:3000/embed/motor | 4-step claim form |
+| Builder | http://localhost:3000/builder | Visual form editor |
+| Diagnostics | http://localhost:3000/diagnostics | Test AI configuration |
 
-# AI Model Settings
-NEXT_PUBLIC_AI_MODEL=gpt-4
-NEXT_PUBLIC_AI_MAX_TOKENS=2000
-NEXT_PUBLIC_AI_TEMPERATURE=0.7
-
-# Optional: Enable AI features
-NEXT_PUBLIC_ENABLE_AI_PARSER=false
-```
-
-See [ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md) for details.
-
-## Design System
-
-The project uses CSS variables defined in `/styles/globals.css` for complete design system control:
-
-- **Colors**: `--color-primary`, `--color-accent`, etc.
-- **Spacing**: `--spacing-xs` to `--spacing-2xl`
-- **Borders**: `--border-width`, `--border-color`
-- **Radius**: `--radius-button`, `--radius-card`, `--radius-input`, `--radius-pill`
-- **Typography**: Inter font family with defined weights and sizes
-
-### Customization
-
-Update design tokens in `/styles/globals.css`:
-
-```css
-:root {
-  --color-primary: 33 150 243;
-  --radius-button: 8px;
-  --font-family: 'Inter', sans-serif;
-}
-```
-
-All components automatically use these variables.
-
-## Project Structure
-
-```
-├── app/                    # Next.js app router pages
-├── components/             # React components
-│   ├── ui/                # shadcn/ui components
-│   └── figma/             # Figma import components
-├── imports/               # Figma design imports
-├── utils/                 # Utilities (AI parser, mock API, tests)
-├── types/                 # TypeScript type definitions
-└── styles/                # Global styles and CSS variables
-```
-
-## Available Scripts
+## ⚙️ Commands
 
 ```bash
 npm run dev              # Start development server
 npm run build            # Build for production
-npm start                # Start production server
-npm run lint             # Run ESLint
-npm run prepare-build    # Fix imports before build
+npm start                # Run production server
+npm run prepare-build    # Fix import paths
+npm run reorganize-docs  # Organize documentation
 ```
 
-## Features
+## 🔐 Environment Variables (Optional)
 
-### Input Layer
-- Rich text editor with formatting
-- Speech-to-text with microphone permission handling
-- File upload (PDF, DOCX, TXT)
-- Grammar correction and AI suggestions
+Create `.env.local` to enable AI features:
 
-### Schema Generation
-- Automatic field detection from natural language
-- Validation rule generation
-- Multi-step wizard configuration
-- Conditional logic support
+```env
+# Speech-to-Text
+NEXT_PUBLIC_WHISPER_API_KEY=your_whisper_key
+NEXT_PUBLIC_WHISPER_ENDPOINT=your_whisper_endpoint
 
-### Form Rendering
-- 4 stepper types: Dots, Numbers, Progress, Breadcrumb
-- 3 layout templates: Simple, Two-Column, Carded
-- 3 spacing options: Compact, Comfortable, Spacious
-- 3 border radius styles: Sharp, Rounded, Pill
-- Responsive and accessible
+# AI Form Generation
+AZURE_OPENAI_API_KEY=your_openai_key
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-02-15-preview
+```
 
-### Embeddable Forms
-- **Travel Insurance Journey**: `/embed/travel` - 4-step travel insurance form
-- **Death Claim Journey**: `/embed/motor` - 4-step claim submission form
-- **Integration Demo**: `/demo-integration` - Live preview with data monitoring
-- **Code Examples**: `/embed` - Copy-paste integration code
-- iframe and React component integration support
-- Real-time postMessage communication
-- See [Embed Integration Guide](./docs/EMBED_INTEGRATION.md)
+**Get API Keys:** [Azure Portal](https://portal.azure.com) → OpenAI Resource → Keys and Endpoint
 
-### Mock API
-- Auto-generated endpoints
-- Configurable response delays
-- Status code simulation
+**Test Configuration:** http://localhost:3000/diagnostics
 
-### Testing
-- Auto-generated unit tests
-- Validation tests
-- Integration tests
+## 🔧 Troubleshooting
 
-## Browser Support
+### Common Issues
 
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-- Opera 76+
+**Port 3000 in use:**
+```bash
+$env:PORT=3001; npm run dev
+```
 
-**Note**: Speech recognition requires HTTPS (or localhost for development).
-
-## Troubleshooting
-
-### Build Fails with Import Errors
-
+**Module not found errors:**
 ```bash
 npm run prepare-build
+npm install
+```
+
+**Build fails:**
+```bash
+rm -rf .next node_modules package-lock.json
 npm install
 npm run build
 ```
 
-### TypeScript Errors
+**AI Features (403 Error):**
+1. Visit http://localhost:3000/diagnostics
+2. Check deployment name matches Azure Portal exactly (case-sensitive!)
+3. Verify "Cognitive Services OpenAI User" role in Azure
+4. Restart: `npm run dev`
 
-```bash
-npx tsc --noEmit
+### Need Help?
+
+- **Documentation:** [/docs](./docs) folder
+- **Troubleshooting Guide:** [/docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md)
+- **Environment Setup:** [/docs/ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md)
+
+## 🏗️ Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **UI:** React 18, TypeScript 5
+- **Styling:** Tailwind CSS v4.0
+- **Forms:** React Hook Form 7.55
+- **AI:** Azure OpenAI (Whisper, GPT-4o)
+
+## 📁 Project Structure
+
+```
+├── app/                 # Next.js pages
+├── components/          # React components
+├── utils/              # Utilities & AI services
+├── hooks/              # Custom hooks
+├── types/              # TypeScript types
+├── styles/             # Global styles
+└── docs/               # Documentation
 ```
 
-### Clear Cache
 
-```bash
-rm -rf .next node_modules package-lock.json
-npm install
-```
-
-See [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) for more details.
-
-## Documentation
-
-### Getting Started
-- [Installation Guide](./docs/INSTALLATION.md) - Complete setup instructions
-- [Quick Start Guide](./docs/QUICK_START_GUIDE.md) - Get running in 5 minutes
-- [Commands Reference](./docs/COMMANDS.md) - All available commands
-
-### Configuration
-- [Environment Variables](./docs/ENVIRONMENT_VARIABLES.md) - AI service setup
-- [Design System](./styles/globals.css) - CSS variables and tokens
-
-### Build & Deploy
-- [Build Checklist](./docs/BUILD_CHECKLIST.md) - Pre-build verification
-- [Deployment Guide](./docs/DEPLOYMENT.md) - Production deployment
-- [Troubleshooting](./docs/TROUBLESHOOTING.md) - Common issues
-
-### Reference
-- [Project Overview](./docs/PROJECT_OVERVIEW.md) - Architecture details
-- [Stepper Types Guide](./docs/STEPPER_TYPES_GUIDE.md) - Form stepper options
-- [Mock Scenarios](./docs/MOCK_SCENARIO_SUMMARY.md) - Sample forms included
-
-**[View All Documentation →](./docs/)**
-
-## Contributing
-
-This is an internal team project. Contributions follow team guidelines in `/guidelines/Guidelines.md`.
-
-## License
+## 📄 License
 
 Proprietary - Internal Use Only
 
 ---
 
-**Built with care for Journey 360 Team**
+**Built by Journey 360 Team** | [Documentation](./docs) | [Diagnostics](http://localhost:3000/diagnostics)
